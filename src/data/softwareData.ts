@@ -15,17 +15,26 @@ export const APP_VERSION = '0.8.29';
 export const FALLBACK_VERSION = '0.8.28';
 
 /**
- * Origem de onde os instaladores são servidos. Vem do ambiente de build
- * (`VITE_DOWNLOAD_ORIGIN`) e não é versionada: assim o repositório não
- * documenta a infraestrutura de distribuição, e trocar de endpoint não exige
- * um commit. Sem ela, os CTAs abrem só as instruções de instalação.
+ * Origem de onde os instaladores são servidos.
+ *
+ * O padrão é o endpoint público atual, para que o download funcione em
+ * qualquer deploy sem configuração. `VITE_DOWNLOAD_ORIGIN` sobrescreve quando
+ * definida — é por ali que se aponta para um domínio próprio, sem alterar
+ * código.
+ *
+ * Este endereço é público por natureza: ele acaba no bundle de qualquer forma,
+ * porque o navegador precisa dele para baixar o arquivo. Não é lugar de nada
+ * que precise ficar em segredo.
  */
-const RELEASE_FEED = (import.meta.env.VITE_DOWNLOAD_ORIGIN ?? '').replace(/\/+$/, '');
+const DEFAULT_RELEASE_FEED = 'https://pub-923c8384ed884da3b04baf53118725a1.r2.dev';
+
+const RELEASE_FEED = (import.meta.env.VITE_DOWNLOAD_ORIGIN || DEFAULT_RELEASE_FEED).replace(
+  /\/+$/,
+  ''
+);
 
 const dmgUrl = (version: string) =>
-  RELEASE_FEED
-    ? `${RELEASE_FEED}/stable/versions/${version}/vision-design-${version}-mac-arm64.dmg`
-    : '';
+  `${RELEASE_FEED}/stable/versions/${version}/vision-design-${version}-mac-arm64.dmg`;
 
 /**
  * Duas versões ficam sempre disponíveis. A atual é o alvo da atualização

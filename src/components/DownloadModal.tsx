@@ -144,33 +144,27 @@ export const DownloadModal: React.FC<DownloadModalProps> = ({ isOpen, onClose, s
                 </p>
               </div>
 
-              {DOWNLOAD_URL ? (
-                <div className="space-y-2.5">
+              <div className="space-y-2.5">
+                <a
+                  href={DOWNLOAD_URL}
+                  download
+                  className="w-full py-3.5 rounded-xl bg-accent hover:bg-accent-strong text-ink-deep font-semibold text-sm shadow-lg shadow-accent/20 transition-colors flex items-center justify-center gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  Baixar o instalador ({option.fileSize})
+                </a>
+                <p className="text-center text-xs text-soft pt-1 leading-relaxed">
+                  Precisa voltar atrás? A versão {FALLBACK_VERSION} continua disponível{' '}
                   <a
-                    href={DOWNLOAD_URL}
-                    download
-                    className="w-full py-3.5 rounded-xl bg-accent hover:bg-accent-strong text-ink-deep font-semibold text-sm shadow-lg shadow-accent/20 transition-colors flex items-center justify-center gap-2"
+                    href="#downloads"
+                    onClick={onClose}
+                    className="text-muted hover:text-accent-strong underline underline-offset-2 transition-colors"
                   >
-                    <Download className="w-4 h-4" />
-                    Baixar o instalador ({option.fileSize})
+                    na central de downloads
                   </a>
-                  <p className="text-center text-xs text-soft pt-1 leading-relaxed">
-                    Precisa voltar atrás? A versão {FALLBACK_VERSION} continua disponível{' '}
-                    <a
-                      href="#downloads"
-                      onClick={onClose}
-                      className="text-muted hover:text-accent-strong underline underline-offset-2 transition-colors"
-                    >
-                      na central de downloads
-                    </a>
-                    .
-                  </p>
-                </div>
-              ) : (
-                <p className="text-xs text-muted text-center leading-relaxed border-t border-cream/10 pt-4">
-                  O link público de download ainda não está configurado neste site.
+                  .
                 </p>
-              )}
+              </div>
             </>
           ) : (
             <>

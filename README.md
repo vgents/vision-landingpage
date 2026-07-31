@@ -52,11 +52,15 @@ isso em vez de prometer o contrário.
 
 | Variável | Obrigatória | Para quê |
 | --- | --- | --- |
-| `VITE_DOWNLOAD_ORIGIN` | Para os downloads funcionarem | Origem de onde os instaladores são servidos, sem barra no fim |
+| `VITE_DOWNLOAD_ORIGIN` | Não | Sobrescreve a origem de onde os instaladores são servidos, sem barra no fim |
 
-Defina no painel do provedor de deploy e em um `.env.local` para desenvolvimento. **Não versione
-esse valor.** Sem ele, o site funciona normalmente e os botões de download passam a abrir apenas as
-instruções de instalação, em vez de apontarem para um link quebrado.
+O site funciona sem configuração nenhuma: a origem padrão está em `DEFAULT_RELEASE_FEED`, em
+`src/data/softwareData.ts`. Defina a variável apenas para apontar para outro endpoint — um domínio
+próprio, por exemplo — sem precisar mexer no código.
+
+Esse endereço é público por natureza: ele acaba no bundle de qualquer forma, porque o navegador
+precisa dele para baixar o arquivo. Não é lugar para nada que precise ficar em segredo, e a
+variável de ambiente não o torna secreto.
 
 ## Publicando uma versão nova
 
