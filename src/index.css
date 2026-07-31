@@ -2,8 +2,8 @@
 
 /*
  * Vision Design — tokens de marca.
- * Espelham o dark mode do app (apps/web/src/index.css do repo do produto):
- * superfícies quentes quase-neutras + um único acento terracota.
+ * Espelham o dark mode do aplicativo: superfícies quentes quase-neutras
+ * com um único acento terracota.
  */
 @theme {
   --font-sans: 'Cairo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;

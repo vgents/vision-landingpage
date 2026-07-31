@@ -8,21 +8,24 @@ import {
   SecondaryFeature
 } from '../types';
 
-/** Versão empacotada — fonte: apps/packaged/package.json do repo do produto. */
+/** Versão publicada como atual. */
 export const APP_VERSION = '0.8.29';
 
 /** Versão anterior, mantida no ar como recuo caso a atual apresente problema. */
 export const FALLBACK_VERSION = '0.8.28';
 
-const RELEASE_FEED = 'https://pub-923c8384ed884da3b04baf53118725a1.r2.dev';
-
 /**
- * Artefatos canônicos publicados por `tools-pack publish` no canal stable — os
- * mesmos que o app instalado consulta para se atualizar. Não hospede cópias à
- * parte: estes são os arquivos com .sha256 e metadata.json ao lado.
+ * Origem de onde os instaladores são servidos. Vem do ambiente de build
+ * (`VITE_DOWNLOAD_ORIGIN`) e não é versionada: assim o repositório não
+ * documenta a infraestrutura de distribuição, e trocar de endpoint não exige
+ * um commit. Sem ela, os CTAs abrem só as instruções de instalação.
  */
+const RELEASE_FEED = (import.meta.env.VITE_DOWNLOAD_ORIGIN ?? '').replace(/\/+$/, '');
+
 const dmgUrl = (version: string) =>
-  `${RELEASE_FEED}/stable/versions/${version}/vision-design-${version}-mac-arm64.dmg`;
+  RELEASE_FEED
+    ? `${RELEASE_FEED}/stable/versions/${version}/vision-design-${version}-mac-arm64.dmg`
+    : '';
 
 /**
  * Duas versões ficam sempre disponíveis. A atual é o alvo da atualização
@@ -38,7 +41,6 @@ export const RELEASES: ReleaseOption[] = [
     description:
       'A versão mais recente, com as últimas correções e novidades. É para cá que o app se atualiza sozinho — instale esta se você não tem motivo para escolher a outra.',
     url: dmgUrl(APP_VERSION),
-    sha256Url: `${dmgUrl(APP_VERSION)}.sha256`,
     autoUpdate: true
   },
   {
@@ -50,16 +52,14 @@ export const RELEASES: ReleaseOption[] = [
     description:
       'A versão anterior, já rodada por mais tempo. Instale por cima da atual se encontrar um problema que impeça o seu trabalho, e nos conte o que aconteceu.',
     url: dmgUrl(FALLBACK_VERSION),
-    sha256Url: `${dmgUrl(FALLBACK_VERSION)}.sha256`,
     autoUpdate: false
   }
 ];
 
-/** Atalhos para a versão atual — usados pelos CTAs principais. */
+/** Atalho para a versão atual — usado pelos CTAs principais. */
 export const DOWNLOAD_URL = RELEASES[0].url;
-export const DOWNLOAD_SHA256_URL = RELEASES[0].sha256Url;
 
-/** Contagens reais, conferidas por listagem de diretórios no repo do produto. */
+/** Contagens de catálogo exibidas no site. */
 export const CATALOG = {
   designSystems: 151,
   skills: 134,

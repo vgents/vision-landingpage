@@ -3,7 +3,6 @@ import { X, Download, Apple, Terminal, Monitor, ShieldAlert, Clock } from 'lucid
 import {
   DOWNLOAD_OPTIONS,
   DOWNLOAD_URL,
-  DOWNLOAD_SHA256_URL,
   FALLBACK_VERSION,
   APP_VERSION
 } from '../data/softwareData';
@@ -154,14 +153,6 @@ export const DownloadModal: React.FC<DownloadModalProps> = ({ isOpen, onClose, s
                   >
                     <Download className="w-4 h-4" />
                     Baixar o instalador ({option.fileSize})
-                  </a>
-                  <a
-                    href={DOWNLOAD_SHA256_URL}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="block text-center text-xs text-muted hover:text-accent-strong transition-colors"
-                  >
-                    Conferir o SHA-256 do arquivo
                   </a>
                   <p className="text-center text-xs text-soft pt-1 leading-relaxed">
                     Precisa voltar atrás? A versão {FALLBACK_VERSION} continua disponível{' '}

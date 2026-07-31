@@ -167,27 +167,28 @@ export const DownloadCenter: React.FC<DownloadCenterProps> = ({ onOpenDownload, 
                   {release.description}
                 </p>
 
-                <a
-                  href={release.url}
-                  download
-                  className={`w-full py-3 rounded-xl font-semibold text-sm transition-colors flex items-center justify-center gap-2 ${
-                    release.autoUpdate
-                      ? 'bg-accent hover:bg-accent-strong text-ink-deep shadow-lg shadow-accent/20'
-                      : 'bg-cream/5 hover:bg-cream/10 border border-cream/15 text-cream'
-                  }`}
-                >
-                  <Download className="w-4 h-4" />
-                  Baixar {release.version} · {release.fileSize}
-                </a>
-
-                <a
-                  href={release.sha256Url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="min-h-10 flex items-center justify-center text-xs text-muted hover:text-accent-strong transition-colors mt-1"
-                >
-                  Conferir SHA-256
-                </a>
+                {release.url ? (
+                  <a
+                    href={release.url}
+                    download
+                    className={`w-full py-3 rounded-xl font-semibold text-sm transition-colors flex items-center justify-center gap-2 ${
+                      release.autoUpdate
+                        ? 'bg-accent hover:bg-accent-strong text-ink-deep shadow-lg shadow-accent/20'
+                        : 'bg-cream/5 hover:bg-cream/10 border border-cream/15 text-cream'
+                    }`}
+                  >
+                    <Download className="w-4 h-4" />
+                    Baixar {release.version} · {release.fileSize}
+                  </a>
+                ) : (
+                  <button
+                    onClick={() => onOpenDownload('mac')}
+                    className="w-full py-3 rounded-xl bg-cream/5 hover:bg-cream/10 border border-cream/15 text-cream font-medium text-sm transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Download className="w-4 h-4" />
+                    Como instalar a {release.version}
+                  </button>
+                )}
               </div>
             ))}
           </div>

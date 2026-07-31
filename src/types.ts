@@ -26,7 +26,6 @@ export interface ReleaseOption {
   tagline: string;
   description: string;
   url: string;
-  sha256Url: string;
   /** Se a atualização automática aponta para esta versão. */
   autoUpdate: boolean;
 }

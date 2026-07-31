@@ -40,39 +40,34 @@ requisitos, funcionalidades e FAQ saem dali — os componentes só renderizam.
 
 ## Fidelidade ao produto
 
-O conteúdo descreve o que existe de fato no app. Ao atualizar, confira contra a fonte da verdade no
-repositório do produto:
-
-| Informação | Onde conferir |
-| --- | --- |
-| Versão empacotada | `apps/packaged/package.json` |
-| Mínimo de macOS | `Info.plist` do app, chave `LSMinimumSystemVersion` |
-| Contagens do catálogo | diretórios `design-systems/`, `skills/`, `design-templates/` |
-| CLIs de agente reconhecidos | `apps/web/public/agent-icons/` |
+O conteúdo descreve o que existe de fato no aplicativo. Ao atualizar qualquer número — versão,
+requisito mínimo, contagem de catálogo —, confira antes contra o próprio produto, nunca contra uma
+versão anterior deste site.
 
 Duas coisas que o site deliberadamente **não** afirma, por falta de dado verificável: mínimos de
 RAM, CPU e GPU; e notarização pela Apple — a build usa assinatura própria, e o texto do site diz
 isso em vez de prometer o contrário.
 
-## Distribuição do instalador
+## Configuração
 
-O DMG é servido pelo feed de releases em Cloudflare R2 — o mesmo bucket
-(`visiondesign-releases`) que o app instalado consulta para se atualizar. O site aponta para os
-artefatos canônicos publicados por `tools-pack publish`, nunca para cópias próprias.
+| Variável | Obrigatória | Para quê |
+| --- | --- | --- |
+| `VITE_DOWNLOAD_ORIGIN` | Para os downloads funcionarem | Origem de onde os instaladores são servidos, sem barra no fim |
 
-**O site mantém sempre duas versões no ar:**
+Defina no painel do provedor de deploy e em um `.env.local` para desenvolvimento. **Não versione
+esse valor.** Sem ele, o site funciona normalmente e os botões de download passam a abrir apenas as
+instruções de instalação, em vez de apontarem para um link quebrado.
+
+## Publicando uma versão nova
+
+O site mantém sempre duas versões disponíveis:
 
 | Rótulo | Constante | Papel |
 | --- | --- | --- |
 | Atual | `APP_VERSION` | Alvo da atualização automática. É o download padrão. |
 | Estável | `FALLBACK_VERSION` | Versão anterior, para quem precisar voltar atrás. |
 
-Ao publicar uma versão nova, desloque as duas em `src/data/softwareData.ts`: a `APP_VERSION` antiga
-vira a nova `FALLBACK_VERSION`. As URLs são derivadas das versões, seguindo o caminho do bucket
-`stable/versions/<versão>/vision-design-<versão>-mac-arm64.dmg` — não há link para editar à mão.
-
-Antes de deslocar, confirme que os dois artefatos respondem no feed público, incluindo os `.sha256`
-que o site expõe para conferência.
-
-> O Supabase Storage do projeto não serve para isso: o plano Free limita cada arquivo a 50 MB e o
-> instalador tem 279 MB. R2 também não cobra egress, o que importa num binário desse tamanho.
+Desloque as duas em `src/data/softwareData.ts`: a `APP_VERSION` antiga vira a nova
+`FALLBACK_VERSION`. As URLs são derivadas dessas constantes, então não há link para editar à mão —
+o que também significa que uma versão sem artefato publicado vira um download quebrado. Confirme
+que ambas respondem antes de fazer o deploy.

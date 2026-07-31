@@ -8,9 +8,9 @@ interface VisionLogoProps {
 
 /**
  * Marca do Vision Design: quatro cantos de crop mark (enquadramento) com um
- * asterisco de oito pontas no centro. Reproduz apps/web/public/logo.svg do
- * repo do produto, com a moldura em currentColor para funcionar sobre fundo
- * escuro — no original ela é #1F1B16, pensada para fundo claro.
+ * asterisco de oito pontas no centro. Reproduz a marca do aplicativo, com a
+ * moldura em currentColor para funcionar sobre fundo escuro — no original ela
+ * é #1F1B16, pensada para fundo claro.
  */
 export const VisionLogo: React.FC<VisionLogoProps> = ({ size = 40, className = '' }) => (
   <svg
