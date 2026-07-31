@@ -1,0 +1,173 @@
+@import "tailwindcss";
+
+/*
+ * Vision Design — tokens de marca.
+ * Espelham o dark mode do app (apps/web/src/index.css do repo do produto):
+ * superfícies quentes quase-neutras + um único acento terracota.
+ */
+@theme {
+  --font-sans: 'Cairo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-heading: 'Cairo', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Superfícies */
+  --color-ink: #1a1917;
+  --color-ink-deep: #131211;
+  --color-panel: #222120;
+  --color-subtle: #272523;
+  --color-elevated: #2a2825;
+
+  /* Texto */
+  --color-cream: #e8e4dc;
+  --color-cream-strong: #f2ede4;
+  --color-muted: #9a9690;
+  --color-soft: #6e6b65;
+  --color-faint: #4e4b46;
+
+  /* Acento */
+  --color-accent: #d97a56;
+  --color-accent-strong: #e8896a;
+  --color-accent-soft: #3d2318;
+  --color-accent-tint: #2e1a12;
+
+  /* Semânticos — estado, não marca */
+  --color-ok: #6fbf87;
+  --color-info: #8aa5f0;
+  --color-warn: #e0a95c;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--color-ink);
+    color: var(--color-cream);
+  }
+
+  h1, h2, h3, .font-heading {
+    font-family: var(--font-heading);
+    letter-spacing: -0.015em;
+  }
+
+  /* O header é fixo: sem isso, a navegação por âncora esconde o topo da seção. */
+  section[id] {
+    scroll-margin-top: 5.5rem;
+  }
+
+  /* Respeita quem pediu menos movimento — o site tem canvas animado e vários pulses. */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Superfícies de vidro */
+.glass-panel {
+  background: rgba(34, 33, 32, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(232, 228, 220, 0.09);
+}
+
+.glass-card {
+  background: rgba(39, 37, 35, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(232, 228, 220, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.35);
+}
+
+.glass-card-hover {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card-hover:hover {
+  background: rgba(42, 40, 37, 0.62);
+  border-color: rgba(217, 122, 86, 0.32);
+  box-shadow: 0 12px 40px -10px rgba(217, 122, 86, 0.22);
+  transform: translateY(-2px);
+}
+
+/*
+ * Nomes herdados do scaffold: mantidos de propósito para não reescrever
+ * todos os componentes de uma vez. O gradiente agora é quente.
+ */
+.text-gradient-aurora {
+  background: linear-gradient(100deg, #f2ede4 0%, #e8896a 45%, #d97a56 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-purple {
+  background: linear-gradient(135deg, #f2ede4 0%, #e8896a 60%, #d97a56 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.bg-aurora-glow {
+  background: radial-gradient(
+    circle at 50% 20%,
+    rgba(217, 122, 86, 0.16) 0%,
+    rgba(224, 169, 92, 0.08) 35%,
+    rgba(26, 25, 23, 0) 70%
+  );
+}
+
+.border-glow {
+  position: relative;
+}
+
+.border-glow::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(
+    90deg,
+    rgba(217, 122, 86, 0.5),
+    rgba(224, 169, 92, 0.4),
+    rgba(217, 122, 86, 0.2)
+  );
+  border-radius: inherit;
+  z-index: -1;
+  opacity: 0.6;
+  filter: blur(2px);
+}
+
+/* Rolagem horizontal contida — usado em barras de abas no mobile */
+.scroll-x {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.scroll-x::-webkit-scrollbar {
+  display: none;
+}
+
+/* Foco visível e consistente em toda a página */
+:where(a, button, input, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-ink-deep);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(217, 122, 86, 0.28);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(217, 122, 86, 0.5);
+}
