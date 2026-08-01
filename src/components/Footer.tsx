@@ -26,7 +26,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDownload }) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10 mb-12">
           <div className="sm:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
-              <VisionLogo size={34} className="text-cream" />
+              <VisionLogo size={34} />
               <span className="font-heading text-xl text-cream-strong">
                 Vision <span className="font-semibold text-accent">Design</span>
               </span>

@@ -63,7 +63,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDownload, detectedOS }) =>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between gap-4">
           <a href="#" className="flex items-center gap-3 group shrink-0" aria-label="Vision Design, início">
-            <VisionLogo size={36} className="text-cream group-hover:text-cream-strong transition-colors" />
+            <VisionLogo size={36} className="transition-transform duration-300 group-hover:scale-105" />
             <span className="flex flex-col leading-none">
               <span className="font-heading text-lg sm:text-xl text-cream-strong">
                 Vision <span className="font-semibold text-accent">Design</span>
