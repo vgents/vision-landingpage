@@ -1,18 +1,15 @@
 import {
-  DownloadOption,
   FeatureItem,
   FaqItem,
   LibraryHighlight,
-  ReleaseOption,
-  RequirementItem,
   SecondaryFeature
 } from '../types';
 
 /** Versão publicada como atual. */
-export const APP_VERSION = '0.8.29';
+export const APP_VERSION = '0.8.30';
 
 /** Versão anterior, mantida no ar como recuo caso a atual apresente problema. */
-export const FALLBACK_VERSION = '0.8.28';
+export const FALLBACK_VERSION = '0.8.29';
 
 /**
  * Origem de onde os instaladores são servidos.
@@ -28,45 +25,9 @@ export const FALLBACK_VERSION = '0.8.28';
  */
 const DEFAULT_RELEASE_FEED = 'https://pub-923c8384ed884da3b04baf53118725a1.r2.dev';
 
-const RELEASE_FEED = (import.meta.env.VITE_DOWNLOAD_ORIGIN || DEFAULT_RELEASE_FEED).replace(
-  /\/+$/,
-  ''
-);
-
-const dmgUrl = (version: string) =>
-  `${RELEASE_FEED}/stable/versions/${version}/vision-design-${version}-mac-arm64.dmg`;
-
-/**
- * Duas versões ficam sempre disponíveis. A atual é o alvo da atualização
- * automática; a anterior existe para quem precisar voltar atrás.
- */
-export const RELEASES: ReleaseOption[] = [
-  {
-    id: 'atual',
-    label: 'Atual',
-    version: APP_VERSION,
-    fileSize: '292 MB',
-    tagline: 'Alvo da atualização automática',
-    description:
-      'A versão mais recente, com as últimas correções e novidades. É para cá que o app se atualiza sozinho — instale esta se você não tem motivo para escolher a outra.',
-    url: dmgUrl(APP_VERSION),
-    autoUpdate: true
-  },
-  {
-    id: 'estavel',
-    label: 'Estável',
-    version: FALLBACK_VERSION,
-    fileSize: '292 MB',
-    tagline: 'Recuo, se algo der errado',
-    description:
-      'A versão anterior, já rodada por mais tempo. Instale por cima da atual se encontrar um problema que impeça o seu trabalho, e nos conte o que aconteceu.',
-    url: dmgUrl(FALLBACK_VERSION),
-    autoUpdate: false
-  }
-];
-
-/** Atalho para a versão atual — usado pelos CTAs principais. */
-export const DOWNLOAD_URL = RELEASES[0].url;
+export const RELEASE_FEED = (
+  import.meta.env.VITE_DOWNLOAD_ORIGIN || DEFAULT_RELEASE_FEED
+).replace(/\/+$/, '');
 
 /** Contagens de catálogo exibidas no site. */
 export const CATALOG = {
@@ -76,41 +37,6 @@ export const CATALOG = {
   agentClis: 18,
   locales: 19
 };
-
-export const DOWNLOAD_OPTIONS: DownloadOption[] = [
-  {
-    id: 'mac-arm64',
-    os: 'mac',
-    osName: 'macOS 12 Monterey ou superior',
-    status: 'available',
-    version: APP_VERSION,
-    fileSize: '292 MB',
-    fileFormat: 'Imagem .DMG',
-    arch: 'Apple Silicon (M1–M4) e Intel',
-    requirements: 'macOS 12.0+ · ~1 GB livres em disco · um CLI de agente instalado ou chave própria de modelo',
-    badge: 'Disponível'
-  },
-  {
-    id: 'linux-appimage',
-    os: 'linux',
-    osName: 'Linux (AppImage)',
-    status: 'coming-soon',
-    fileFormat: 'Executável .AppImage',
-    arch: 'x86_64',
-    requirements: 'Integração de ícone e atalho via ~/.local/share',
-    comingSoonNote: 'Build existe, mas está atrás da versão do macOS. Publicação pareada em preparação.'
-  },
-  {
-    id: 'windows-nsis',
-    os: 'windows',
-    osName: 'Windows 10 / 11',
-    status: 'coming-soon',
-    fileFormat: 'Instalador NSIS',
-    arch: 'x64',
-    requirements: 'Instalação por usuário, sem exigir privilégio de administrador',
-    comingSoonNote: 'Empacotamento pronto no código; ainda sem binário publicado.'
-  }
-];
 
 export const FEATURE_ITEMS: FeatureItem[] = [
   {
@@ -238,39 +164,6 @@ export const LIBRARY_HIGHLIGHTS: LibraryHighlight[] = [
   }
 ];
 
-export const REQUIREMENTS: RequirementItem[] = [
-  {
-    label: 'Sistema operacional',
-    value: 'macOS 12.0 Monterey ou superior',
-    note: 'Linux e Windows em preparação',
-    icon: 'Monitor'
-  },
-  {
-    label: 'Arquitetura',
-    value: 'Apple Silicon (M1 a M4) e Intel',
-    note: 'Binário universal, sem Rosetta',
-    icon: 'Cpu'
-  },
-  {
-    label: 'Espaço em disco',
-    value: 'Cerca de 1 GB',
-    note: 'Instalador de 292 MB, mais os seus projetos',
-    icon: 'HardDrive'
-  },
-  {
-    label: 'Motor de IA',
-    value: 'Um CLI de agente instalado no PATH',
-    note: `O app detecta ${CATALOG.agentClis} CLIs — entre eles Claude Code, Codex, Gemini CLI, Cursor Agent, Copilot CLI e OpenCode`,
-    icon: 'Terminal'
-  },
-  {
-    label: 'Alternativa ao CLI',
-    value: 'Sua própria chave de modelo',
-    note: 'Anthropic, OpenAI, Azure ou Google, configurada no app',
-    icon: 'KeyRound'
-  }
-];
-
 export const FAQ_ITEMS: FaqItem[] = [
   {
     id: 'faq-ia',
@@ -291,21 +184,29 @@ export const FAQ_ITEMS: FaqItem[] = [
     category: 'Dados',
     question: 'Onde ficam os meus arquivos?',
     answer:
-      'Em disco, na sua conta local, sob ~/Library/Application Support/Vision Design. Cada projeto é uma pasta comum, com as telas em HTML, os assets, a inception e os documentos. Publicar na nuvem é opcional e seletivo — você marca o que vai junto e o resto não sai da máquina.'
+      'Em disco, na sua conta local: no macOS sob ~/Library/Application Support/Vision Design, no Windows sob %APPDATA%\\Vision Design. Cada projeto é uma pasta comum, com as telas em HTML, os assets, a inception e os documentos. Publicar na nuvem é opcional e seletivo — você marca o que vai junto e o resto não sai da máquina.'
   },
   {
     id: 'faq-plataformas',
     category: 'Plataformas',
-    question: 'Quando sai a versão para Windows e Linux?',
-    answer:
-      'Hoje o instalador publicado é o do macOS. O empacotamento para Windows (instalador NSIS x64) e para Linux (AppImage) já existe no código e roda, mas ainda não há binário publicado no mesmo ritmo do macOS. macOS, Linux e WSL2 são os caminhos principais de suporte; Windows nativo é best-effort.'
+    question: 'Quais sistemas estão suportados?',
+    answer: `macOS e Windows nativos, os dois com instalador publicado e suportados por igual: no mac uma imagem .dmg para Apple Silicon e Intel, no Windows um instalador NSIS x64 que instala por usuário, sem pedir administrador. O Linux tem o empacotamento em AppImage pronto no código e ele roda, mas ainda não há binário publicado no mesmo ritmo dos outros dois — entra assim que a publicação for pareada. Quem está no Linux hoje também tem o caminho do WSL2.`
   },
   {
     id: 'faq-gatekeeper',
     category: 'Instalação',
+    os: 'mac',
     question: 'O macOS avisa que não consegue verificar o app. É esperado?',
     answer:
       'Sim. A build é assinada com uma identidade própria, não notarizada pela Apple, então o Gatekeeper mostra o aviso na primeira abertura. Para continuar, clique com o botão direito no app dentro de Aplicações e escolha "Abrir" — ou libere em Ajustes do Sistema, Privacidade e Segurança. Depois disso ele abre normalmente.'
+  },
+  {
+    id: 'faq-smartscreen',
+    category: 'Instalação',
+    os: 'windows',
+    question: 'O Windows diz que o autor não é reconhecido. É esperado?',
+    answer:
+      'Sim. A build é assinada com identidade própria, sem certificado comercial de autoria, então o SmartScreen mostra o aviso de autor não reconhecido ao rodar o instalador. Para continuar, clique em "Mais informações" e depois em "Executar assim mesmo". A instalação é por usuário e não pede senha de administrador.'
   },
   {
     id: 'faq-atualizacao',
@@ -319,7 +220,7 @@ export const FAQ_ITEMS: FaqItem[] = [
     category: 'Atualizações',
     question: 'Encontrei um problema na versão nova. Como volto para a anterior?',
     answer:
-      `O site mantém sempre duas versões no ar: a atual (${APP_VERSION}), que é o alvo da atualização automática, e a anterior (${FALLBACK_VERSION}), que fica disponível como recuo. Baixe a anterior na central de downloads e instale por cima — arraste para Aplicações e substitua. Seus projetos ficam em disco, fora do aplicativo, então não se perdem na troca. Vale saber de uma coisa: como a atualização automática sempre aponta para a mais recente, ela vai trazer você de volta à atual na sequência. Se o problema persistir, nos avise para que a correção entre na próxima versão.`
+      `No macOS o site mantém duas versões no ar: a atual (${APP_VERSION}), que é o alvo da atualização automática, e a anterior (${FALLBACK_VERSION}), disponível como recuo. Baixe a anterior na central de downloads e instale por cima. O Windows estreia agora com a ${APP_VERSION} e passa a ter as duas a partir da próxima publicação. Seus projetos ficam em disco, fora do aplicativo, então não se perdem na troca. Vale saber de uma coisa: como a atualização automática sempre aponta para a mais recente, ela vai trazer você de volta à atual na sequência. Se o problema persistir, nos avise para que a correção entre na próxima versão.`
   },
   {
     id: 'faq-figma',

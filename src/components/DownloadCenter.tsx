@@ -3,17 +3,27 @@ import {
   Monitor, Apple, Terminal, Download, Cpu, HardDrive,
   RefreshCw, ShieldAlert, Clock, History
 } from 'lucide-react';
-import { DOWNLOAD_OPTIONS, RELEASES, APP_VERSION } from '../data/softwareData';
-import { OperatingSystem } from '../types';
+import { APP_VERSION } from '../data/softwareData';
+import { PLATFORMS, referenceProfile } from '../data/platforms';
+import { OperatingSystem, SupportedOS } from '../types';
 
 interface DownloadCenterProps {
-  onOpenDownload: (os?: 'windows' | 'mac' | 'linux') => void;
+  onOpenDownload: (os?: SupportedOS) => void;
   detectedOS: OperatingSystem;
 }
 
-const OS_ICON = { windows: Monitor, mac: Apple, linux: Terminal };
+const OS_ICON = { Apple, Monitor, Terminal };
 
 export const DownloadCenter: React.FC<DownloadCenterProps> = ({ onOpenDownload, detectedOS }) => {
+  /**
+   * As versões e o aviso de primeira execução seguem o sistema do visitante.
+   * Quem está no Linux ou em sistema não identificado vê as do macOS, sinalizadas
+   * como tal — melhor que esconder a seção.
+   */
+  const profile = referenceProfile(detectedOS);
+  const releases = profile.releases;
+  const hasFallback = releases.length > 1;
+
   return (
     <section id="downloads" className="py-16 sm:py-24 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -26,28 +36,29 @@ export const DownloadCenter: React.FC<DownloadCenterProps> = ({ onOpenDownload, 
             Baixe o <span className="text-gradient-aurora font-semibold">Vision Design</span>
           </h2>
           <p className="text-cream/75 text-sm sm:text-base leading-relaxed">
-            O instalador do macOS é o que está publicado hoje, em duas versões — a atual e a
-            anterior, para o caso de precisar voltar atrás. Linux e Windows já existem no código e
-            entram assim que forem publicados no mesmo ritmo.
+            macOS e Windows têm instalador publicado e suportado por igual. O macOS mantém duas
+            versões no ar — a atual e a anterior, para o caso de precisar voltar atrás; o Windows
+            estreia com a atual e passa a ter as duas nas próximas publicações. O Linux já existe no
+            código e entra assim que for publicado no mesmo ritmo.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-8 mb-10 sm:mb-14">
-          {DOWNLOAD_OPTIONS.map((opt) => {
-            const Icon = OS_ICON[opt.os];
+          {PLATFORMS.map((opt) => {
+            const Icon = OS_ICON[opt.icon];
             const isAvailable = opt.status === 'available';
             const isDetected = detectedOS === opt.os;
 
             return (
               <div
-                key={opt.id}
+                key={opt.os}
                 className={`glass-card rounded-3xl p-5 sm:p-7 flex flex-col relative transition-all duration-300 ${
                   isAvailable
                     ? 'border-accent/40 shadow-2xl shadow-accent/10 glass-card-hover'
                     : 'opacity-70'
                 }`}
               >
-                {isAvailable && isDetected && (
+                {isDetected && (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-accent text-ink-deep text-[11px] font-bold shadow-lg whitespace-nowrap">
                     Seu sistema
                   </span>
@@ -68,7 +79,7 @@ export const DownloadCenter: React.FC<DownloadCenterProps> = ({ onOpenDownload, 
                   </span>
                 </div>
 
-                <h3 className="text-lg font-medium text-cream-strong mb-4">{opt.osName}</h3>
+                <h3 className="text-lg font-medium text-cream-strong mb-4">{opt.fullName}</h3>
 
                 <div className="space-y-2 mb-5 text-xs text-cream/75">
                   <div className="flex items-start gap-2">
@@ -97,7 +108,7 @@ export const DownloadCenter: React.FC<DownloadCenterProps> = ({ onOpenDownload, 
                     className="w-full py-3.5 rounded-xl bg-accent hover:bg-accent-strong text-ink-deep font-semibold text-sm shadow-lg shadow-accent/20 transition-colors flex items-center justify-center gap-2 group"
                   >
                     <Download className="w-4 h-4 transition-transform group-hover:-translate-y-0.5" />
-                    <span>Baixar para {opt.os === 'mac' ? 'macOS' : opt.osName}</span>
+                    <span>{opt.ctaLabel}</span>
                   </button>
                 ) : (
                   <span className="w-full py-3.5 rounded-xl bg-cream/5 border border-cream/10 text-muted font-medium text-sm flex items-center justify-center gap-2 cursor-not-allowed">
@@ -110,20 +121,26 @@ export const DownloadCenter: React.FC<DownloadCenterProps> = ({ onOpenDownload, 
           })}
         </div>
 
-        {/* Duas versões sempre no ar: a atual e o recuo */}
+        {/* Versões no ar para o sistema em foco: duas no macOS, uma no Windows */}
         <div className="max-w-4xl mx-auto mb-6">
           <div className="text-center mb-6">
-            <h3 className="text-lg sm:text-xl font-medium text-cream-strong mb-2">
-              Duas versões, sempre disponíveis
+            <span className="text-[11px] uppercase tracking-widest text-accent-strong">
+              Versões para {profile.name}
+            </span>
+            <h3 className="text-lg sm:text-xl font-medium text-cream-strong mb-2 mt-1.5">
+              {hasFallback ? 'Duas versões, sempre disponíveis' : 'A primeira versão publicada'}
             </h3>
             <p className="text-xs sm:text-sm text-muted max-w-2xl mx-auto leading-relaxed">
-              Se algo quebrar na versão atual, você não fica preso: a anterior continua no ar para
-              instalar por cima, a qualquer momento.
+              {hasFallback
+                ? 'Se algo quebrar na versão atual, você não fica preso: a anterior continua no ar para instalar por cima, a qualquer momento.'
+                : `O Windows estreia agora, então só a versão atual está no ar. Da próxima publicação em diante ele também mantém a anterior, como o macOS.`}
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {RELEASES.map((release) => (
+          <div
+            className={`grid grid-cols-1 gap-4 ${hasFallback ? 'md:grid-cols-2' : 'max-w-md mx-auto'}`}
+          >
+            {releases.map((release) => (
               <div
                 key={release.id}
                 className={`glass-card rounded-2xl p-5 flex flex-col ${
@@ -195,8 +212,9 @@ export const DownloadCenter: React.FC<DownloadCenterProps> = ({ onOpenDownload, 
               </h4>
               <p className="text-xs text-muted leading-relaxed">
                 O app consulta o feed de releases e se atualiza sozinho para a versão mais recente.
-                Se você voltar para a estável, a atualização automática vai trazê-lo de volta à
-                atual na sequência.
+                {hasFallback
+                  ? ' Se você voltar para a estável, a atualização automática vai trazê-lo de volta à atual na sequência.'
+                  : ' Vale para as duas plataformas publicadas, cada uma no seu instalador.'}
               </p>
             </div>
           </div>
@@ -207,12 +225,9 @@ export const DownloadCenter: React.FC<DownloadCenterProps> = ({ onOpenDownload, 
             </span>
             <div>
               <h4 className="text-sm font-semibold text-cream-strong mb-1.5">
-                Aviso do Gatekeeper na primeira abertura
+                {profile.firstRun?.title}
               </h4>
-              <p className="text-xs text-muted leading-relaxed">
-                A build é assinada com identidade própria, não notarizada pela Apple. Na primeira
-                vez, abra pelo botão direito → "Abrir", ou libere em Privacidade e Segurança.
-              </p>
+              <p className="text-xs text-muted leading-relaxed">{profile.firstRun?.note}</p>
             </div>
           </div>
         </div>

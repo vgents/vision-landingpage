@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Apple, Download, Menu, X } from 'lucide-react';
+import { Apple, Monitor, Terminal, Download, Menu, X } from 'lucide-react';
 import { VisionLogo } from './VisionLogo';
 import { APP_VERSION } from '../data/softwareData';
-import { OperatingSystem } from '../types';
+import { availabilityShort, downloadTarget } from '../data/platforms';
+import { OperatingSystem, SupportedOS } from '../types';
 
 interface NavbarProps {
-  onOpenDownload: (os?: 'windows' | 'mac' | 'linux') => void;
+  onOpenDownload: (os?: SupportedOS) => void;
   detectedOS: OperatingSystem;
 }
+
+const OS_ICON = { Apple, Monitor, Terminal };
 
 const NAV_LINKS = [
   { href: '#como-funciona', label: 'Como funciona' },
@@ -50,7 +53,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDownload, detectedOS }) =>
     };
   }, [mobileMenuOpen]);
 
-  const isMac = detectedOS === 'mac';
+  const target = downloadTarget(detectedOS);
+  const PillIcon = target ? OS_ICON[target.icon] : Download;
+  const pillLabel = target
+    ? `Pronto para o seu ${target.name}`
+    : detectedOS === 'linux'
+      ? 'Linux em preparação'
+      : 'Publicado para macOS e Windows';
 
   return (
     <header
@@ -89,17 +98,27 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDownload, detectedOS }) =>
           <div className="hidden lg:flex items-center gap-3 xl:gap-4 shrink-0">
             {/* A pílula só cabe a partir de xl — em 1024px ela empurrava o CTA para fora da tela. */}
             <span className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent/25 bg-accent-soft/40 text-accent-strong text-xs whitespace-nowrap">
-              <Apple className="w-3.5 h-3.5" />
-              <span>{isMac ? 'Pronto para o seu Mac' : 'Disponível para macOS'}</span>
+              <PillIcon className="w-3.5 h-3.5" />
+              <span>{pillLabel}</span>
             </span>
 
-            <button
-              onClick={() => onOpenDownload('mac')}
-              className="group px-4 xl:px-5 py-2.5 rounded-xl bg-accent hover:bg-accent-strong text-ink-deep font-semibold text-sm shadow-lg shadow-accent/20 transition-all active:scale-95 flex items-center gap-2 whitespace-nowrap"
-            >
-              <Download className="w-4 h-4 transition-transform group-hover:-translate-y-0.5" />
-              <span>Baixar para macOS</span>
-            </button>
+            {target ? (
+              <button
+                onClick={() => onOpenDownload(target.os)}
+                className="group px-4 xl:px-5 py-2.5 rounded-xl bg-accent hover:bg-accent-strong text-ink-deep font-semibold text-sm shadow-lg shadow-accent/20 transition-all active:scale-95 flex items-center gap-2 whitespace-nowrap"
+              >
+                <Download className="w-4 h-4 transition-transform group-hover:-translate-y-0.5" />
+                <span>{target.ctaLabel}</span>
+              </button>
+            ) : (
+              <a
+                href="#downloads"
+                className="group px-4 xl:px-5 py-2.5 rounded-xl bg-accent hover:bg-accent-strong text-ink-deep font-semibold text-sm shadow-lg shadow-accent/20 transition-all active:scale-95 flex items-center gap-2 whitespace-nowrap"
+              >
+                <Download className="w-4 h-4 transition-transform group-hover:-translate-y-0.5" />
+                <span>Ver downloads</span>
+              </a>
+            )}
           </div>
 
           <button
@@ -134,20 +153,31 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDownload, detectedOS }) =>
               ))}
             </nav>
 
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onOpenDownload('mac');
-              }}
-              className="w-full py-3.5 rounded-xl bg-accent hover:bg-accent-strong text-ink-deep font-semibold text-sm flex items-center justify-center gap-2 shadow-lg shadow-accent/20 transition-colors"
-            >
-              <Download className="w-4 h-4" />
-              <span>Baixar Vision Design {APP_VERSION}</span>
-            </button>
+            {target ? (
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onOpenDownload(target.os);
+                }}
+                className="w-full py-3.5 rounded-xl bg-accent hover:bg-accent-strong text-ink-deep font-semibold text-sm flex items-center justify-center gap-2 shadow-lg shadow-accent/20 transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                <span>
+                  Baixar {APP_VERSION} para {target.name}
+                </span>
+              </button>
+            ) : (
+              <a
+                href="#downloads"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full py-3.5 rounded-xl bg-accent hover:bg-accent-strong text-ink-deep font-semibold text-sm flex items-center justify-center gap-2 shadow-lg shadow-accent/20 transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                <span>Ver plataformas disponíveis</span>
+              </a>
+            )}
 
-            <p className="text-xs text-muted text-center">
-              macOS 12 ou superior · Linux e Windows em breve
-            </p>
+            <p className="text-xs text-muted text-center">{availabilityShort(detectedOS)}</p>
           </div>
         </div>
       )}

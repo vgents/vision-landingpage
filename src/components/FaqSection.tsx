@@ -1,9 +1,24 @@
 import React, { useState } from 'react';
 import { HelpCircle, ChevronDown } from 'lucide-react';
 import { FAQ_ITEMS } from '../data/softwareData';
+import { referenceProfile } from '../data/platforms';
+import { OperatingSystem } from '../types';
 
-export const FaqSection: React.FC = () => {
-  const [openId, setOpenId] = useState<string | null>(FAQ_ITEMS[0].id);
+interface FaqSectionProps {
+  detectedOS: OperatingSystem;
+}
+
+export const FaqSection: React.FC<FaqSectionProps> = ({ detectedOS }) => {
+  /**
+   * Perguntas marcadas com `os` são específicas de plataforma — o aviso do
+   * Gatekeeper no mac e o do SmartScreen no Windows. Mostrar as duas confundiria,
+   * então cada visitante vê só a do seu sistema. Sem sistema identificado, cai no
+   * perfil de referência.
+   */
+  const relevantOS = referenceProfile(detectedOS).os;
+  const faqs = FAQ_ITEMS.filter((faq) => !faq.os || faq.os === relevantOS);
+
+  const [openId, setOpenId] = useState<string | null>(faqs[0].id);
 
   const toggleFaq = (id: string) => setOpenId(openId === id ? null : id);
 
@@ -25,7 +40,7 @@ export const FaqSection: React.FC = () => {
         </div>
 
         <div className="space-y-3">
-          {FAQ_ITEMS.map((faq) => {
+          {faqs.map((faq) => {
             const isOpen = openId === faq.id;
             return (
               <div key={faq.id} className="glass-card rounded-2xl overflow-hidden">

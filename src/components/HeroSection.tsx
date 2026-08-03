@@ -1,12 +1,17 @@
 import React from 'react';
-import { Download, Play, Apple, HardDrive, Terminal, Palette, Figma } from 'lucide-react';
+import {
+  Download, Play, Apple, Monitor, HardDrive, Terminal, Palette, Figma, ArrowDown
+} from 'lucide-react';
 import { APP_VERSION, CATALOG } from '../data/softwareData';
-import { OperatingSystem } from '../types';
+import { availabilityLine, downloadTarget } from '../data/platforms';
+import { OperatingSystem, SupportedOS } from '../types';
 
 interface HeroSectionProps {
-  onOpenDownload: (os?: 'windows' | 'mac' | 'linux') => void;
+  onOpenDownload: (os?: SupportedOS) => void;
   detectedOS: OperatingSystem;
 }
+
+const OS_ICON = { Apple, Monitor, Terminal };
 
 const STATS = [
   {
@@ -36,7 +41,9 @@ const STATS = [
 ];
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenDownload, detectedOS }) => {
-  const isMac = detectedOS === 'mac';
+  /** Nulo quando não há instalador para oferecer: Linux, ou sistema não identificado. */
+  const target = downloadTarget(detectedOS);
+  const TargetIcon = target ? OS_ICON[target.icon] : null;
 
   return (
     <section className="relative pt-28 pb-16 sm:pt-32 sm:pb-20 md:pt-44 md:pb-28 overflow-hidden">
@@ -62,21 +69,37 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenDownload, detect
         </p>
 
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 mb-12">
-          <button
-            onClick={() => onOpenDownload('mac')}
-            className="px-7 py-4 rounded-2xl bg-accent hover:bg-accent-strong text-ink-deep font-semibold shadow-xl shadow-accent/25 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3 group"
-          >
-            <Download className="w-5 h-5 transition-transform group-hover:-translate-y-1" />
-            <span className="text-left">
-              <span className="block text-sm leading-tight flex items-center gap-2">
-                Baixar para macOS
-                <Apple className="w-4 h-4 opacity-70" />
+          {target && TargetIcon ? (
+            <button
+              onClick={() => onOpenDownload(target.os)}
+              className="px-7 py-4 rounded-2xl bg-accent hover:bg-accent-strong text-ink-deep font-semibold shadow-xl shadow-accent/25 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3 group"
+            >
+              <Download className="w-5 h-5 transition-transform group-hover:-translate-y-1" />
+              <span className="text-left">
+                <span className="block text-sm leading-tight flex items-center gap-2">
+                  {target.ctaLabel}
+                  <TargetIcon className="w-4 h-4 opacity-70" />
+                </span>
+                <span className="block text-[11px] font-medium opacity-70">
+                  {target.ctaDetail}
+                </span>
               </span>
-              <span className="block text-[11px] font-medium opacity-70">
-                Apple Silicon e Intel · 292 MB
+            </button>
+          ) : (
+            /* Sem build para o sistema detectado: manda escolher em vez de prometer arquivo. */
+            <a
+              href="#downloads"
+              className="px-7 py-4 rounded-2xl bg-accent hover:bg-accent-strong text-ink-deep font-semibold shadow-xl shadow-accent/25 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3 group"
+            >
+              <ArrowDown className="w-5 h-5 transition-transform group-hover:translate-y-1" />
+              <span className="text-left">
+                <span className="block text-sm leading-tight">Ver plataformas disponíveis</span>
+                <span className="block text-[11px] font-medium opacity-70">
+                  macOS e Windows publicados
+                </span>
               </span>
-            </span>
-          </button>
+            </a>
+          )}
 
           <a
             href="#como-funciona"
@@ -90,8 +113,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenDownload, detect
         </div>
 
         <p className="text-xs sm:text-sm text-muted mb-16">
-          {isMac ? 'Detectamos que você está no macOS. ' : ''}
-          Linux e Windows em preparação · Requer um CLI de agente instalado ou a sua chave de modelo
+          {availabilityLine(detectedOS)} · Requer um CLI de agente instalado ou a sua chave de modelo
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto text-left">

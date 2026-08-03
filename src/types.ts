@@ -1,21 +1,43 @@
 export type OperatingSystem = 'windows' | 'mac' | 'linux' | 'unknown';
 
+/** Sistemas que têm um perfil de plataforma, publicados ou não. */
+export type SupportedOS = 'windows' | 'mac' | 'linux';
+
 export type DownloadStatus = 'available' | 'coming-soon';
 
-export interface DownloadOption {
-  id: string;
-  os: 'windows' | 'mac' | 'linux';
-  osName: string;
+/**
+ * Tudo o que muda de um sistema para outro. Fonte única do conteúdo específico
+ * de plataforma — sem isso as mesmas strings se espalham pelos componentes e
+ * cada um adapta por conta própria.
+ */
+export interface PlatformProfile {
+  os: SupportedOS;
+  /** Rótulo curto, para botões e frases: "macOS", "Windows", "Linux". */
+  name: string;
+  /** Nome com a versão mínima, para cards e requisitos. */
+  fullName: string;
+  icon: 'Apple' | 'Monitor' | 'Terminal';
   status: DownloadStatus;
-  /** Só preenchido quando status === 'available'. */
-  version?: string;
-  fileSize?: string;
   fileFormat: string;
   arch: string;
   requirements: string;
-  /** Texto exibido no lugar do CTA quando ainda não há build publicado. */
+  /** Rótulo do CTA principal — some do padrão "Baixar para X" quando não há build. */
+  ctaLabel: string;
+  /** Preenchidos apenas quando status === 'available'. */
+  version?: string;
+  fileSize?: string;
+  url?: string;
+  /** Linha secundária do CTA do hero, ex. "x64 · 223 MB". */
+  ctaDetail?: string;
+  installSteps?: string[];
+  /** Aviso do sistema na primeira execução: Gatekeeper no mac, SmartScreen no Windows. */
+  firstRun?: { title: string; note: string };
+  /** Exibido no lugar do CTA e dos requisitos quando ainda não há build publicado. */
   comingSoonNote?: string;
-  badge?: string;
+  /** Nota da linha de espaço em disco nos requisitos. */
+  diskNote?: string;
+  /** Versões no ar para este sistema: duas no macOS, uma no Windows, nenhuma no Linux. */
+  releases: ReleaseOption[];
 }
 
 export interface ReleaseOption {
@@ -57,6 +79,8 @@ export interface FaqItem {
   question: string;
   answer: string;
   category: string;
+  /** Quando presente, a pergunta só aparece para quem está nesse sistema. */
+  os?: SupportedOS;
 }
 
 export interface RequirementItem {

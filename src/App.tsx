@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { AuroraCanvas } from './components/AuroraCanvas';
 import { Navbar } from './components/Navbar';
 import { HeroSection } from './components/HeroSection';
@@ -10,33 +10,22 @@ import { SystemRequirements } from './components/SystemRequirements';
 import { FaqSection } from './components/FaqSection';
 import { Footer } from './components/Footer';
 import { DownloadModal } from './components/DownloadModal';
-import { OperatingSystem } from './types';
+import { detectOS } from './lib/detectOS';
+import { SupportedOS } from './types';
 
 export default function App() {
-  const [detectedOS, setDetectedOS] = useState<OperatingSystem>('windows');
+  /**
+   * Resolvido no primeiro render, não em efeito: adaptar depois faria o
+   * conteúdo de um sistema aparecer por um frame para quem está em outro.
+   */
+  const [detectedOS] = useState(detectOS);
   const [downloadModalOpen, setDownloadModalOpen] = useState(false);
-  const [selectedDownloadOS, setSelectedDownloadOS] = useState<'windows' | 'mac' | 'linux'>('windows');
+  const [selectedDownloadOS, setSelectedDownloadOS] = useState<SupportedOS>(
+    detectedOS === 'unknown' ? 'mac' : detectedOS
+  );
 
-  useEffect(() => {
-    const userAgent = window.navigator.userAgent.toLowerCase();
-    if (userAgent.includes('mac')) {
-      setDetectedOS('mac');
-      setSelectedDownloadOS('mac');
-    } else if (userAgent.includes('linux')) {
-      setDetectedOS('linux');
-      setSelectedDownloadOS('linux');
-    } else {
-      setDetectedOS('windows');
-      setSelectedDownloadOS('windows');
-    }
-  }, []);
-
-  const handleOpenDownload = (os?: 'windows' | 'mac' | 'linux') => {
-    if (os) {
-      setSelectedDownloadOS(os);
-    } else {
-      setSelectedDownloadOS(detectedOS === 'unknown' ? 'windows' : (detectedOS as 'windows' | 'mac' | 'linux'));
-    }
+  const handleOpenDownload = (os?: SupportedOS) => {
+    setSelectedDownloadOS(os ?? (detectedOS === 'unknown' ? 'mac' : detectedOS));
     setDownloadModalOpen(true);
   };
 
@@ -59,20 +48,20 @@ export default function App() {
         {/* Funcionalidades reais do produto */}
         <FeatureShowcase />
 
-        {/* Download — macOS publicado, Linux e Windows em preparação */}
+        {/* Download — macOS e Windows publicados, Linux em preparação */}
         <DownloadCenter onOpenDownload={handleOpenDownload} detectedOS={detectedOS} />
 
         {/* Biblioteca pública de projetos */}
         <PublicLibrarySection />
 
         {/* Pré-requisitos de instalação */}
-        <SystemRequirements />
+        <SystemRequirements detectedOS={detectedOS} />
 
         {/* FAQ Accordion */}
-        <FaqSection />
+        <FaqSection detectedOS={detectedOS} />
 
         {/* Footer */}
-        <Footer onOpenDownload={handleOpenDownload} />
+        <Footer onOpenDownload={handleOpenDownload} detectedOS={detectedOS} />
 
         {/* Download Progress Modal */}
         <DownloadModal

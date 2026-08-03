@@ -1,11 +1,16 @@
 import React from 'react';
-import { Download, Apple, HardDrive } from 'lucide-react';
+import { Download, Apple, Monitor, Terminal, HardDrive } from 'lucide-react';
 import { VisionLogo } from './VisionLogo';
 import { APP_VERSION } from '../data/softwareData';
+import { PUBLISHED, downloadTarget } from '../data/platforms';
+import { OperatingSystem, SupportedOS } from '../types';
 
 interface FooterProps {
-  onOpenDownload: (os?: 'windows' | 'mac' | 'linux') => void;
+  onOpenDownload: (os?: SupportedOS) => void;
+  detectedOS: OperatingSystem;
 }
+
+const OS_ICON = { Apple, Monitor, Terminal };
 
 const PRODUCT_LINKS = [
   { href: '#como-funciona', label: 'Como funciona' },
@@ -19,7 +24,11 @@ const SUPPORT_LINKS = [
   { href: '#faq', label: 'Perguntas frequentes' }
 ];
 
-export const Footer: React.FC<FooterProps> = ({ onOpenDownload }) => {
+export const Footer: React.FC<FooterProps> = ({ onOpenDownload, detectedOS }) => {
+  const target = downloadTarget(detectedOS);
+  const PlatformIcon = target ? OS_ICON[target.icon] : Download;
+  const platformChip = target ? target.fullName : 'macOS e Windows';
+
   return (
     <footer className="relative bg-ink-deep border-t border-cream/10 pt-14 pb-10 text-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -43,8 +52,8 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDownload }) => {
                 Local-first
               </span>
               <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-cream/5 border border-cream/10 text-xs text-cream/70">
-                <Apple className="w-3.5 h-3.5 text-accent" />
-                macOS 12+
+                <PlatformIcon className="w-3.5 h-3.5 text-accent" />
+                {platformChip}
               </span>
             </div>
           </div>
@@ -84,19 +93,31 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDownload }) => {
               ))}
             </ul>
 
-            <button
-              onClick={() => onOpenDownload('mac')}
-              className="mt-2 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-accent hover:bg-accent-strong text-ink-deep text-xs font-semibold transition-colors"
-            >
-              <Download className="w-3.5 h-3.5" />
-              Baixar {APP_VERSION}
-            </button>
+            {target ? (
+              <button
+                onClick={() => onOpenDownload(target.os)}
+                className="mt-2 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-accent hover:bg-accent-strong text-ink-deep text-xs font-semibold transition-colors"
+              >
+                <Download className="w-3.5 h-3.5" />
+                Baixar {APP_VERSION} para {target.name}
+              </button>
+            ) : (
+              <a
+                href="#downloads"
+                className="mt-2 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-accent hover:bg-accent-strong text-ink-deep text-xs font-semibold transition-colors"
+              >
+                <Download className="w-3.5 h-3.5" />
+                Ver downloads
+              </a>
+            )}
           </div>
         </div>
 
         <div className="pt-7 border-t border-cream/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-soft">
           <span>© {new Date().getFullYear()} Vision Design</span>
-          <span>Versão {APP_VERSION} · macOS · Linux e Windows em preparação</span>
+          <span>
+            Versão {APP_VERSION} · {PUBLISHED.map((p) => p.name).join(' e ')} · Linux em preparação
+          </span>
         </div>
       </div>
     </footer>

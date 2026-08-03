@@ -1,10 +1,17 @@
 import React from 'react';
 import { Monitor, Cpu, HardDrive, Terminal, KeyRound, Server } from 'lucide-react';
-import { REQUIREMENTS } from '../data/softwareData';
+import { requirementsFor } from '../data/platforms';
+import { OperatingSystem } from '../types';
+
+interface SystemRequirementsProps {
+  detectedOS: OperatingSystem;
+}
 
 const ICONS = { Monitor, Cpu, HardDrive, Terminal, KeyRound };
 
-export const SystemRequirements: React.FC = () => {
+export const SystemRequirements: React.FC<SystemRequirementsProps> = ({ detectedOS }) => {
+  const requirements = requirementsFor(detectedOS);
+
   return (
     <section id="requisitos" className="py-16 sm:py-24 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -24,7 +31,7 @@ export const SystemRequirements: React.FC = () => {
 
         {/* Cards com rótulo e valor explícitos: legível em qualquer largura */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
-          {REQUIREMENTS.map((item) => {
+          {requirements.map((item) => {
             const Icon = ICONS[item.icon];
             return (
               <div key={item.label} className="glass-card glass-card-hover rounded-2xl p-5">
@@ -49,7 +56,7 @@ export const SystemRequirements: React.FC = () => {
 
         <p className="text-xs text-muted text-center max-w-2xl mx-auto mt-8 leading-relaxed">
           Não publicamos mínimos de RAM, CPU ou GPU porque não medimos isso de forma confiável ainda.
-          Se o seu Mac roda um editor de código moderno, roda o Vision Design.
+          Se a sua máquina roda um editor de código moderno, roda o Vision Design.
         </p>
       </div>
     </section>

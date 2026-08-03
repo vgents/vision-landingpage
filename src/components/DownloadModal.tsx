@@ -1,34 +1,26 @@
 import React, { useEffect, useRef } from 'react';
 import { X, Download, Apple, Terminal, Monitor, ShieldAlert, Clock } from 'lucide-react';
-import {
-  DOWNLOAD_OPTIONS,
-  DOWNLOAD_URL,
-  FALLBACK_VERSION,
-  APP_VERSION
-} from '../data/softwareData';
+import { APP_VERSION } from '../data/softwareData';
+import { PLATFORM_BY_OS, PUBLISHED } from '../data/platforms';
+import { SupportedOS } from '../types';
 
 interface DownloadModalProps {
   isOpen: boolean;
   onClose: () => void;
-  selectedOS: 'windows' | 'mac' | 'linux';
+  selectedOS: SupportedOS;
 }
 
-const OS_ICON = { windows: Monitor, mac: Apple, linux: Terminal };
-
-const MAC_STEPS = [
-  'Abra o arquivo .dmg baixado.',
-  'Arraste o ícone do Vision Design para a pasta Aplicações.',
-  'Na primeira abertura, clique com o botão direito no app e escolha "Abrir" — o macOS pede confirmação porque a build usa assinatura própria.',
-  'Configure o motor de IA: o app procura os CLIs de agente instalados, ou você informa a sua chave de modelo.'
-];
+const OS_ICON = { Apple, Monitor, Terminal };
 
 export const DownloadModal: React.FC<DownloadModalProps> = ({ isOpen, onClose, selectedOS }) => {
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
-  const option = DOWNLOAD_OPTIONS.find((opt) => opt.os === selectedOS) || DOWNLOAD_OPTIONS[0];
+  const option = PLATFORM_BY_OS[selectedOS];
   const isAvailable = option.status === 'available';
-  const Icon = OS_ICON[selectedOS];
+  const Icon = OS_ICON[option.icon];
+  /** A versão de recuo só existe onde há mais de uma no ar. */
+  const fallback = option.releases[1];
 
   useEffect(() => {
     if (!isOpen) return;
@@ -125,7 +117,7 @@ export const DownloadModal: React.FC<DownloadModalProps> = ({ isOpen, onClose, s
                   Passos de instalação
                 </h4>
                 <ol className="space-y-2.5">
-                  {MAC_STEPS.map((step, index) => (
+                  {(option.installSteps ?? []).map((step, index) => (
                     <li key={step} className="flex items-start gap-3 text-sm text-cream/85">
                       <span className="w-6 h-6 rounded-full bg-accent-soft/60 text-accent-strong text-xs flex items-center justify-center shrink-0 mt-px">
                         {index + 1}
@@ -138,15 +130,12 @@ export const DownloadModal: React.FC<DownloadModalProps> = ({ isOpen, onClose, s
 
               <div className="p-3.5 rounded-xl bg-warn/10 border border-warn/25 flex items-start gap-2.5">
                 <ShieldAlert className="w-4 h-4 text-warn shrink-0 mt-0.5" />
-                <p className="text-xs text-cream/80 leading-relaxed">
-                  O aviso do macOS na primeira abertura é esperado: a build é assinada com identidade
-                  própria e não passou pela notarização da Apple.
-                </p>
+                <p className="text-xs text-cream/80 leading-relaxed">{option.firstRun?.note}</p>
               </div>
 
               <div className="space-y-2.5">
                 <a
-                  href={DOWNLOAD_URL}
+                  href={option.url}
                   download
                   className="w-full py-3.5 rounded-xl bg-accent hover:bg-accent-strong text-ink-deep font-semibold text-sm shadow-lg shadow-accent/20 transition-colors flex items-center justify-center gap-2"
                 >
@@ -154,15 +143,24 @@ export const DownloadModal: React.FC<DownloadModalProps> = ({ isOpen, onClose, s
                   Baixar o instalador ({option.fileSize})
                 </a>
                 <p className="text-center text-xs text-soft pt-1 leading-relaxed">
-                  Precisa voltar atrás? A versão {FALLBACK_VERSION} continua disponível{' '}
-                  <a
-                    href="#downloads"
-                    onClick={onClose}
-                    className="text-muted hover:text-accent-strong underline underline-offset-2 transition-colors"
-                  >
-                    na central de downloads
-                  </a>
-                  .
+                  {fallback ? (
+                    <>
+                      Precisa voltar atrás? A versão {fallback.version} continua disponível{' '}
+                      <a
+                        href="#downloads"
+                        onClick={onClose}
+                        className="text-muted hover:text-accent-strong underline underline-offset-2 transition-colors"
+                      >
+                        na central de downloads
+                      </a>
+                      .
+                    </>
+                  ) : (
+                    <>
+                      Esta é a primeira versão de {option.name} publicada, então ainda não há uma
+                      anterior para recuar. A partir da próxima, as duas ficam no ar.
+                    </>
+                  )}
                 </p>
               </div>
             </>
@@ -173,7 +171,7 @@ export const DownloadModal: React.FC<DownloadModalProps> = ({ isOpen, onClose, s
                 <p className="text-sm text-cream/80 leading-relaxed">{option.comingSoonNote}</p>
               </div>
               <p className="text-xs text-muted leading-relaxed">
-                Por enquanto, o instalador publicado é o do macOS 12 ou superior.
+                Publicados hoje: {PUBLISHED.map((p) => p.fullName).join(' e ')}.
               </p>
               <button
                 onClick={onClose}
