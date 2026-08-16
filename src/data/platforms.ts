@@ -1,13 +1,13 @@
 import { OperatingSystem, PlatformProfile, RequirementItem, SupportedOS } from '../types';
-import { APP_VERSION, CATALOG, FALLBACK_VERSION, RELEASE_FEED } from './softwareData';
+import { CATALOG, RELEASE_FEED, RELEASES } from './softwareData';
 
 /**
  * Perfis de plataforma: o conteúdo do site que muda conforme o sistema do
  * visitante. Os componentes leem daqui em vez de embutir texto de macOS.
  *
- * O que está publicado hoje: macOS com duas versões no ar (a atual e a anterior,
- * como recuo) e Windows estreando com a atual. O Linux tem build no código, mas
- * ainda sem binário publicado.
+ * O que está publicado hoje: macOS e Windows, cada um com duas versões no ar
+ * (a atual e a anterior, como recuo) e cada um no seu próprio número — ver
+ * `RELEASES`. O Linux tem build no código, mas ainda sem binário publicado.
  */
 
 const artifactUrl = (version: string, file: string) =>
@@ -16,11 +16,16 @@ const artifactUrl = (version: string, file: string) =>
 const dmgUrl = (version: string) => artifactUrl(version, 'mac-arm64.dmg');
 const exeUrl = (version: string) => artifactUrl(version, 'win-x64.exe');
 
-/** Tamanhos conferidos no Content-Length de cada artefato publicado. */
+/**
+ * Tamanhos conferidos no Content-Length de cada artefato publicado, em MiB
+ * arredondado. Cada linha é de uma versão específica: ao trocar uma versão em
+ * `RELEASES`, meça o arquivo novo em vez de reaproveitar o número antigo.
+ */
 const SIZES = {
-  macAtual: '277 MB',
-  macAnterior: '279 MB',
-  winAtual: '223 MB'
+  /** 0.8.33 */ macAtual: '280 MB',
+  /** 0.8.32 */ macAnterior: '278 MB',
+  /** 0.8.32 */ winAtual: '224 MB',
+  /** 0.8.30 */ winAnterior: '223 MB'
 };
 
 const AI_ENGINE_STEP =
@@ -32,11 +37,11 @@ const MAC: PlatformProfile = {
   fullName: 'macOS 12 Monterey ou superior',
   icon: 'Apple',
   status: 'available',
-  version: APP_VERSION,
+  version: RELEASES.mac.current,
   fileSize: SIZES.macAtual,
   fileFormat: 'Imagem .DMG',
   arch: 'Apple Silicon (M1–M4) e Intel',
-  url: dmgUrl(APP_VERSION),
+  url: dmgUrl(RELEASES.mac.current),
   requirements: `macOS 12.0+ · ~1 GB livres em disco · um CLI de agente instalado ou chave própria de modelo`,
   ctaLabel: 'Baixar para macOS',
   ctaDetail: `Apple Silicon e Intel · ${SIZES.macAtual}`,
@@ -55,23 +60,23 @@ const MAC: PlatformProfile = {
     {
       id: 'atual',
       label: 'Atual',
-      version: APP_VERSION,
+      version: RELEASES.mac.current,
       fileSize: SIZES.macAtual,
       tagline: 'Alvo da atualização automática',
       description:
         'A versão mais recente, com as últimas correções e novidades. É para cá que o app se atualiza sozinho — instale esta se você não tem motivo para escolher a outra.',
-      url: dmgUrl(APP_VERSION),
+      url: dmgUrl(RELEASES.mac.current),
       autoUpdate: true
     },
     {
       id: 'estavel',
       label: 'Estável',
-      version: FALLBACK_VERSION,
+      version: RELEASES.mac.previous,
       fileSize: SIZES.macAnterior,
       tagline: 'Recuo, se algo der errado',
       description:
         'A versão anterior, já rodada por mais tempo. Instale por cima da atual se encontrar um problema que impeça o seu trabalho, e nos conte o que aconteceu.',
-      url: dmgUrl(FALLBACK_VERSION),
+      url: dmgUrl(RELEASES.mac.previous),
       autoUpdate: false
     }
   ]
@@ -83,11 +88,11 @@ const WINDOWS: PlatformProfile = {
   fullName: 'Windows 10 ou 11',
   icon: 'Monitor',
   status: 'available',
-  version: APP_VERSION,
+  version: RELEASES.windows.current,
   fileSize: SIZES.winAtual,
   fileFormat: 'Instalador .EXE (NSIS)',
   arch: 'x64',
-  url: exeUrl(APP_VERSION),
+  url: exeUrl(RELEASES.windows.current),
   requirements: `Windows 10 ou 11 em x64 · ~1 GB livres em disco · um CLI de agente instalado ou chave própria de modelo`,
   ctaLabel: 'Baixar para Windows',
   ctaDetail: `x64 · ${SIZES.winAtual}`,
@@ -106,13 +111,24 @@ const WINDOWS: PlatformProfile = {
     {
       id: 'atual',
       label: 'Atual',
-      version: APP_VERSION,
+      version: RELEASES.windows.current,
       fileSize: SIZES.winAtual,
       tagline: 'Alvo da atualização automática',
       description:
-        'A primeira versão de Windows publicada, com o mesmo conteúdo da build de macOS. É para cá que o app se atualiza sozinho. A partir da próxima publicação, a versão anterior também fica no ar como recuo.',
-      url: exeUrl(APP_VERSION),
+        'A versão de Windows mais recente publicada, com as últimas correções e novidades. É para cá que o app se atualiza sozinho — instale esta se você não tem motivo para escolher a outra.',
+      url: exeUrl(RELEASES.windows.current),
       autoUpdate: true
+    },
+    {
+      id: 'estavel',
+      label: 'Estável',
+      version: RELEASES.windows.previous,
+      fileSize: SIZES.winAnterior,
+      tagline: 'Recuo, se algo der errado',
+      description:
+        'A versão anterior, já rodada por mais tempo. Instale por cima da atual se encontrar um problema que impeça o seu trabalho, e nos conte o que aconteceu.',
+      url: exeUrl(RELEASES.windows.previous),
+      autoUpdate: false
     }
   ]
 };

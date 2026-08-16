@@ -78,7 +78,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDownload, detectedOS }) =>
                 Vision <span className="font-semibold text-accent">Design</span>
               </span>
               <span className="text-[11px] tracking-widest text-muted uppercase mt-1">
-                v{APP_VERSION}
+                v{target?.version ?? APP_VERSION}
               </span>
             </span>
           </a>
@@ -163,7 +163,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDownload, detectedOS }) =>
               >
                 <Download className="w-4 h-4" />
                 <span>
-                  Baixar {APP_VERSION} para {target.name}
+                  Baixar {target.version} para {target.name}
                 </span>
               </button>
             ) : (

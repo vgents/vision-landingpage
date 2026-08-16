@@ -99,7 +99,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDownload, detectedOS }) =>
                 className="mt-2 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-accent hover:bg-accent-strong text-ink-deep text-xs font-semibold transition-colors"
               >
                 <Download className="w-3.5 h-3.5" />
-                Baixar {APP_VERSION} para {target.name}
+                Baixar {target.version} para {target.name}
               </button>
             ) : (
               <a
@@ -116,7 +116,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDownload, detectedOS }) =>
         <div className="pt-7 border-t border-cream/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-soft">
           <span>© {new Date().getFullYear()} Vision Design</span>
           <span>
-            Versão {APP_VERSION} · {PUBLISHED.map((p) => p.name).join(' e ')} · Linux em preparação
+            {PUBLISHED.map((p) => `${p.name} ${p.version}`).join(' · ')} · Linux em preparação
           </span>
         </div>
       </div>

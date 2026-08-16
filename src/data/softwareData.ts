@@ -5,11 +5,34 @@ import {
   SecondaryFeature
 } from '../types';
 
-/** Versão publicada como atual. */
-export const APP_VERSION = '0.8.30';
+/**
+ * Versões publicadas no feed, por plataforma.
+ *
+ * macOS e Windows divergem, e não por descuido: cada `tools-pack publish` sobe
+ * os artefatos da máquina que rodou o build, então uma versão pode existir só
+ * de um lado — hoje a 0.8.34 é só de macOS, e o Windows mais recente é a
+ * 0.8.32. Apontar as duas plataformas para um número único faz o botão de uma
+ * delas cair em 404, que é justamente o que este formato impede.
+ *
+ * Antes de mexer nestes números, confira o que existe de verdade:
+ * `curl -sI <RELEASE_FEED>/stable/versions/<versão>/vision-design-<versão>-mac-arm64.dmg`
+ * (e o `-win-x64.exe`). O `stable/latest/metadata.json` não basta: ele descreve
+ * apenas a última publicação, então uma publicação de macOS apaga do índice a
+ * existência do instalador de Windows.
+ */
+export const RELEASES = {
+  mac: { current: '0.8.34', previous: '0.8.33' },
+  windows: { current: '0.8.32', previous: '0.8.30' }
+} as const;
 
-/** Versão anterior, mantida no ar como recuo caso a atual apresente problema. */
-export const FALLBACK_VERSION = '0.8.29';
+/**
+ * A versão mais nova publicada em qualquer plataforma — o número de vitrine,
+ * para onde o texto fala do produto e não de um arquivo.
+ *
+ * O botão de baixar NÃO usa este valor: usa a versão da plataforma do
+ * visitante (`PlatformProfile.version`), que pode ser outra.
+ */
+export const APP_VERSION = RELEASES.mac.current;
 
 /**
  * Origem de onde os instaladores são servidos.
@@ -220,7 +243,7 @@ export const FAQ_ITEMS: FaqItem[] = [
     category: 'Atualizações',
     question: 'Encontrei um problema na versão nova. Como volto para a anterior?',
     answer:
-      `No macOS o site mantém duas versões no ar: a atual (${APP_VERSION}), que é o alvo da atualização automática, e a anterior (${FALLBACK_VERSION}), disponível como recuo. Baixe a anterior na central de downloads e instale por cima. O Windows estreia agora com a ${APP_VERSION} e passa a ter as duas a partir da próxima publicação. Seus projetos ficam em disco, fora do aplicativo, então não se perdem na troca. Vale saber de uma coisa: como a atualização automática sempre aponta para a mais recente, ela vai trazer você de volta à atual na sequência. Se o problema persistir, nos avise para que a correção entre na próxima versão.`
+      `Cada sistema mantém duas versões no ar: a atual, que é o alvo da atualização automática, e a anterior, disponível como recuo. No macOS são a ${RELEASES.mac.current} e a ${RELEASES.mac.previous}; no Windows, a ${RELEASES.windows.current} e a ${RELEASES.windows.previous}. Os números não andam juntos porque cada instalador é publicado a partir da máquina que o construiu, então um dos sistemas pode ficar uma versão à frente por um tempo. Baixe a anterior na central de downloads e instale por cima. Seus projetos ficam em disco, fora do aplicativo, então não se perdem na troca. Vale saber de uma coisa: como a atualização automática sempre aponta para a mais recente, ela vai trazer você de volta à atual na sequência. Se o problema persistir, nos avise para que a correção entre na próxima versão.`
   },
   {
     id: 'faq-figma',

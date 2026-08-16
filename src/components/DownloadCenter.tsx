@@ -3,7 +3,6 @@ import {
   Monitor, Apple, Terminal, Download, Cpu, HardDrive,
   RefreshCw, ShieldAlert, Clock, History
 } from 'lucide-react';
-import { APP_VERSION } from '../data/softwareData';
 import { PLATFORMS, referenceProfile } from '../data/platforms';
 import { OperatingSystem, SupportedOS } from '../types';
 
@@ -30,16 +29,17 @@ export const DownloadCenter: React.FC<DownloadCenterProps> = ({ onOpenDownload, 
         <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-accent-soft/50 border border-accent/25 text-accent-strong text-xs uppercase tracking-widest mb-4">
             <Download className="w-3.5 h-3.5" />
-            <span>Versão {APP_VERSION}</span>
+            <span>Versão {profile.version}</span>
           </div>
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-light text-cream-strong tracking-tight mb-5">
             Baixe o <span className="text-gradient-aurora font-semibold">Vision Design</span>
           </h2>
           <p className="text-cream/75 text-sm sm:text-base leading-relaxed">
-            macOS e Windows têm instalador publicado e suportado por igual. O macOS mantém duas
-            versões no ar — a atual e a anterior, para o caso de precisar voltar atrás; o Windows
-            estreia com a atual e passa a ter as duas nas próximas publicações. O Linux já existe no
-            código e entra assim que for publicado no mesmo ritmo.
+            macOS e Windows têm instalador publicado e suportado por igual, cada um com duas versões
+            no ar — a atual e a anterior, para o caso de precisar voltar atrás. Os números dos dois
+            sistemas nem sempre coincidem: cada instalador sai da máquina que o construiu, então um
+            deles pode ficar uma versão à frente por um tempo. O Linux já existe no código e entra
+            assim que for publicado no mesmo ritmo.
           </p>
         </div>
 
@@ -121,7 +121,7 @@ export const DownloadCenter: React.FC<DownloadCenterProps> = ({ onOpenDownload, 
           })}
         </div>
 
-        {/* Versões no ar para o sistema em foco: duas no macOS, uma no Windows */}
+        {/* Versões no ar para o sistema em foco: a atual e a anterior, quando há */}
         <div className="max-w-4xl mx-auto mb-6">
           <div className="text-center mb-6">
             <span className="text-[11px] uppercase tracking-widest text-accent-strong">
@@ -133,7 +133,7 @@ export const DownloadCenter: React.FC<DownloadCenterProps> = ({ onOpenDownload, 
             <p className="text-xs sm:text-sm text-muted max-w-2xl mx-auto leading-relaxed">
               {hasFallback
                 ? 'Se algo quebrar na versão atual, você não fica preso: a anterior continua no ar para instalar por cima, a qualquer momento.'
-                : `O Windows estreia agora, então só a versão atual está no ar. Da próxima publicação em diante ele também mantém a anterior, como o macOS.`}
+                : `Por enquanto só a versão atual está no ar para ${profile.name}. A anterior entra como recuo a partir da próxima publicação.`}
             </p>
           </div>
 

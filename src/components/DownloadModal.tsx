@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import { X, Download, Apple, Terminal, Monitor, ShieldAlert, Clock } from 'lucide-react';
-import { APP_VERSION } from '../data/softwareData';
 import { PLATFORM_BY_OS, PUBLISHED } from '../data/platforms';
 import { SupportedOS } from '../types';
 
@@ -90,7 +89,7 @@ export const DownloadModal: React.FC<DownloadModalProps> = ({ isOpen, onClose, s
               {isAvailable ? 'Instalação' : 'Ainda não publicado'}
             </span>
             <h3 id="titulo-download" className="text-lg font-medium text-cream-strong">
-              Vision Design {isAvailable ? APP_VERSION : ''}
+              Vision Design {isAvailable ? option.version : ''}
             </h3>
           </div>
 
