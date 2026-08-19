@@ -10,7 +10,7 @@ import {
  *
  * macOS e Windows divergem, e não por descuido: cada `tools-pack publish` sobe
  * os artefatos da máquina que rodou o build, então uma versão pode existir só
- * de um lado — hoje a 0.8.34 é só de macOS, e o Windows mais recente é a
+ * de um lado — hoje a 0.8.35 é só de macOS, e o Windows mais recente é a
  * 0.8.32. Apontar as duas plataformas para um número único faz o botão de uma
  * delas cair em 404, que é justamente o que este formato impede.
  *
@@ -21,7 +21,7 @@ import {
  * existência do instalador de Windows.
  */
 export const RELEASES = {
-  mac: { current: '0.8.34', previous: '0.8.33' },
+  mac: { current: '0.8.35', previous: '0.8.34' },
   windows: { current: '0.8.32', previous: '0.8.30' }
 } as const;
 

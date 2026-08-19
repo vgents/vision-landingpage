@@ -22,8 +22,8 @@ const exeUrl = (version: string) => artifactUrl(version, 'win-x64.exe');
  * `RELEASES`, meça o arquivo novo em vez de reaproveitar o número antigo.
  */
 const SIZES = {
-  /** 0.8.33 */ macAtual: '280 MB',
-  /** 0.8.32 */ macAnterior: '278 MB',
+  /** 0.8.35 */ macAtual: '281 MB',
+  /** 0.8.34 */ macAnterior: '280 MB',
   /** 0.8.32 */ winAtual: '224 MB',
   /** 0.8.30 */ winAnterior: '223 MB'
 };
