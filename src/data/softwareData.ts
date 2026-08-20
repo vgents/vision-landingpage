@@ -21,7 +21,7 @@ import {
  * existência do instalador de Windows.
  */
 export const RELEASES = {
-  mac: { current: '0.8.35', previous: '0.8.34' },
+  mac: { current: '0.8.36', previous: '0.8.35' },
   windows: { current: '0.8.32', previous: '0.8.30' }
 } as const;
 
