@@ -10,9 +10,15 @@ import {
  *
  * macOS e Windows divergem, e não por descuido: cada `tools-pack publish` sobe
  * os artefatos da máquina que rodou o build, então uma versão pode existir só
- * de um lado — hoje a 0.8.35 é só de macOS, e o Windows mais recente é a
- * 0.8.32. Apontar as duas plataformas para um número único faz o botão de uma
- * delas cair em 404, que é justamente o que este formato impede.
+ * de um lado — hoje as 0.8.35/0.8.36/0.8.37 são só de macOS, e o Windows mais
+ * recente é a 0.8.34. Apontar as duas plataformas para um número único faz o
+ * botão de uma delas cair em 404, que é justamente o que este formato impede.
+ *
+ * O feed também PODA versões antigas (`tools-pack publish --prune N`), e a poda
+ * não sabe de plataforma: ao publicar a 0.8.37 a janela passou a guardar
+ * 0.8.33–0.8.37, o que apagou os `.exe` da 0.8.32 e da 0.8.30 que este arquivo
+ * apontava. Por isso a conferência abaixo é por plataforma E por arquivo, não
+ * por número de versão.
  *
  * Antes de mexer nestes números, confira o que existe de verdade:
  * `curl -sI <RELEASE_FEED>/stable/versions/<versão>/vision-design-<versão>-mac-arm64.dmg`
@@ -21,8 +27,13 @@ import {
  * existência do instalador de Windows.
  */
 export const RELEASES = {
-  mac: { current: '0.8.36', previous: '0.8.35' },
-  windows: { current: '0.8.32', previous: '0.8.30' }
+  mac: { current: '0.8.37', previous: '0.8.36' },
+  // O Windows está sem `previous`: das versões que sobreviveram à poda do feed,
+  // só a 0.8.34 carrega um `.exe`. `DownloadCenter` já trata a ausência de
+  // recuo (`hasFallback = releases.length > 1`), então o Windows exibe apenas a
+  // versão atual até que um segundo instalador seja publicado de uma máquina
+  // Windows.
+  windows: { current: '0.8.34' }
 } as const;
 
 /**
@@ -243,7 +254,7 @@ export const FAQ_ITEMS: FaqItem[] = [
     category: 'Atualizações',
     question: 'Encontrei um problema na versão nova. Como volto para a anterior?',
     answer:
-      `Cada sistema mantém duas versões no ar: a atual, que é o alvo da atualização automática, e a anterior, disponível como recuo. No macOS são a ${RELEASES.mac.current} e a ${RELEASES.mac.previous}; no Windows, a ${RELEASES.windows.current} e a ${RELEASES.windows.previous}. Os números não andam juntos porque cada instalador é publicado a partir da máquina que o construiu, então um dos sistemas pode ficar uma versão à frente por um tempo. Baixe a anterior na central de downloads e instale por cima. Seus projetos ficam em disco, fora do aplicativo, então não se perdem na troca. Vale saber de uma coisa: como a atualização automática sempre aponta para a mais recente, ela vai trazer você de volta à atual na sequência. Se o problema persistir, nos avise para que a correção entre na próxima versão.`
+      `No macOS ficam duas versões no ar: a ${RELEASES.mac.current}, que é o alvo da atualização automática, e a ${RELEASES.mac.previous}, disponível como recuo — baixe a anterior na central de downloads e instale por cima. No Windows há só a ${RELEASES.windows.current} no momento, sem versão de recuo. Os números não andam juntos porque cada instalador é publicado a partir da máquina que o construiu, então um dos sistemas pode ficar algumas versões à frente por um tempo. Seus projetos ficam em disco, fora do aplicativo, então não se perdem na troca. Vale saber de uma coisa: como a atualização automática sempre aponta para a mais recente, ela vai trazer você de volta à atual na sequência. Se o problema persistir, nos avise para que a correção entre na próxima versão.`
   },
   {
     id: 'faq-figma',
