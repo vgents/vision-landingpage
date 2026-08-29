@@ -5,10 +5,10 @@ import { CATALOG, RELEASE_FEED, RELEASES } from './softwareData';
  * Perfis de plataforma: o conteúdo do site que muda conforme o sistema do
  * visitante. Os componentes leem daqui em vez de embutir texto de macOS.
  *
- * O que está publicado hoje: macOS com duas versões no ar (a atual e a
- * anterior, como recuo) e Windows com apenas a atual, cada plataforma no seu
- * próprio número — ver `RELEASES`. O Linux tem build no código, mas ainda sem
- * binário publicado.
+ * O que está publicado hoje: macOS e Windows, cada um com duas versões no ar
+ * (a atual e a anterior, como recuo) e cada plataforma no seu próprio número —
+ * ver `RELEASES`. O Linux tem build no código, mas ainda sem binário
+ * publicado.
  */
 
 const artifactUrl = (version: string, file: string) =>
@@ -25,7 +25,8 @@ const exeUrl = (version: string) => artifactUrl(version, 'win-x64.exe');
 const SIZES = {
   /** 0.8.37 */ macAtual: '281 MB',
   /** 0.8.36 */ macAnterior: '281 MB',
-  /** 0.8.34 */ winAtual: '226 MB'
+  /** 0.8.37 */ winAtual: '227 MB',
+  /** 0.8.34 */ winAnterior: '226 MB'
 };
 
 const AI_ENGINE_STEP =
@@ -118,6 +119,17 @@ const WINDOWS: PlatformProfile = {
         'A versão de Windows mais recente publicada, com as últimas correções e novidades. É para cá que o app se atualiza sozinho — instale esta se você não tem motivo para escolher a outra.',
       url: exeUrl(RELEASES.windows.current),
       autoUpdate: true
+    },
+    {
+      id: 'estavel',
+      label: 'Estável',
+      version: RELEASES.windows.previous,
+      fileSize: SIZES.winAnterior,
+      tagline: 'Recuo, se algo der errado',
+      description:
+        'O instalador de Windows anterior, já rodado por mais tempo. Instale por cima da atual se encontrar um problema que impeça o seu trabalho, e nos conte o que aconteceu.',
+      url: exeUrl(RELEASES.windows.previous),
+      autoUpdate: false
     }
   ]
 };
