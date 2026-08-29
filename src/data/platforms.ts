@@ -223,7 +223,7 @@ export function requirementsFor(os: OperatingSystem): RequirementItem[] {
     {
       label: 'Espaço em disco',
       value: 'Cerca de 1 GB',
-      note: target?.diskNote ?? 'O instalador ocupa entre 220 e 280 MB, mais os seus projetos',
+      note: target?.diskNote ?? 'O instalador ocupa entre 227 e 281 MB, mais os seus projetos',
       icon: 'HardDrive'
     },
     {

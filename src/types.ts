@@ -27,7 +27,7 @@ export interface PlatformProfile {
   version?: string;
   fileSize?: string;
   url?: string;
-  /** Linha secundária do CTA do hero, ex. "x64 · 223 MB". */
+  /** Linha secundária do CTA do hero, ex. "x64 · 227 MB". */
   ctaDetail?: string;
   installSteps?: string[];
   /** Aviso do sistema na primeira execução: Gatekeeper no mac, SmartScreen no Windows. */
@@ -36,7 +36,7 @@ export interface PlatformProfile {
   comingSoonNote?: string;
   /** Nota da linha de espaço em disco nos requisitos. */
   diskNote?: string;
-  /** Versões no ar para este sistema: duas no macOS, uma no Windows, nenhuma no Linux. */
+  /** Versões no ar para este sistema: duas em cada sistema publicado, nenhuma no Linux. */
   releases: ReleaseOption[];
 }
 

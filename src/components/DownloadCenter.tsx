@@ -38,7 +38,7 @@ export const DownloadCenter: React.FC<DownloadCenterProps> = ({ onOpenDownload, 
             macOS e Windows têm instalador publicado e suportado por igual, cada um com duas versões
             no ar — a atual e a anterior, para o caso de precisar voltar atrás. Os números dos dois
             sistemas nem sempre coincidem: cada instalador sai da máquina que o construiu, então um
-            deles pode ficar uma versão à frente por um tempo. O Linux já existe no código e entra
+            deles pode ficar algumas versões à frente por um tempo. O Linux já existe no código e entra
             assim que for publicado no mesmo ritmo.
           </p>
         </div>
