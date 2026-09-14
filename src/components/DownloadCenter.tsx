@@ -16,8 +16,8 @@ const OS_ICON = { Apple, Monitor, Terminal };
 export const DownloadCenter: React.FC<DownloadCenterProps> = ({ onOpenDownload, detectedOS }) => {
   /**
    * As versões e o aviso de primeira execução seguem o sistema do visitante.
-   * Quem está no Linux ou em sistema não identificado vê as do macOS, sinalizadas
-   * como tal — melhor que esconder a seção.
+   * Quem está em sistema não identificado (celular, tablet, Chromebook) vê as do
+   * macOS, sinalizadas como tal — melhor que esconder a seção.
    */
   const profile = referenceProfile(detectedOS);
   const releases = profile.releases;
@@ -35,11 +35,11 @@ export const DownloadCenter: React.FC<DownloadCenterProps> = ({ onOpenDownload, 
             Baixe o <span className="text-gradient-aurora font-semibold">Vision Design</span>
           </h2>
           <p className="text-cream/75 text-sm sm:text-base leading-relaxed">
-            macOS e Windows têm instalador publicado e suportado por igual, cada um com duas versões
-            no ar — a atual e a anterior, para o caso de precisar voltar atrás. Os números dos dois
-            sistemas nem sempre coincidem: cada instalador sai da máquina que o construiu, então um
-            deles pode ficar algumas versões à frente por um tempo. O Linux já existe no código e entra
-            assim que for publicado no mesmo ritmo.
+            macOS, Windows e Linux têm instalador publicado e suportado por igual. No mac e no
+            Windows há duas versões no ar — a atual e a anterior, para o caso de precisar voltar
+            atrás; o Linux estreia agora, com a primeira. Os números nem sempre coincidem entre os
+            sistemas: cada instalador sai da máquina que o construiu, então um deles pode ficar
+            algumas versões à frente por um tempo.
           </p>
         </div>
 
@@ -214,7 +214,7 @@ export const DownloadCenter: React.FC<DownloadCenterProps> = ({ onOpenDownload, 
                 O app consulta o feed de releases e se atualiza sozinho para a versão mais recente.
                 {hasFallback
                   ? ' Se você voltar para a estável, a atualização automática vai trazê-lo de volta à atual na sequência.'
-                  : ' Vale para as duas plataformas publicadas, cada uma no seu instalador.'}
+                  : ` No ${profile.name} ele baixa o arquivo novo e abre o instalador para você confirmar — a troca não acontece pelas suas costas.`}
               </p>
             </div>
           </div>

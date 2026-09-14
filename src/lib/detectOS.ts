@@ -47,8 +47,8 @@ export function resolveOS({
   // userAgentData é mais confiável que a user agent, quando existe.
   const source = platform ? platform.toLowerCase() : ua;
 
-  // ChromeOS não é Linux desktop: o AppImage não serve, então cai no estado
-  // neutro em vez de prometer a build de Linux que está em preparação.
+  // ChromeOS não é Linux desktop: o AppImage publicado não roda num Chromebook
+  // comum, então cai no estado neutro em vez de oferecer um arquivo que falha.
   if (/cros|chrome os/.test(source)) return 'unknown';
 
   if (/mac|darwin/.test(source)) return 'mac';

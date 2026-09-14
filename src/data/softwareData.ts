@@ -8,11 +8,17 @@ import {
 /**
  * Versões publicadas no feed, por plataforma.
  *
- * macOS e Windows podem divergir, e não por descuido: cada `tools-pack publish`
+ * Os sistemas podem divergir, e não por descuido: cada `tools-pack publish`
  * sobe os artefatos da máquina que rodou o build, então uma versão pode existir
- * só de um lado. Hoje as duas plataformas estão na 0.8.37, mas o formato por
- * plataforma continua: as 0.8.35 e 0.8.36 saíram só de macOS, e apontar as duas
- * para um número único faria o botão de uma delas cair em 404.
+ * só de um lado. Hoje os três estão na 0.8.37, mas o formato por plataforma
+ * continua: as 0.8.35 e 0.8.36 saíram só de macOS, e apontar todos para um
+ * número único faria o botão de um deles cair em 404.
+ *
+ * A divergência também é de CÓDIGO, não só de número: o 0.8.37 de macOS e o de
+ * Windows foram publicados em 27 e 29/08, e o de Linux em 14/09 — o AppImage
+ * carrega semanas a mais de trabalho sob o mesmo rótulo. É uma escolha
+ * consciente do mantenedor, e mac e Windows são renumerados na próxima
+ * publicação.
  *
  * O feed também PODA versões antigas (`tools-pack publish --prune N`), e a poda
  * não sabe de plataforma: a plataforma atrasada é a primeira a perder arquivos.
@@ -30,7 +36,10 @@ export const RELEASES = {
   mac: { current: '0.8.37', previous: '0.8.36' },
   // O recuo do Windows salta para a 0.8.34 porque as 0.8.35 e 0.8.36 nunca
   // tiveram `.exe`: é o instalador de Windows anterior que ainda está no ar.
-  windows: { current: '0.8.37', previous: '0.8.34' }
+  windows: { current: '0.8.37', previous: '0.8.34' },
+  // O Linux estreia na 0.8.37 e ainda não tem recuo: não existe AppImage
+  // publicado em nenhuma versão anterior (0.8.36 e 0.8.34 respondem 404).
+  linux: { current: '0.8.37' }
 } as const;
 
 /**
@@ -215,13 +224,13 @@ export const FAQ_ITEMS: FaqItem[] = [
     category: 'Dados',
     question: 'Onde ficam os meus arquivos?',
     answer:
-      'Em disco, na sua conta local: no macOS sob ~/Library/Application Support/Vision Design, no Windows sob %APPDATA%\\Vision Design. Cada projeto é uma pasta comum, com as telas em HTML, os assets, a inception e os documentos. Publicar na nuvem é opcional e seletivo — você marca o que vai junto e o resto não sai da máquina.'
+      'Em disco, na sua conta local: no macOS sob ~/Library/Application Support/Vision Design, no Windows sob %APPDATA%\\Vision Design, no Linux sob ~/.config/Vision Design. Cada projeto é uma pasta comum, com as telas em HTML, os assets, a inception e os documentos. Publicar na nuvem é opcional e seletivo — você marca o que vai junto e o resto não sai da máquina.'
   },
   {
     id: 'faq-plataformas',
     category: 'Plataformas',
     question: 'Quais sistemas estão suportados?',
-    answer: `macOS e Windows nativos, os dois com instalador publicado e suportados por igual: no mac uma imagem .dmg para Apple Silicon e Intel, no Windows um instalador NSIS x64 que instala por usuário, sem pedir administrador. O Linux tem o empacotamento em AppImage pronto no código e ele roda, mas ainda não há binário publicado no mesmo ritmo dos outros dois — entra assim que a publicação for pareada. Quem está no Linux hoje também tem o caminho do WSL2.`
+    answer: `macOS, Windows e Linux nativos, os três com instalador publicado: no mac uma imagem .dmg para Apple Silicon e Intel, no Windows um instalador NSIS x64 que instala por usuário, sem pedir administrador, e no Linux um AppImage x86_64 que roda em qualquer distribuição, sem instalar nada no sistema. A diferença hoje é o recuo: mac e Windows têm duas versões no ar, e o Linux estreou agora, com a primeira.`
   },
   {
     id: 'faq-gatekeeper',
@@ -240,18 +249,25 @@ export const FAQ_ITEMS: FaqItem[] = [
       'Sim. A build é assinada com identidade própria, sem certificado comercial de autoria, então o SmartScreen mostra o aviso de autor não reconhecido ao rodar o instalador. Para continuar, clique em "Mais informações" e depois em "Executar assim mesmo". A instalação é por usuário e não pede senha de administrador.'
   },
   {
+    id: 'faq-appimage',
+    category: 'Instalação',
+    os: 'linux',
+    question: 'Baixei o AppImage e ele não abre. O que falta?',
+    answer: `Quase sempre é a permissão de execução: o navegador salva o arquivo sem ela. Rode chmod +x vision-design-${RELEASES.linux.current}-linux-x64.AppImage no terminal, ou marque "Permitir execução como programa" nas propriedades do arquivo, e abra de novo. Se a mensagem de erro falar em FUSE, a sua distribuição não traz mais o libfuse2: instale-o pelo gerenciador de pacotes, ou rode o arquivo com --appimage-extract-and-run. O AppImage não instala nada no sistema — o ícone e o atalho são integrados em ~/.local/share na primeira execução.`
+  },
+  {
     id: 'faq-atualizacao',
     category: 'Atualizações',
     question: 'Como o app se atualiza?',
     answer:
-      'O aplicativo instalado consulta o feed de releases e baixa a versão nova sozinho — sempre a mais recente. Existem quatro canais: stable para a entrega formal, preview para acesso antecipado, beta para o desenvolvimento diário e nightly para validação interna. Cada canal instala com identidade separada, então dá para manter mais de um na mesma máquina.'
+      'O aplicativo instalado consulta o feed de releases e baixa a versão nova sozinho — sempre a mais recente. No macOS a troca do app é feita pelo próprio aplicativo; no Windows e no Linux ele baixa o arquivo e abre o instalador para você confirmar. Existem quatro canais: stable para a entrega formal, preview para acesso antecipado, beta para o desenvolvimento diário e nightly para validação interna. Cada canal instala com identidade separada, então dá para manter mais de um na mesma máquina.'
   },
   {
     id: 'faq-versao-anterior',
     category: 'Atualizações',
     question: 'Encontrei um problema na versão nova. Como volto para a anterior?',
     answer:
-      `Cada sistema tem duas versões no ar: a atual, que é o alvo da atualização automática, e a anterior, disponível como recuo — baixe a anterior na central de downloads e instale por cima. No macOS são a ${RELEASES.mac.current} e a ${RELEASES.mac.previous}; no Windows, a ${RELEASES.windows.current} e a ${RELEASES.windows.previous}. O recuo do Windows salta alguns números porque cada instalador é publicado a partir da máquina que o construiu, então um dos sistemas pode ficar algumas versões à frente por um tempo. Seus projetos ficam em disco, fora do aplicativo, então não se perdem na troca. Vale saber de uma coisa: como a atualização automática sempre aponta para a mais recente, ela vai trazer você de volta à atual na sequência. Se o problema persistir, nos avise para que a correção entre na próxima versão.`
+      `No macOS e no Windows há duas versões no ar: a atual, que é o alvo da atualização automática, e a anterior, disponível como recuo — baixe a anterior na central de downloads e instale por cima. No macOS são a ${RELEASES.mac.current} e a ${RELEASES.mac.previous}; no Windows, a ${RELEASES.windows.current} e a ${RELEASES.windows.previous}. O recuo do Windows salta alguns números porque cada instalador é publicado a partir da máquina que o construiu, então um dos sistemas pode ficar algumas versões à frente por um tempo. O Linux estreou na ${RELEASES.linux.current} e ainda não tem anterior no ar: o recuo passa a existir a partir da próxima publicação. Seus projetos ficam em disco, fora do aplicativo, então não se perdem na troca. Vale saber de uma coisa: como a atualização automática sempre aponta para a mais recente, ela vai trazer você de volta à atual na sequência. Se o problema persistir, nos avise para que a correção entre na próxima versão.`
   },
   {
     id: 'faq-figma',

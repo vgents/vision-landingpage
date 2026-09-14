@@ -48,7 +48,7 @@ export default function App() {
         {/* Funcionalidades reais do produto */}
         <FeatureShowcase />
 
-        {/* Download — macOS e Windows publicados, Linux em preparação */}
+        {/* Download — macOS, Windows e Linux publicados */}
         <DownloadCenter onOpenDownload={handleOpenDownload} detectedOS={detectedOS} />
 
         {/* Biblioteca pública de projetos */}

@@ -36,7 +36,7 @@ export interface PlatformProfile {
   comingSoonNote?: string;
   /** Nota da linha de espaço em disco nos requisitos. */
   diskNote?: string;
-  /** Versões no ar para este sistema: duas em cada sistema publicado, nenhuma no Linux. */
+  /** Versões no ar para este sistema: duas no mac e no Windows, uma no Linux. */
   releases: ReleaseOption[];
 }
 

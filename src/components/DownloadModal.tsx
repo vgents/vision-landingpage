@@ -170,7 +170,7 @@ export const DownloadModal: React.FC<DownloadModalProps> = ({ isOpen, onClose, s
                 <p className="text-sm text-cream/80 leading-relaxed">{option.comingSoonNote}</p>
               </div>
               <p className="text-xs text-muted leading-relaxed">
-                Publicados hoje: {PUBLISHED.map((p) => p.fullName).join(' e ')}.
+                Publicados hoje: {PUBLISHED.map((p) => p.name).join(', ')}.
               </p>
               <button
                 onClick={onClose}

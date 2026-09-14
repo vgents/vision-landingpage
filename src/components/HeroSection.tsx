@@ -41,7 +41,7 @@ const STATS = [
 ];
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenDownload, detectedOS }) => {
-  /** Nulo quando não há instalador para oferecer: Linux, ou sistema não identificado. */
+  /** Nulo quando não há instalador para oferecer: celular, tablet ou sistema não identificado. */
   const target = downloadTarget(detectedOS);
   const TargetIcon = target ? OS_ICON[target.icon] : null;
 
@@ -95,7 +95,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenDownload, detect
               <span className="text-left">
                 <span className="block text-sm leading-tight">Ver plataformas disponíveis</span>
                 <span className="block text-[11px] font-medium opacity-70">
-                  macOS e Windows publicados
+                  macOS, Windows e Linux publicados
                 </span>
               </span>
             </a>

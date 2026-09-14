@@ -27,7 +27,7 @@ const SUPPORT_LINKS = [
 export const Footer: React.FC<FooterProps> = ({ onOpenDownload, detectedOS }) => {
   const target = downloadTarget(detectedOS);
   const PlatformIcon = target ? OS_ICON[target.icon] : Download;
-  const platformChip = target ? target.fullName : 'macOS e Windows';
+  const platformChip = target ? target.fullName : 'macOS, Windows e Linux';
 
   return (
     <footer className="relative bg-ink-deep border-t border-cream/10 pt-14 pb-10 text-sm">
@@ -116,7 +116,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDownload, detectedOS }) =>
         <div className="pt-7 border-t border-cream/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-soft">
           <span>© {new Date().getFullYear()} Vision Design</span>
           <span>
-            {PUBLISHED.map((p) => `${p.name} ${p.version}`).join(' · ')} · Linux em preparação
+            {PUBLISHED.map((p) => `${p.name} ${p.version}`).join(' · ')}
           </span>
         </div>
       </div>

@@ -57,9 +57,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDownload, detectedOS }) =>
   const PillIcon = target ? OS_ICON[target.icon] : Download;
   const pillLabel = target
     ? `Pronto para o seu ${target.name}`
-    : detectedOS === 'linux'
-      ? 'Linux em preparação'
-      : 'Publicado para macOS e Windows';
+    : 'Publicado para macOS, Windows e Linux';
 
   return (
     <header

@@ -11,9 +11,9 @@ interface FaqSectionProps {
 export const FaqSection: React.FC<FaqSectionProps> = ({ detectedOS }) => {
   /**
    * Perguntas marcadas com `os` são específicas de plataforma — o aviso do
-   * Gatekeeper no mac e o do SmartScreen no Windows. Mostrar as duas confundiria,
-   * então cada visitante vê só a do seu sistema. Sem sistema identificado, cai no
-   * perfil de referência.
+   * Gatekeeper no mac, o do SmartScreen no Windows e a permissão de execução do
+   * AppImage no Linux. Mostrar as três confundiria, então cada visitante vê só a
+   * do seu sistema. Sem sistema identificado, cai no perfil de referência.
    */
   const relevantOS = referenceProfile(detectedOS).os;
   const faqs = FAQ_ITEMS.filter((faq) => !faq.os || faq.os === relevantOS);
