@@ -32,8 +32,8 @@ const appImageUrl = (version: string) => artifactUrl(version, 'linux-x64.AppImag
  * `RELEASES`, meça o arquivo novo em vez de reaproveitar o número antigo.
  */
 const SIZES = {
-  /** 0.8.37 */ macAtual: '281 MB',
-  /** 0.8.36 */ macAnterior: '281 MB',
+  /** 0.8.38 */ macAtual: '290 MB',
+  /** 0.8.37 */ macAnterior: '281 MB',
   /** 0.8.37 */ winAtual: '227 MB',
   /** 0.8.34 */ winAnterior: '226 MB',
   /** 0.8.37 */ linuxAtual: '290 MB'
