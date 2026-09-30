@@ -34,7 +34,7 @@ import {
  * o cache ao conferir.
  */
 export const RELEASES = {
-  mac: { current: '0.8.39', previous: '0.8.38' },
+  mac: { current: '0.8.40', previous: '0.8.39' },
   // O recuo do Windows salta para a 0.8.34 porque as 0.8.35 e 0.8.36 nunca
   // tiveram `.exe`: é o instalador de Windows anterior que ainda está no ar.
   windows: { current: '0.8.37', previous: '0.8.34' },
