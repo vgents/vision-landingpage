@@ -10,8 +10,8 @@ import {
  *
  * Os sistemas podem divergir, e não por descuido: cada `tools-pack publish`
  * sobe os artefatos da máquina que rodou o build, então uma versão pode existir
- * só de um lado. Hoje o macOS está na 0.8.43 (publicada em 27/10, só de
- * macOS; a 0.8.42 nunca foi publicada) e Windows e Linux seguem na 0.8.37; as 0.8.35 e 0.8.36
+ * só de um lado. Hoje macOS e Windows estão na 0.8.43 (macOS publicada em 27/10,
+ * Windows em 29/10; a 0.8.42 nunca foi publicada) e o Linux segue na 0.8.37; as 0.8.35 e 0.8.36
  * também saíram só de macOS, e apontar todos para um número único faria o botão de um deles
  * cair em 404.
  *
@@ -37,7 +37,7 @@ export const RELEASES = {
   mac: { current: '0.8.43', previous: '0.8.41' },
   // O recuo do Windows salta para a 0.8.34 porque as 0.8.35 e 0.8.36 nunca
   // tiveram `.exe`: é o instalador de Windows anterior que ainda está no ar.
-  windows: { current: '0.8.37', previous: '0.8.34' },
+  windows: { current: '0.8.43', previous: '0.8.37' },
   // O Linux estreia na 0.8.37 e ainda não tem recuo: não existe AppImage
   // publicado em nenhuma versão anterior (0.8.36 e 0.8.34 respondem 404).
   linux: { current: '0.8.37' }

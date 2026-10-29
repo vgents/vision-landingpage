@@ -34,8 +34,8 @@ const appImageUrl = (version: string) => artifactUrl(version, 'linux-x64.AppImag
 const SIZES = {
   /** 0.8.43 */ macAtual: '398 MB',
   /** 0.8.41 */ macAnterior: '290 MB',
-  /** 0.8.37 */ winAtual: '227 MB',
-  /** 0.8.34 */ winAnterior: '226 MB',
+  /** 0.8.43 */ winAtual: '344 MB',
+  /** 0.8.37 */ winAnterior: '227 MB',
   /** 0.8.37 */ linuxAtual: '290 MB'
 };
 
