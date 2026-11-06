@@ -12,6 +12,7 @@ import { Footer } from './components/Footer';
 import { DownloadModal } from './components/DownloadModal';
 import { PricingSection } from './components/PricingSection';
 import { PlansPage } from './pages/PlansPage';
+import { CheckoutPage } from './pages/CheckoutPage';
 import { useRoute, type Route } from './lib/router';
 import { detectOS } from './lib/detectOS';
 import { SupportedOS } from './types';
@@ -103,6 +104,8 @@ function renderPage(route: Exclude<Route, { name: 'home' }>) {
   switch (route.name) {
     case 'planos':
       return <PlansPage />;
+    case 'compra':
+      return <CheckoutPage key={route.planId ?? ''} planId={route.planId} />;
     default:
       return <PlansPage />;
   }
