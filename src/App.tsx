@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { AuroraCanvas } from './components/AuroraCanvas';
 import { Navbar } from './components/Navbar';
 import { HeroSection } from './components/HeroSection';
@@ -16,6 +16,7 @@ import { CheckoutPage } from './pages/CheckoutPage';
 import { CheckoutResultPage } from './pages/CheckoutResultPage';
 import { CreatePasswordPage } from './pages/CreatePasswordPage';
 import { useRoute, type Route } from './lib/router';
+import { applyRouteMeta } from './lib/pageMeta';
 import { detectOS } from './lib/detectOS';
 import { SupportedOS } from './types';
 
@@ -31,6 +32,12 @@ export default function App() {
   );
 
   const route = useRoute();
+
+  const firstRoute = useRef(true);
+  useEffect(() => {
+    applyRouteMeta(route, !firstRoute.current);
+    firstRoute.current = false;
+  }, [route.name]);
 
   /**
    * Na landing, um `/#secao` vindo de outra página só rola depois que a seção
@@ -109,7 +116,7 @@ function renderPage(route: Exclude<Route, { name: 'home' }>) {
     case 'compra':
       return <CheckoutPage key={route.planId ?? ''} planId={route.planId} />;
     case 'compra-confirmada':
-      return <CheckoutResultPage variant="confirmada" free={route.free} orderId={route.orderId} />;
+      return <CheckoutResultPage variant="confirmada" free={route.free} approved={route.approved} orderId={route.orderId} />;
     case 'compra-pendente':
       return <CheckoutResultPage variant="pendente" />;
     case 'compra-erro':

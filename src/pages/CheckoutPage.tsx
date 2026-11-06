@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ArrowLeft, Loader2, ShoppingBag, Users, AlertCircle } from 'lucide-react';
 import { CHECKOUT_COPY } from '../data/checkout';
 import { FALLBACK_PLANS, type PlanCard } from '../data/plans';
-import { singleFlight, submitCheckout, validateCheckoutForm, type CheckoutErrors, type CheckoutForm } from '../lib/checkout';
+import { checkoutErrorMessage, singleFlight, submitCheckout, validateCheckoutForm, type CheckoutErrors, type CheckoutForm } from '../lib/checkout';
 import { fetchPlans, formatPrice, seatsLabel } from '../lib/plans';
 import { handleLinkClick, navigate } from '../lib/router';
 import { PlansPage } from './PlansPage';
@@ -34,7 +34,7 @@ function usePlan(planId: string | null): PlanState {
 }
 
 const inputClass =
-  'w-full px-4 py-3 rounded-xl bg-ink-deep/70 border text-cream-strong placeholder:text-soft text-sm outline-none transition-colors focus:border-accent/60';
+  'w-full px-4 py-3 rounded-xl bg-ink-deep/70 border text-cream-strong placeholder:text-soft text-base sm:text-sm outline-none transition-colors focus:border-accent/60';
 
 export const CheckoutPage: React.FC<{ planId: string | null }> = ({ planId }) => {
   const planState = usePlan(planId);
@@ -44,6 +44,19 @@ export const CheckoutPage: React.FC<{ planId: string | null }> = ({ planId }) =>
   const [submitting, setSubmitting] = useState(false);
   /** Trava síncrona: o estado do React só muda no próximo render, e um clique duplo chegaria antes. */
   const [guard] = useState(() => singleFlight(submitCheckout));
+  const [redirecting, setRedirecting] = useState(false);
+
+  // Voltar do Mercado Pago pode restaurar esta página do cache (bfcache) ainda travada.
+  useEffect(() => {
+    const onPageShow = (event: PageTransitionEvent) => {
+      if (!event.persisted) return;
+      guard.release();
+      setSubmitting(false);
+      setRedirecting(false);
+    };
+    window.addEventListener('pageshow', onPageShow);
+    return () => window.removeEventListener('pageshow', onPageShow);
+  }, [guard]);
 
   if (planState.status === 'missing') {
     return <PlansPage notice={planId ? CHECKOUT_COPY.unknownPlan : CHECKOUT_COPY.choosePlan} />;
@@ -71,10 +84,23 @@ export const CheckoutPage: React.FC<{ planId: string | null }> = ({ planId }) =>
     const found = validateCheckoutForm(form, plan);
     setErrors(found);
     setServerError(null);
-    if (Object.keys(found).length > 0) return;
+    const firstInvalid = (['buyerName', 'buyerEmail', 'companyName', 'acceptTerms'] as const).find((k) => found[k]);
+    if (firstInvalid) {
+      const ids = { buyerName: 'buyer-name', buyerEmail: 'buyer-email', companyName: 'company-name', acceptTerms: 'accept-terms' };
+      document.getElementById(ids[firstInvalid])?.focus();
+      return;
+    }
 
     setSubmitting(true);
-    const outcome = await guard.run(plan.id, form);
+    let outcome;
+    try {
+      outcome = await guard.run(plan.id, form);
+    } catch {
+      guard.release();
+      setSubmitting(false);
+      setServerError({ code: 'server_error', message: checkoutErrorMessage('server_error') });
+      return;
+    }
     if (!outcome) return;
 
     if (outcome.kind === 'check_email') {
@@ -83,6 +109,7 @@ export const CheckoutPage: React.FC<{ planId: string | null }> = ({ planId }) =>
     }
     if (outcome.kind === 'redirect') {
       // Continua travado: a página está saindo para o Mercado Pago.
+      setRedirecting(true);
       window.location.assign(outcome.url);
       return;
     }
@@ -144,7 +171,7 @@ export const CheckoutPage: React.FC<{ planId: string | null }> = ({ planId }) =>
                   className={`${inputClass} ${fieldBorder('buyerName')}`}
                 />
                 {errors.buyerName && (
-                  <p id="buyer-name-error" className="text-xs text-warn mt-1.5">
+                  <p id="buyer-name-error" role="alert" className="text-xs text-warn mt-1.5">
                     {errors.buyerName}
                   </p>
                 )}
@@ -165,7 +192,7 @@ export const CheckoutPage: React.FC<{ planId: string | null }> = ({ planId }) =>
                   aria-describedby="buyer-email-hint"
                   className={`${inputClass} ${fieldBorder('buyerEmail')}`}
                 />
-                <p id="buyer-email-hint" className={`text-xs mt-1.5 ${errors.buyerEmail ? 'text-warn' : 'text-muted'}`}>
+                <p id="buyer-email-hint" role={errors.buyerEmail ? 'alert' : undefined} className={`text-xs mt-1.5 ${errors.buyerEmail ? 'text-warn' : 'text-muted'}`}>
                   {errors.buyerEmail ?? CHECKOUT_COPY.emailHint}
                 </p>
               </div>
@@ -188,6 +215,7 @@ export const CheckoutPage: React.FC<{ planId: string | null }> = ({ planId }) =>
                   />
                   <p
                     id="company-name-hint"
+                    role={errors.companyName ? 'alert' : undefined}
                     className={`text-xs mt-1.5 ${errors.companyName ? 'text-warn' : 'text-muted'}`}
                   >
                     {errors.companyName ?? CHECKOUT_COPY.companyHint}
@@ -198,11 +226,13 @@ export const CheckoutPage: React.FC<{ planId: string | null }> = ({ planId }) =>
               <div>
                 <label className="flex items-start gap-3 text-sm text-cream/85 cursor-pointer">
                   <input
+                    id="accept-terms"
                     type="checkbox"
                     name="terms"
                     checked={form.acceptTerms}
                     onChange={(e) => update('acceptTerms', e.target.checked)}
                     aria-invalid={!!errors.acceptTerms}
+                    aria-describedby={errors.acceptTerms ? 'accept-terms-error' : undefined}
                     className="mt-0.5 w-4 h-4 accent-[#d97a56] shrink-0"
                   />
                   <span>
@@ -212,7 +242,7 @@ export const CheckoutPage: React.FC<{ planId: string | null }> = ({ planId }) =>
                     </a>
                   </span>
                 </label>
-                {errors.acceptTerms && <p className="text-xs text-warn mt-1.5">{errors.acceptTerms}</p>}
+                {errors.acceptTerms && <p id="accept-terms-error" role="alert" className="text-xs text-warn mt-1.5">{errors.acceptTerms}</p>}
               </div>
 
               {serverError && (
@@ -237,7 +267,7 @@ export const CheckoutPage: React.FC<{ planId: string | null }> = ({ planId }) =>
                 className="w-full py-3.5 rounded-xl bg-accent hover:bg-accent-strong disabled:opacity-60 disabled:cursor-wait text-ink-deep font-semibold text-sm shadow-lg shadow-accent/20 transition-colors flex items-center justify-center gap-2"
               >
                 {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                {submitting ? CHECKOUT_COPY.submitting : isFree ? CHECKOUT_COPY.submit : CHECKOUT_COPY.submitPaid}
+                {submitting ? (redirecting ? CHECKOUT_COPY.redirecting : CHECKOUT_COPY.submitting) : isFree ? CHECKOUT_COPY.submit : CHECKOUT_COPY.submitPaid}
               </button>
             </form>
           </section>

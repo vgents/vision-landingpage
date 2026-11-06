@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { Session, SupabaseClient } from '@supabase/supabase-js';
 import { KeyRound, Loader2, CheckCircle2, LinkIcon, AlertCircle, Download } from 'lucide-react';
 import { CREATE_PASSWORD_COPY as COPY } from '../data/checkout';
-import { confirmAccount, readAuthFragment, validateNewPassword, type ConfirmOutcome } from '../lib/createPassword';
+import { classifyUpdateError, confirmAccount, readAuthFragment, validateNewPassword, type ConfirmOutcome } from '../lib/createPassword';
 import { getSupabase } from '../lib/supabase';
 import { handleLinkClick } from '../lib/router';
 
@@ -13,12 +13,12 @@ type PageState =
   | { step: 'expired' }
   /** Sem fragmento (recarregou depois de usar o link, ou abriu a página direto). */
   | { step: 'no-session' }
-  | { step: 'error'; description: string }
+  | { step: 'error' }
   | { step: 'form'; linkType: LinkType; session: Session; client: SupabaseClient }
   | { step: 'done'; orgName?: string; planName?: string };
 
 const inputClass =
-  'w-full px-4 py-3 rounded-xl bg-ink-deep/70 border border-cream/12 text-cream-strong text-sm outline-none transition-colors focus:border-accent/60';
+  'w-full px-4 py-3 rounded-xl bg-ink-deep/70 border border-cream/12 text-cream-strong text-base sm:text-sm outline-none transition-colors focus:border-accent/60';
 
 function confirmErrorMessage(code: Extract<ConfirmOutcome, { ok: false }>['code']): string {
   if (code === 'unauthorized') return COPY.confirmUnauthorized;
@@ -38,7 +38,7 @@ export const CreatePasswordPage: React.FC = () => {
     fragment.kind === 'expired'
       ? { step: 'expired' }
       : fragment.kind === 'error'
-        ? { step: 'error', description: fragment.description }
+        ? { step: 'error' }
         : fragment.kind === 'none'
           ? { step: 'no-session' }
           : { step: 'loading' },
@@ -47,6 +47,8 @@ export const CreatePasswordPage: React.FC = () => {
   const [confirm, setConfirm] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  /** A senha já foi gravada: numa nova tentativa (confirmAccount falhou) não regrava. */
+  const passwordSaved = useRef(false);
 
   useEffect(() => {
     if (fragment.kind === 'error' || fragment.kind === 'expired') dropFragment();
@@ -63,6 +65,7 @@ export const CreatePasswordPage: React.FC = () => {
             : { step: 'no-session' },
         );
       } catch {
+        dropFragment();
         if (alive) setState({ step: 'no-session' });
       }
     })();
@@ -80,13 +83,16 @@ export const CreatePasswordPage: React.FC = () => {
     if (invalid) return;
 
     setSaving(true);
-    if (password) {
+    if (password && !passwordSaved.current) {
       const { error } = await state.client.auth.updateUser({ password });
-      if (error) {
+      const kind = error ? classifyUpdateError(error) : null;
+      // `same`: a senha já é essa (tentativa anterior gravou); segue para confirmar.
+      if (error && kind !== 'same') {
         setSaving(false);
-        setFormError(COPY.passwordRejected);
+        setFormError(kind === 'network' ? COPY.confirmNetwork : kind === 'weak' ? COPY.passwordWeak : COPY.confirmServer);
         return;
       }
+      passwordSaved.current = true;
     }
     const outcome = await confirmAccount(state.session.access_token);
     if ('code' in outcome) {
@@ -126,10 +132,9 @@ export const CreatePasswordPage: React.FC = () => {
               <h1 className="text-2xl sm:text-3xl font-light text-cream-strong tracking-tight mb-3">
                 {state.step === 'error' ? COPY.errorTitle : COPY.expiredTitle}
               </h1>
-              {state.step === 'error' && state.description && (
-                <p className="text-xs text-muted mb-3 break-words">{state.description}</p>
-              )}
-              <p className="text-sm text-cream/80 leading-relaxed">{COPY.expiredBody}</p>
+              <p className="text-sm text-cream/80 leading-relaxed">
+                {state.step === 'error' ? COPY.errorBody : COPY.expiredBody}
+              </p>
             </div>
           )}
 
@@ -160,10 +165,12 @@ export const CreatePasswordPage: React.FC = () => {
                   type="password"
                   autoComplete="new-password"
                   value={password}
+                  aria-invalid={!!formError}
+                  aria-describedby="new-password-hint"
                   onChange={(e) => setPassword(e.target.value)}
                   className={inputClass}
                 />
-                <p className="text-xs text-muted mt-1.5">{COPY.passwordHint}</p>
+                <p id="new-password-hint" className="text-xs text-muted mt-1.5">{COPY.passwordHint}</p>
               </div>
 
               <div>
@@ -175,6 +182,7 @@ export const CreatePasswordPage: React.FC = () => {
                   type="password"
                   autoComplete="new-password"
                   value={confirm}
+                  aria-invalid={!!formError}
                   onChange={(e) => setConfirm(e.target.value)}
                   className={inputClass}
                 />

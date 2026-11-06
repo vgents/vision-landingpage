@@ -64,8 +64,8 @@ export const PLANS_COPY = {
   titleLead: 'Escolha o plano da',
   titleAccent: 'sua equipe',
   intro:
-    'Todos os planos dão acesso ao aplicativo inteiro; o que muda é quantas pessoas usam a mesma equipe. Quem compra já entra como dona da equipe.',
-  ownerIncluded: 'dona inclusa',
+    'Todos os planos dão acesso ao aplicativo inteiro; o que muda é quantas pessoas usam a mesma equipe. Quem compra já entra como responsável pela equipe.',
+  ownerIncluded: 'responsável incluso',
   choose: 'Escolher',
   perPeriod: 'por enquanto, sem custo',
   fallbackNotice: 'Mostrando a lista de planos salva no site; os valores são os mesmos.',
