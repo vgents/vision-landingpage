@@ -13,6 +13,7 @@ import { DownloadModal } from './components/DownloadModal';
 import { PricingSection } from './components/PricingSection';
 import { PlansPage } from './pages/PlansPage';
 import { CheckoutPage } from './pages/CheckoutPage';
+import { CheckoutResultPage } from './pages/CheckoutResultPage';
 import { useRoute, type Route } from './lib/router';
 import { detectOS } from './lib/detectOS';
 import { SupportedOS } from './types';
@@ -106,6 +107,12 @@ function renderPage(route: Exclude<Route, { name: 'home' }>) {
       return <PlansPage />;
     case 'compra':
       return <CheckoutPage key={route.planId ?? ''} planId={route.planId} />;
+    case 'compra-confirmada':
+      return <CheckoutResultPage variant="confirmada" free={route.free} orderId={route.orderId} />;
+    case 'compra-pendente':
+      return <CheckoutResultPage variant="pendente" />;
+    case 'compra-erro':
+      return <CheckoutResultPage variant="erro" />;
     default:
       return <PlansPage />;
   }

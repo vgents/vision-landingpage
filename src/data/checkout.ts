@@ -42,3 +42,40 @@ export const CHECKOUT_ERROR_MESSAGES: Record<string, string> = {
 };
 
 export const CHECKOUT_ERROR_DEFAULT = 'Algo deu errado ao registrar o pedido. Tente de novo em alguns minutos.';
+
+/**
+ * Páginas de resultado (as `back_urls` do Mercado Pago e o retorno do pedido
+ * grátis). Nenhuma afirma aprovação além deste texto: o estado real do
+ * pagamento vem do webhook, não dos parâmetros da URL.
+ */
+export const RESULT_COPY = {
+  confirmadaGratis: {
+    eyebrow: 'Pedido recebido',
+    title: 'Confira o seu e-mail',
+    body: 'Pedido recebido. Enviamos um link para o seu e-mail; abra-o para criar sua senha e ativar a equipe.',
+    // Validade do link = "Email OTP Expiration" do Supabase Auth (padrão: 1 hora). Só
+    // escrever um prazo aqui depois de conferir o valor configurado no painel.
+    note: 'Não chegou? Confira a caixa de spam. O link tem validade limitada: se vencer, use Primeiro acesso na tela de entrada do Vision para receber um código.',
+  },
+  confirmada: {
+    eyebrow: 'Pagamento aprovado',
+    title: 'Tudo certo com o pagamento',
+    body: 'Pagamento aprovado. Enviamos o acesso para o seu e-mail.',
+    note: 'Não chegou em alguns minutos? Confira a caixa de spam.',
+  },
+  pendente: {
+    eyebrow: 'Pagamento pendente',
+    title: 'Pagamento em processamento',
+    body: 'Pagamento em processamento (Pix/boleto podem levar alguns minutos). Assim que for aprovado, o acesso chega por e-mail.',
+    note: 'Você pode fechar esta página; nada mais precisa ser feito aqui.',
+  },
+  erro: {
+    eyebrow: 'Não deu certo',
+    title: 'O pagamento não foi concluído',
+    body: 'O pagamento não foi concluído. Nenhum valor foi cobrado.',
+    note: '',
+  },
+  orderLabel: 'Pedido',
+  retry: 'Tentar de novo',
+  download: 'Baixar o Vision',
+};
