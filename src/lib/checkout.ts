@@ -12,6 +12,19 @@ export type CheckoutOutcome =
   | { kind: 'error'; code: string; message: string; field?: keyof CheckoutForm };
 
 const MAX_TEXT = 120;
+
+/** Hosts do Mercado Pago para onde o servidor pode mandar o comprador. */
+const CHECKOUT_HOSTS = new Set(['www.mercadopago.com.br', 'sandbox.mercadopago.com.br', 'mercadopago.com.br']);
+
+/** Só `https` em host do Mercado Pago, sem credenciais embutidas. */
+export function isAllowedCheckoutUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' && !url.username && !url.password && CHECKOUT_HOSTS.has(url.hostname);
+  } catch {
+    return false;
+  }
+}
 /** Mesmo padrão do servidor (`team-rules.ts`). */
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
@@ -82,7 +95,7 @@ export async function submitCheckout(
   if (data?.next === 'check_email' && typeof data.order_id === 'string') {
     return { kind: 'check_email', orderId: data.order_id };
   }
-  if (data?.next === 'redirect' && typeof data.redirect_url === 'string' && /^https:\/\//.test(data.redirect_url)) {
+  if (data?.next === 'redirect' && typeof data.redirect_url === 'string' && isAllowedCheckoutUrl(data.redirect_url)) {
     return { kind: 'redirect', url: data.redirect_url };
   }
   return errorOutcome('server_error');
@@ -102,7 +115,12 @@ export function singleFlight<A extends unknown[], R>(fn: (...args: A) => Promise
     async run(...args: A): Promise<R | null> {
       if (busy) return null;
       busy = true;
-      return fn(...args);
+      try {
+        return await fn(...args);
+      } catch (error) {
+        busy = false;
+        throw error;
+      }
     },
     release() {
       busy = false;

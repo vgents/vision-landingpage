@@ -3,6 +3,7 @@ import { SUPABASE_ANON_KEY } from '../src/data/cloud';
 import { FALLBACK_PLANS } from '../src/data/plans';
 import {
   checkoutErrorMessage,
+  isAllowedCheckoutUrl,
   singleFlight,
   submitCheckout,
   validateCheckoutForm,
@@ -71,9 +72,9 @@ describe('submitCheckout', () => {
     const res = await submitCheckout(
       'empresas',
       ok,
-      fakeFetch(200, { order_id: 'o2', status: 'pending', next: 'redirect', redirect_url: 'https://mp.example/x' }),
+      fakeFetch(200, { order_id: 'o2', status: 'pending', next: 'redirect', redirect_url: 'https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=1' }),
     );
-    expect(res).toEqual({ kind: 'redirect', url: 'https://mp.example/x' });
+    expect(res).toEqual({ kind: 'redirect', url: 'https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=1' });
   });
 
   test('server error maps to local copy', async () => {
@@ -137,5 +138,45 @@ describe('singleFlight (submitting state)', () => {
     guard.release();
     await guard.run();
     expect(calls).toBe(2);
+  });
+});
+
+describe('isAllowedCheckoutUrl', () => {
+  test('accepts Mercado Pago hosts over https', () => {
+    for (const u of [
+      'https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=1',
+      'https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=1',
+      'https://mercadopago.com.br/x',
+    ]) {
+      expect(isAllowedCheckoutUrl(u)).toBe(true);
+    }
+  });
+  test('rejects other hosts, http, lookalikes and credentials', () => {
+    for (const u of [
+      'https://evil.example/x',
+      'http://www.mercadopago.com.br/x',
+      'https://www.mercadopago.com.br.evil.example/x',
+      'https://evilmercadopago.com.br/x',
+      'https://user:pw@www.mercadopago.com.br/x',
+      'javascript:alert(1)',
+      'not a url',
+    ]) {
+      expect(isAllowedCheckoutUrl(u)).toBe(false);
+    }
+  });
+  test('submitCheckout refuses a redirect to a foreign host', async () => {
+    const res = await submitCheckout('individual', ok, (async () =>
+      new Response(JSON.stringify({ next: 'redirect', redirect_url: 'https://evil.example/pay' }), { status: 200 })) as typeof fetch);
+    expect(res).toMatchObject({ kind: 'error', code: 'server_error' });
+  });
+});
+
+describe('singleFlight on failure', () => {
+  test('a throwing call releases the guard', async () => {
+    const guard = singleFlight(async () => {
+      throw new Error('boom');
+    });
+    await expect(guard.run()).rejects.toThrow('boom');
+    expect(guard.busy).toBe(false);
   });
 });

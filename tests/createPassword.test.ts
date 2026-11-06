@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { SUPABASE_ANON_KEY } from '../src/data/cloud';
-import { confirmAccount, readAuthFragment, validateNewPassword } from '../src/lib/createPassword';
+import { classifyUpdateError, confirmAccount, readAuthFragment, validateNewPassword } from '../src/lib/createPassword';
 
 describe('readAuthFragment', () => {
   test('session links', () => {
@@ -79,5 +79,14 @@ describe('confirmAccount', () => {
       throw new TypeError('offline');
     }) as typeof fetch);
     expect(res).toEqual({ ok: false, code: 'network_error' });
+  });
+});
+
+describe('classifyUpdateError', () => {
+  test('separates same password, weak password and network failures', () => {
+    expect(classifyUpdateError({ code: 'same_password' })).toBe('same');
+    expect(classifyUpdateError({ code: 'weak_password' })).toBe('weak');
+    expect(classifyUpdateError({ name: 'AuthRetryableFetchError', status: 0 })).toBe('network');
+    expect(classifyUpdateError({ code: 'unexpected', status: 500 })).toBe('other');
   });
 });

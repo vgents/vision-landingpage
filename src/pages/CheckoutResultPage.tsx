@@ -8,6 +8,7 @@ type Variant = 'confirmada' | 'pendente' | 'erro';
 interface CheckoutResultPageProps {
   variant: Variant;
   free?: boolean;
+  approved?: boolean;
   orderId?: string | null;
 }
 
@@ -18,8 +19,13 @@ const TONE = {
   erro: 'bg-cream/5 border-cream/15 text-cream/80',
 };
 
-export const CheckoutResultPage: React.FC<CheckoutResultPageProps> = ({ variant, free = false, orderId }) => {
-  const copy = variant === 'confirmada' && free ? RESULT_COPY.confirmadaGratis : RESULT_COPY[variant];
+export const CheckoutResultPage: React.FC<CheckoutResultPageProps> = ({ variant, free = false, approved = false, orderId }) => {
+  const copy =
+    variant === 'confirmada' && free
+      ? RESULT_COPY.confirmadaGratis
+      : variant === 'confirmada' && !approved
+        ? RESULT_COPY.confirmadaIncerta
+        : RESULT_COPY[variant];
   const Icon = ICON[variant];
 
   return (

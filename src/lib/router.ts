@@ -8,7 +8,7 @@ export type Route =
   | { name: 'home' }
   | { name: 'planos' }
   | { name: 'compra'; planId: string | null }
-  | { name: 'compra-confirmada'; orderId: string | null; free: boolean }
+  | { name: 'compra-confirmada'; orderId: string | null; free: boolean; approved: boolean }
   | { name: 'compra-pendente' }
   | { name: 'compra-erro' }
   | { name: 'criar-senha' };
@@ -20,6 +20,14 @@ export type Route =
  */
 export function isAuthFragment(hash: string): boolean {
   return hash.includes('access_token=') || hash.includes('error_code=');
+}
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Só mostra o número do pedido se for um UUID (o texto da URL é de quem abriu o link). */
+function orderIdOf(value: string | null): string | null {
+  const v = clean(value);
+  return v && UUID_RE.test(v) ? v : null;
 }
 
 function clean(value: string | null): string | null {
@@ -39,8 +47,10 @@ export function parseRoute(pathname: string, search: string, hash: string): Rout
     case '/compra/confirmada':
       return {
         name: 'compra-confirmada',
-        orderId: clean(params.get('pedido')) ?? clean(params.get('external_reference')),
+        orderId: orderIdOf(params.get('pedido')) ?? orderIdOf(params.get('external_reference')),
         free: params.get('tipo') === 'gratis',
+        // Retorno do Mercado Pago: só `approved` sustenta o texto de aprovação.
+        approved: (params.get('collection_status') ?? params.get('status')) === 'approved',
       };
     case '/compra/pendente':
       return { name: 'compra-pendente' };

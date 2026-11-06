@@ -4,7 +4,7 @@ export const CHECKOUT_COPY = {
   eyebrow: 'Compra',
   title: 'Confirme o seu plano',
   intro:
-    'Informe quem vai ser a dona da equipe. O acesso chega por e-mail: um link para criar a senha, sem senha provisória.',
+    'Informe quem será responsável pela equipe. O acesso chega por e-mail: um link para criar a senha, sem senha provisória.',
   changePlan: 'Trocar de plano',
   nameLabel: 'Seu nome',
   emailLabel: 'E-mail',
@@ -16,6 +16,7 @@ export const CHECKOUT_COPY = {
   submit: 'Confirmar pedido',
   submitPaid: 'Ir para o pagamento',
   submitting: 'Enviando…',
+  redirecting: 'Redirecionando…',
   choosePlan: 'Escolha um plano para continuar.',
   unknownPlan: 'Esse plano não está disponível. Escolha um dos planos abaixo.',
   alreadyInTeamHint: 'Se a sua empresa já tem um plano, fale com quem administra a equipe para ser incluída.',
@@ -60,8 +61,15 @@ export const RESULT_COPY = {
   confirmada: {
     eyebrow: 'Pagamento aprovado',
     title: 'Tudo certo com o pagamento',
-    body: 'Pagamento aprovado. Enviamos o acesso para o seu e-mail.',
+    body: 'Enviamos o acesso para o seu e-mail.',
     note: 'Não chegou em alguns minutos? Confira a caixa de spam.',
+  },
+  /** Retorno do Mercado Pago sem `approved` nos parâmetros: não afirma aprovação. */
+  confirmadaIncerta: {
+    eyebrow: 'Pedido recebido',
+    title: 'Confira o seu e-mail',
+    body: 'Se o pagamento foi aprovado, o acesso chega por e-mail.',
+    note: 'Não chegou em alguns minutos? Confira a caixa de spam ou o status no Mercado Pago.',
   },
   pendente: {
     eyebrow: 'Pagamento pendente',
@@ -72,7 +80,7 @@ export const RESULT_COPY = {
   erro: {
     eyebrow: 'Não deu certo',
     title: 'O pagamento não foi concluído',
-    body: 'O pagamento não foi concluído. Nenhum valor foi cobrado.',
+    body: 'O pagamento não foi concluído. Se tiver dúvida sobre alguma cobrança, confira no Mercado Pago ou fale com o suporte.',
     note: '',
   },
   orderLabel: 'Pedido',
@@ -98,7 +106,8 @@ export const CREATE_PASSWORD_COPY = {
   passwordRequired: 'Crie uma senha para continuar.',
   passwordTooShort: 'A senha precisa ter pelo menos 8 caracteres.',
   passwordMismatch: 'As duas senhas não são iguais.',
-  passwordRejected: 'Essa senha foi recusada. Escolha outra, mais longa ou menos comum.',
+  passwordWeak: 'Essa senha foi recusada. Escolha outra, mais longa ou menos comum.',
+  linkError: 'O link não pôde ser aberto. Peça um novo acesso pelo Vision.',
   confirmUnauthorized: 'O link expirou durante a confirmação. Abra o e-mail mais recente e tente de novo.',
   confirmNetwork: 'Sem conexão com o servidor. Confira a sua internet e tente de novo.',
   confirmServer: 'Não foi possível concluir agora. Tente de novo em alguns minutos.',
@@ -106,6 +115,7 @@ export const CREATE_PASSWORD_COPY = {
   expiredBody:
     'Abra o e-mail mais recente, ou no Vision use Primeiro acesso na tela de entrada para receber um código.',
   errorTitle: 'Não foi possível abrir o link',
+  errorBody: 'Este link não pôde ser aberto. Abra o e-mail mais recente, ou no Vision use Primeiro acesso na tela de entrada para receber um código.',
   doneTitle: 'Tudo pronto',
   doneTeam: (org: string, plan?: string) => (plan ? `Equipe ${org} · plano ${plan}.` : `Equipe ${org}.`),
   donePlanOnly: (plan: string) => `Plano ${plan}.`,

@@ -26,6 +26,19 @@ export function readAuthFragment(hash: string): AuthFragment {
   return { kind: 'none' };
 }
 
+export type UpdateErrorKind = 'same' | 'weak' | 'network' | 'other';
+
+/** Classifica o erro de `auth.updateUser` para escolher a mensagem (ou seguir adiante). */
+export function classifyUpdateError(error: { code?: string; name?: string; status?: number } | null | undefined): UpdateErrorKind {
+  if (!error) return 'other';
+  if (error.code === 'same_password') return 'same';
+  if (error.code === 'weak_password') return 'weak';
+  if (error.name === 'AuthRetryableFetchError' || error.status === 0 || (error.status === undefined && error.name === 'TypeError')) {
+    return 'network';
+  }
+  return 'other';
+}
+
 /** Mesmo mínimo do app (`CloudAuthCard`). Vazio só vale quando a senha é opcional. */
 export const MIN_PASSWORD_LENGTH = 8;
 

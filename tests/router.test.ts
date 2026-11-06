@@ -12,17 +12,33 @@ describe('parseRoute', () => {
   });
 
   test('confirmed purchase reads our order or the MP reference', () => {
-    expect(parseRoute('/compra/confirmada', '?external_reference=abc&collection_status=approved', '')).toEqual({
+    expect(parseRoute('/compra/confirmada', '?external_reference=0b5d3c1e-7a9f-4c2e-8d41-6f1a2b3c4d5e&collection_status=approved', '')).toEqual({
       name: 'compra-confirmada',
-      orderId: 'abc',
+      orderId: '0b5d3c1e-7a9f-4c2e-8d41-6f1a2b3c4d5e',
       free: false,
+      approved: true,
     });
-    expect(parseRoute('/compra/confirmada', '?pedido=abc&tipo=gratis', '')).toEqual({
+    expect(parseRoute('/compra/confirmada', '?pedido=0b5d3c1e-7a9f-4c2e-8d41-6f1a2b3c4d5e&tipo=gratis', '')).toEqual({
       name: 'compra-confirmada',
-      orderId: 'abc',
+      orderId: '0b5d3c1e-7a9f-4c2e-8d41-6f1a2b3c4d5e',
       free: true,
+      approved: false,
     });
-    expect(parseRoute('/compra/confirmada', '', '')).toEqual({ name: 'compra-confirmada', orderId: null, free: false });
+    expect(parseRoute('/compra/confirmada', '', '')).toEqual({
+      name: 'compra-confirmada',
+      orderId: null,
+      free: false,
+      approved: false,
+    });
+  });
+
+  test('order id that is not a UUID is not shown', () => {
+    expect(parseRoute('/compra/confirmada', '?pedido=Clique+aqui+http://x.co', '')).toMatchObject({ orderId: null });
+  });
+
+  test('approval only counts with approved status from Mercado Pago', () => {
+    expect(parseRoute('/compra/confirmada', '?status=approved', '')).toMatchObject({ approved: true });
+    expect(parseRoute('/compra/confirmada', '?collection_status=pending', '')).toMatchObject({ approved: false });
   });
 
   test('unknown path falls back to home', () => {
