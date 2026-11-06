@@ -14,6 +14,7 @@ import { PricingSection } from './components/PricingSection';
 import { PlansPage } from './pages/PlansPage';
 import { CheckoutPage } from './pages/CheckoutPage';
 import { CheckoutResultPage } from './pages/CheckoutResultPage';
+import { CreatePasswordPage } from './pages/CreatePasswordPage';
 import { useRoute, type Route } from './lib/router';
 import { detectOS } from './lib/detectOS';
 import { SupportedOS } from './types';
@@ -113,7 +114,7 @@ function renderPage(route: Exclude<Route, { name: 'home' }>) {
       return <CheckoutResultPage variant="pendente" />;
     case 'compra-erro':
       return <CheckoutResultPage variant="erro" />;
-    default:
-      return <PlansPage />;
+    case 'criar-senha':
+      return <CreatePasswordPage />;
   }
 }

@@ -79,3 +79,36 @@ export const RESULT_COPY = {
   retry: 'Tentar de novo',
   download: 'Baixar o Vision',
 };
+
+/** Página Criar senha (destino do link do e-mail de acesso). */
+export const CREATE_PASSWORD_COPY = {
+  eyebrow: 'Acesso ao Vision',
+  loading: 'Abrindo o seu link…',
+  inviteTitle: 'Crie a sua senha',
+  inviteIntro: 'Esta é a senha que você vai usar para entrar no Vision com o seu e-mail.',
+  recoveryTitle: 'Confirme o seu acesso',
+  recoveryIntro: 'Sua senha atual continua valendo. Se quiser, defina uma nova abaixo; senão, só confirme.',
+  recoveryOptional: 'Definir nova senha (opcional)',
+  passwordLabel: 'Senha',
+  confirmLabel: 'Repita a senha',
+  passwordHint: 'Pelo menos 8 caracteres.',
+  submitInvite: 'Criar senha e ativar',
+  submitRecovery: 'Confirmar',
+  saving: 'Salvando…',
+  passwordRequired: 'Crie uma senha para continuar.',
+  passwordTooShort: 'A senha precisa ter pelo menos 8 caracteres.',
+  passwordMismatch: 'As duas senhas não são iguais.',
+  passwordRejected: 'Essa senha foi recusada. Escolha outra, mais longa ou menos comum.',
+  confirmUnauthorized: 'O link expirou durante a confirmação. Abra o e-mail mais recente e tente de novo.',
+  confirmNetwork: 'Sem conexão com o servidor. Confira a sua internet e tente de novo.',
+  confirmServer: 'Não foi possível concluir agora. Tente de novo em alguns minutos.',
+  expiredTitle: 'Este link expirou ou já foi usado',
+  expiredBody:
+    'Abra o e-mail mais recente, ou no Vision use Primeiro acesso na tela de entrada para receber um código.',
+  errorTitle: 'Não foi possível abrir o link',
+  doneTitle: 'Tudo pronto',
+  doneTeam: (org: string, plan?: string) => (plan ? `Equipe ${org} · plano ${plan}.` : `Equipe ${org}.`),
+  donePlanOnly: (plan: string) => `Plano ${plan}.`,
+  doneSteps: ['Baixe o Vision.', 'Abra e entre com seu e-mail e senha.'],
+  download: 'Baixar o Vision',
+};

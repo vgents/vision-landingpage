@@ -66,8 +66,23 @@ export function navigate(path: string): void {
   if (!path.includes('#')) window.scrollTo(0, 0);
 }
 
+/**
+ * Link do e-mail aberto na raiz: troca o caminho para /criar-senha mantendo o
+ * fragmento. Sem isso, quando o supabase-js limpa o fragmento (o que dispara
+ * `popstate`), a raiz sem fragmento voltaria a ser a landing no meio do fluxo.
+ */
+function canonicalizeAuthLanding(): void {
+  const { pathname, search, hash } = window.location;
+  if (parseRoute(pathname, search, hash).name === 'criar-senha' && pathname.replace(/\/+$/, '') !== '/criar-senha') {
+    window.history.replaceState(window.history.state, '', `/criar-senha${search}${hash}`);
+  }
+}
+
 export function useRoute(): Route {
-  const [route, setRoute] = useState<Route>(currentRoute);
+  const [route, setRoute] = useState<Route>(() => {
+    canonicalizeAuthLanding();
+    return currentRoute();
+  });
 
   useEffect(() => {
     const update = () => setRoute(currentRoute());
