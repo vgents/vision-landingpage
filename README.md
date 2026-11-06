@@ -19,6 +19,7 @@ Outros comandos:
 npm run build    # gera dist/
 npm run preview  # serve o build
 npm run lint     # tsc --noEmit
+npm test         # vitest (lógica de src/lib)
 ```
 
 ## Stack
@@ -30,13 +31,34 @@ React 19 · Vite 6 · Tailwind CSS 4 · lucide-react
 ```
 public/                 favicon, logo e imagem de compartilhamento
 src/
-  data/softwareData.ts  todo o conteúdo textual do site
+  data/softwareData.ts  conteúdo textual da landing
+  data/plans.ts         planos (recuo estático) e textos dos cartões
+  data/checkout.ts      textos da compra, dos resultados e de Criar senha
+  data/cloud.ts         URL do Supabase e chave pública (anon)
+  lib/                  lógica pura (rotas, planos, compra, Criar senha), testada com Vitest
+  pages/                páginas fora da landing
   components/           uma seção por arquivo
   index.css             tokens de marca (@theme do Tailwind 4)
+tests/                  testes Vitest de src/lib
+vercel.json             fallback SPA: todo caminho serve index.html
 ```
 
-**Todo o texto do site vive em `src/data/softwareData.ts`.** Versão, contagens do catálogo,
-requisitos, funcionalidades e FAQ saem dali — os componentes só renderizam.
+**Todo o texto do site vive em `src/data/`.** Versão, contagens do catálogo, requisitos,
+funcionalidades, FAQ, planos e textos da compra saem dali — os componentes só renderizam.
+
+## Páginas
+
+| Caminho | O quê |
+| --- | --- |
+| `/` | landing (com a seção de planos) |
+| `/planos` | planos, lidos da tabela `plans` do Supabase, com recuo estático |
+| `/compra?plano=<id>` | formulário de compra; chama a Edge Function `checkout-create` |
+| `/compra/confirmada`, `/compra/pendente`, `/compra/erro` | retornos (as `back_urls` do Mercado Pago e o pedido grátis) |
+| `/criar-senha` | destino do link do e-mail de acesso; define a senha e chama `account-confirm` |
+
+O roteamento é por caminho, sem biblioteca (`src/lib/router.ts`). O site só conhece a URL pública
+do Supabase e a chave **anon** (`src/data/cloud.ts`); o token do Mercado Pago e a chave service
+role ficam só nos segredos das Edge Functions.
 
 ## Fidelidade ao produto
 
