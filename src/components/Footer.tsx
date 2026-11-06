@@ -4,6 +4,7 @@ import { VisionLogo } from './VisionLogo';
 import { APP_VERSION } from '../data/softwareData';
 import { PUBLISHED, downloadTarget } from '../data/platforms';
 import { OperatingSystem, SupportedOS } from '../types';
+import { handleLinkClick } from '../lib/router';
 
 interface FooterProps {
   onOpenDownload: (os?: SupportedOS) => void;
@@ -13,15 +14,16 @@ interface FooterProps {
 const OS_ICON = { Apple, Monitor, Terminal };
 
 const PRODUCT_LINKS = [
-  { href: '#como-funciona', label: 'Como funciona' },
-  { href: '#recursos', label: 'Funcionalidades' },
-  { href: '#biblioteca', label: 'Biblioteca' }
+  { href: '/#como-funciona', label: 'Como funciona' },
+  { href: '/#recursos', label: 'Funcionalidades' },
+  { href: '/#biblioteca', label: 'Biblioteca' },
+  { href: '/planos', label: 'Planos' }
 ];
 
 const SUPPORT_LINKS = [
-  { href: '#downloads', label: 'Download' },
-  { href: '#requisitos', label: 'Requisitos' },
-  { href: '#faq', label: 'Perguntas frequentes' }
+  { href: '/#downloads', label: 'Download' },
+  { href: '/#requisitos', label: 'Requisitos' },
+  { href: '/#faq', label: 'Perguntas frequentes' }
 ];
 
 export const Footer: React.FC<FooterProps> = ({ onOpenDownload, detectedOS }) => {
@@ -67,6 +69,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDownload, detectedOS }) =>
                 <li key={link.href}>
                   <a
                     href={link.href}
+                    onClick={(event) => handleLinkClick(event, link.href)}
                     className="inline-block py-2 hover:text-accent-strong transition-colors"
                   >
                     {link.label}
@@ -85,6 +88,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDownload, detectedOS }) =>
                 <li key={link.href}>
                   <a
                     href={link.href}
+                    onClick={(event) => handleLinkClick(event, link.href)}
                     className="inline-block py-2 hover:text-accent-strong transition-colors"
                   >
                     {link.label}
@@ -103,7 +107,8 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDownload, detectedOS }) =>
               </button>
             ) : (
               <a
-                href="#downloads"
+                href="/#downloads"
+                onClick={(event) => handleLinkClick(event, '/#downloads')}
                 className="mt-2 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-accent hover:bg-accent-strong text-ink-deep text-xs font-semibold transition-colors"
               >
                 <Download className="w-3.5 h-3.5" />

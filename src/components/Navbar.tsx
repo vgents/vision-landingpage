@@ -4,6 +4,7 @@ import { VisionLogo } from './VisionLogo';
 import { APP_VERSION } from '../data/softwareData';
 import { availabilityShort, downloadTarget } from '../data/platforms';
 import { OperatingSystem, SupportedOS } from '../types';
+import { handleLinkClick } from '../lib/router';
 
 interface NavbarProps {
   onOpenDownload: (os?: SupportedOS) => void;
@@ -13,12 +14,13 @@ interface NavbarProps {
 const OS_ICON = { Apple, Monitor, Terminal };
 
 const NAV_LINKS = [
-  { href: '#como-funciona', label: 'Como funciona' },
-  { href: '#recursos', label: 'Funcionalidades' },
-  { href: '#downloads', label: 'Download' },
-  { href: '#biblioteca', label: 'Biblioteca' },
-  { href: '#requisitos', label: 'Requisitos' },
-  { href: '#faq', label: 'FAQ' }
+  { href: '/#como-funciona', label: 'Como funciona' },
+  { href: '/#recursos', label: 'Funcionalidades' },
+  { href: '/#downloads', label: 'Download' },
+  { href: '/#biblioteca', label: 'Biblioteca' },
+  { href: '/#requisitos', label: 'Requisitos' },
+  { href: '/planos', label: 'Planos' },
+  { href: '/#faq', label: 'FAQ' }
 ];
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenDownload, detectedOS }) => {
@@ -69,7 +71,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDownload, detectedOS }) =>
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between gap-4">
-          <a href="#" className="flex items-center gap-3 group shrink-0" aria-label="Vision Design, início">
+          <a
+            href="/"
+            onClick={(event) => handleLinkClick(event, '/')}
+            className="flex items-center gap-3 group shrink-0" aria-label="Vision Design, início">
             <VisionLogo size={36} className="transition-transform duration-300 group-hover:scale-105" />
             <span className="flex flex-col leading-none">
               <span className="font-heading text-lg sm:text-xl text-cream-strong">
@@ -86,6 +91,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDownload, detectedOS }) =>
               <a
                 key={link.href}
                 href={link.href}
+                onClick={(event) => handleLinkClick(event, link.href)}
                 className="py-2 whitespace-nowrap hover:text-cream-strong transition-colors"
               >
                 {link.label}
@@ -110,7 +116,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDownload, detectedOS }) =>
               </button>
             ) : (
               <a
-                href="#downloads"
+                href="/#downloads"
+                onClick={(event) => handleLinkClick(event, '/#downloads')}
                 className="group px-4 xl:px-5 py-2.5 rounded-xl bg-accent hover:bg-accent-strong text-ink-deep font-semibold text-sm shadow-lg shadow-accent/20 transition-all active:scale-95 flex items-center gap-2 whitespace-nowrap"
               >
                 <Download className="w-4 h-4 transition-transform group-hover:-translate-y-0.5" />
@@ -143,7 +150,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDownload, detectedOS }) =>
                 <a
                   key={link.href}
                   href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={(event) => {
+                    setMobileMenuOpen(false);
+                    handleLinkClick(event, link.href);
+                  }}
                   className="py-3.5 border-b border-cream/5 hover:text-accent-strong transition-colors"
                 >
                   {link.label}
@@ -166,8 +176,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDownload, detectedOS }) =>
               </button>
             ) : (
               <a
-                href="#downloads"
-                onClick={() => setMobileMenuOpen(false)}
+                href="/#downloads"
+                onClick={(event) => {
+                  setMobileMenuOpen(false);
+                  handleLinkClick(event, '/#downloads');
+                }}
                 className="w-full py-3.5 rounded-xl bg-accent hover:bg-accent-strong text-ink-deep font-semibold text-sm flex items-center justify-center gap-2 shadow-lg shadow-accent/20 transition-colors"
               >
                 <Download className="w-4 h-4" />

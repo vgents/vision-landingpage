@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type MouseEvent } from 'react';
 
 /**
  * Roteador mínimo por caminho (History API). A Vercel serve `index.html` para
@@ -76,4 +76,15 @@ export function useRoute(): Route {
   }, []);
 
   return route;
+}
+
+/**
+ * Clique num link interno: troca de página sem recarregar, mas deixa o
+ * navegador cuidar de Cmd/Ctrl/Shift/botão do meio (abrir em nova aba).
+ */
+export function handleLinkClick(event: MouseEvent<HTMLAnchorElement>, path: string): void {
+  if (event.defaultPrevented || event.button !== 0) return;
+  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  event.preventDefault();
+  navigate(path);
 }

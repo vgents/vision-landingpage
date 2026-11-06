@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AuroraCanvas } from './components/AuroraCanvas';
 import { Navbar } from './components/Navbar';
 import { HeroSection } from './components/HeroSection';
@@ -10,6 +10,9 @@ import { SystemRequirements } from './components/SystemRequirements';
 import { FaqSection } from './components/FaqSection';
 import { Footer } from './components/Footer';
 import { DownloadModal } from './components/DownloadModal';
+import { PricingSection } from './components/PricingSection';
+import { PlansPage } from './pages/PlansPage';
+import { useRoute, type Route } from './lib/router';
 import { detectOS } from './lib/detectOS';
 import { SupportedOS } from './types';
 
@@ -23,6 +26,19 @@ export default function App() {
   const [selectedDownloadOS, setSelectedDownloadOS] = useState<SupportedOS>(
     detectedOS === 'unknown' ? 'mac' : detectedOS
   );
+
+  const route = useRoute();
+
+  /**
+   * Na landing, um `/#secao` vindo de outra página só rola depois que a seção
+   * existe: o navegador tenta antes do React montar.
+   */
+  useEffect(() => {
+    if (route.name !== 'home' || !window.location.hash) return;
+    const id = decodeURIComponent(window.location.hash.slice(1));
+    const frame = requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView());
+    return () => cancelAnimationFrame(frame);
+  }, [route]);
 
   const handleOpenDownload = (os?: SupportedOS) => {
     setSelectedDownloadOS(os ?? (detectedOS === 'unknown' ? 'mac' : detectedOS));
@@ -39,26 +55,35 @@ export default function App() {
         {/* Navigation */}
         <Navbar onOpenDownload={handleOpenDownload} detectedOS={detectedOS} />
 
-        {/* Hero Section */}
-        <HeroSection onOpenDownload={handleOpenDownload} detectedOS={detectedOS} />
+        {route.name === 'home' ? (
+          <>
+            {/* Hero Section */}
+            <HeroSection onOpenDownload={handleOpenDownload} detectedOS={detectedOS} />
 
-        {/* Demonstração do fluxo: inception, fluxo, documentação e protótipo */}
-        <InteractiveAppDemo />
+            {/* Demonstração do fluxo: inception, fluxo, documentação e protótipo */}
+            <InteractiveAppDemo />
 
-        {/* Funcionalidades reais do produto */}
-        <FeatureShowcase />
+            {/* Funcionalidades reais do produto */}
+            <FeatureShowcase />
 
-        {/* Download — macOS, Windows e Linux publicados */}
-        <DownloadCenter onOpenDownload={handleOpenDownload} detectedOS={detectedOS} />
+            {/* Planos — os mesmos cartões da página /planos */}
+            <PricingSection id="planos" />
 
-        {/* Biblioteca pública de projetos */}
-        <PublicLibrarySection />
+            {/* Download — macOS, Windows e Linux publicados */}
+            <DownloadCenter onOpenDownload={handleOpenDownload} detectedOS={detectedOS} />
 
-        {/* Pré-requisitos de instalação */}
-        <SystemRequirements detectedOS={detectedOS} />
+            {/* Biblioteca pública de projetos */}
+            <PublicLibrarySection />
 
-        {/* FAQ Accordion */}
-        <FaqSection detectedOS={detectedOS} />
+            {/* Pré-requisitos de instalação */}
+            <SystemRequirements detectedOS={detectedOS} />
+
+            {/* FAQ Accordion */}
+            <FaqSection detectedOS={detectedOS} />
+          </>
+        ) : (
+          renderPage(route)
+        )}
 
         {/* Footer */}
         <Footer onOpenDownload={handleOpenDownload} detectedOS={detectedOS} />
@@ -72,4 +97,13 @@ export default function App() {
       </div>
     </div>
   );
+}
+
+function renderPage(route: Exclude<Route, { name: 'home' }>) {
+  switch (route.name) {
+    case 'planos':
+      return <PlansPage />;
+    default:
+      return <PlansPage />;
+  }
 }
