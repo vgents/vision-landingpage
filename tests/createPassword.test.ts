@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'vitest';
+import { CREATE_PASSWORD_COPY } from '../src/data/checkout';
 import { SUPABASE_ANON_KEY } from '../src/data/cloud';
 import { classifyUpdateError, confirmAccount, readAuthFragment, validateNewPassword } from '../src/lib/createPassword';
 
