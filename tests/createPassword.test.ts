@@ -90,3 +90,14 @@ describe('classifyUpdateError', () => {
     expect(classifyUpdateError({ code: 'unexpected', status: 500 })).toBe('other');
   });
 });
+
+describe('confirmAccount email_not_verified', () => {
+  test('403 email_not_verified gets its own outcome and copy', async () => {
+    const out = await confirmAccount('tok', fakeFetch(403, { error: 'email_not_verified', message: 'x' }));
+    expect(out).toEqual({ ok: false, code: 'email_not_verified' });
+    expect(CREATE_PASSWORD_COPY.confirmEmailNotVerified).toMatch(/Primeiro acesso/);
+  });
+  test('other 403 stays a server error', async () => {
+    expect(await confirmAccount('tok', fakeFetch(403, { error: 'forbidden' }))).toEqual({ ok: false, code: 'server_error' });
+  });
+});

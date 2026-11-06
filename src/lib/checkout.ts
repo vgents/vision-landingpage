@@ -90,7 +90,10 @@ export async function submitCheckout(
 
   const data = (await res.json().catch(() => null)) as Record<string, unknown> | null;
   if (!res.ok) {
-    return errorOutcome(typeof data?.error === 'string' ? data.error : 'server_error', data?.field);
+    return errorOutcome(
+      typeof data?.error === 'string' ? data.error : res.status === 429 ? 'rate_limited' : 'server_error',
+      data?.field,
+    );
   }
   if (data?.next === 'check_email' && typeof data.order_id === 'string') {
     return { kind: 'check_email', orderId: data.order_id };

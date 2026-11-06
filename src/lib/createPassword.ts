@@ -54,7 +54,7 @@ type ConfirmStatus = (typeof CONFIRM_STATUSES)[number];
 
 export type ConfirmOutcome =
   | { ok: true; status: ConfirmStatus; orgName?: string; planName?: string }
-  | { ok: false; code: 'unauthorized' | 'network_error' | 'server_error' };
+  | { ok: false; code: 'unauthorized' | 'email_not_verified' | 'network_error' | 'server_error' };
 
 /** Chama `account-confirm` com o token da sessão aberta pelo link. */
 export async function confirmAccount(accessToken: string, fetchImpl: typeof fetch = fetch): Promise<ConfirmOutcome> {
@@ -74,6 +74,7 @@ export async function confirmAccount(accessToken: string, fetchImpl: typeof fetc
   }
   if (res.status === 401) return { ok: false, code: 'unauthorized' };
   const data = (await res.json().catch(() => null)) as Record<string, unknown> | null;
+  if (res.status === 403 && data?.error === 'email_not_verified') return { ok: false, code: 'email_not_verified' };
   const status = data?.status;
   if (!res.ok || !CONFIRM_STATUSES.includes(status as ConfirmStatus)) return { ok: false, code: 'server_error' };
   return {

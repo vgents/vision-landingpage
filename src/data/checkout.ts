@@ -34,7 +34,7 @@ export const CHECKOUT_ERROR_MESSAGES: Record<string, string> = {
   validation_error: 'Confira os campos do formulário.',
   invalid_plan: 'Esse plano não está disponível. Escolha outro na página de planos.',
   already_in_team: 'Esse e-mail já faz parte de uma equipe com plano do Vision. Entre no app com ele ou use outro e-mail.',
-  rate_limited: 'Muitos pedidos em pouco tempo para este e-mail. Tente de novo daqui a uma hora.',
+  rate_limited: 'Muitas tentativas em pouco tempo. Tente de novo em alguns minutos.',
   mp_unavailable: 'Não foi possível falar com o Mercado Pago agora. Tente de novo em alguns minutos.',
   email_failed:
     'Seu pedido foi registrado, mas o e-mail de acesso não pôde ser enviado. Tente de novo em alguns minutos.',
@@ -108,6 +108,8 @@ export const CREATE_PASSWORD_COPY = {
   passwordMismatch: 'As duas senhas não são iguais.',
   passwordWeak: 'Essa senha foi recusada. Escolha outra, mais longa ou menos comum.',
   linkError: 'O link não pôde ser aberto. Peça um novo acesso pelo Vision.',
+  confirmEmailNotVerified:
+    'O seu e-mail ainda não foi confirmado. Abra o link mais recente que enviamos, ou peça um novo pelo Primeiro acesso na tela de entrada do Vision.',
   confirmUnauthorized: 'O link expirou durante a confirmação. Abra o e-mail mais recente e tente de novo.',
   confirmNetwork: 'Sem conexão com o servidor. Confira a sua internet e tente de novo.',
   confirmServer: 'Não foi possível concluir agora. Tente de novo em alguns minutos.',

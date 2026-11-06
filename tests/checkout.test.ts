@@ -180,3 +180,13 @@ describe('singleFlight on failure', () => {
     expect(guard.busy).toBe(false);
   });
 });
+
+describe('429 rate limit', () => {
+  test('429 with or without a body shows the friendly message', async () => {
+    for (const body of [{ error: 'rate_limited' }, {}]) {
+      const res = await submitCheckout('individual', ok, fakeFetch(429, body));
+      expect(res).toMatchObject({ kind: 'error', code: 'rate_limited' });
+      expect((res as { message: string }).message).toMatch(/Muitas tentativas.*minutos/);
+    }
+  });
+});

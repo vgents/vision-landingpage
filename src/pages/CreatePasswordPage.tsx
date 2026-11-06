@@ -22,6 +22,7 @@ const inputClass =
 
 function confirmErrorMessage(code: Extract<ConfirmOutcome, { ok: false }>['code']): string {
   if (code === 'unauthorized') return COPY.confirmUnauthorized;
+  if (code === 'email_not_verified') return COPY.confirmEmailNotVerified;
   if (code === 'network_error') return COPY.confirmNetwork;
   return COPY.confirmServer;
 }
