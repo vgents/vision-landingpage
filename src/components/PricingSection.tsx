@@ -1,35 +1,61 @@
 import React, { useEffect, useState } from 'react';
 import { Check, Users, BadgeCheck } from 'lucide-react';
-import { FALLBACK_PLANS, PLANS_COPY, type PlanCard } from '../data/plans';
-import { fetchPlans, formatPrice, seatsLabel } from '../lib/plans';
+import { PLANS_COPY } from '../data/plans';
+import { fetchSeatPricing, formatPrice } from '../lib/plans';
 import { handleLinkClick } from '../lib/router';
+import { DEFAULT_SEAT_PRICING, seatPriceCents, type SeatPricing } from '../lib/seatPricing';
 
 interface PricingSectionProps {
   /** `id` da seção, para âncora na landing. */
   id?: string;
-  /** Aviso acima dos cartões (ex.: plano inválido na compra). */
+  /** Aviso acima dos cartões. */
   notice?: string;
 }
 
 /**
- * Cartões dos planos. Começa pela lista estática (nada pisca vazio) e troca
- * pela da tabela `plans` quando a busca responde.
+ * Dois cartões: Somente eu e Tenho uma equipe. Começa pela tabela estática
+ * (nada pisca vazio) e troca pela tabela `seat_pricing` quando a busca responde.
  */
 export const PricingSection: React.FC<PricingSectionProps> = ({ id, notice }) => {
-  const [plans, setPlans] = useState<PlanCard[]>(FALLBACK_PLANS);
+  const [pricing, setPricing] = useState<SeatPricing>(DEFAULT_SEAT_PRICING);
   const [source, setSource] = useState<'loading' | 'remote' | 'fallback'>('loading');
 
   useEffect(() => {
     let alive = true;
-    fetchPlans().then((res) => {
+    fetchSeatPricing().then((res) => {
       if (!alive) return;
-      setPlans(res.plans);
+      setPricing(res.pricing);
       setSource(res.source);
     });
     return () => {
       alive = false;
     };
   }, []);
+
+  const cards = [
+    {
+      key: 'solo' as const,
+      name: PLANS_COPY.solo.name,
+      tagline: PLANS_COPY.solo.tagline,
+      lead: null,
+      price: formatPrice(pricing.base_cents),
+      unit: PLANS_COPY.perMonth,
+      seats: null,
+      features: PLANS_COPY.solo.features,
+      highlighted: false,
+    },
+    {
+      key: 'team' as const,
+      name: PLANS_COPY.team.name,
+      tagline: PLANS_COPY.team.tagline,
+      lead: PLANS_COPY.team.from,
+      price: formatPrice(seatPriceCents(pricing, pricing.tier2_from)),
+      unit: PLANS_COPY.team.perSeatMonth,
+      seats: PLANS_COPY.team.range(pricing.max_seats),
+      features: PLANS_COPY.team.features,
+      highlighted: true,
+    },
+  ];
 
   return (
     <section id={id} className="py-16 sm:py-24 relative">
@@ -55,38 +81,35 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ id, notice }) =>
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-8" aria-busy={source === 'loading'}>
-          {plans.map((plan, index) => {
-            const highlighted = index === 1;
-            const href = `/compra?plano=${encodeURIComponent(plan.id)}`;
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-8 max-w-4xl mx-auto" aria-busy={source === 'loading'}>
+          {cards.map((card) => {
+            const href = `/compra?escolha=${card.key}`;
             return (
               <div
-                key={plan.id}
-                data-plan={plan.id}
+                key={card.key}
+                data-plan={card.key}
                 className={`glass-card glass-card-hover rounded-3xl p-5 sm:p-7 flex flex-col ${
-                  highlighted ? 'border-accent/40 shadow-2xl shadow-accent/10' : ''
+                  card.highlighted ? 'border-accent/40 shadow-2xl shadow-accent/10' : ''
                 }`}
               >
-                <h3 className="text-lg font-medium text-cream-strong leading-snug mb-2">{plan.name}</h3>
-                {plan.tagline && <p className="text-xs text-muted leading-relaxed mb-5">{plan.tagline}</p>}
+                <h3 className="text-lg font-medium text-cream-strong leading-snug mb-2">{card.name}</h3>
+                <p className="text-xs text-muted leading-relaxed mb-5">{card.tagline}</p>
 
                 <div className="mb-5">
-                  <span className="text-4xl font-semibold text-cream-strong">{formatPrice(plan.priceCents)}</span>
-                  {plan.priceCents === 0 && (
-                    <span className="block text-xs text-muted mt-1">{PLANS_COPY.perPeriod}</span>
-                  )}
+                  {card.lead && <span className="block text-xs text-muted mb-1">{card.lead}</span>}
+                  <span className="text-4xl font-semibold text-cream-strong">{card.price}</span>
+                  <span className="text-sm text-muted ml-1.5">{card.unit}</span>
                 </div>
 
-                <div className="flex items-center gap-2 text-sm text-cream/85 mb-5">
-                  <Users className="w-4 h-4 text-accent shrink-0" />
-                  <span>
-                    {seatsLabel(plan.maxUsers)}
-                    <span className="text-muted"> · {PLANS_COPY.ownerIncluded}</span>
-                  </span>
-                </div>
+                {card.seats && (
+                  <div className="flex items-center gap-2 text-sm text-cream/85 mb-5">
+                    <Users className="w-4 h-4 text-accent shrink-0" />
+                    <span>{card.seats}</span>
+                  </div>
+                )}
 
                 <ul className="space-y-2 mb-6 text-xs text-cream/75 flex-1">
-                  {plan.features.map((feature) => (
+                  {card.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-2">
                       <Check className="w-3.5 h-3.5 text-ok shrink-0 mt-0.5" />
                       <span>{feature}</span>
@@ -98,7 +121,7 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ id, notice }) =>
                   href={href}
                   onClick={(event) => handleLinkClick(event, href)}
                   className={`w-full py-3.5 rounded-xl font-semibold text-sm transition-colors flex items-center justify-center gap-2 ${
-                    highlighted
+                    card.highlighted
                       ? 'bg-accent hover:bg-accent-strong text-ink-deep shadow-lg shadow-accent/20'
                       : 'bg-cream/5 hover:bg-cream/10 border border-cream/15 text-cream'
                   }`}

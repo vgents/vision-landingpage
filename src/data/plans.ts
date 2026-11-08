@@ -1,27 +1,21 @@
 /**
- * Planos do Vision. A fonte é a tabela `plans` do Supabase (só os ativos e
- * listados chegam ao site); esta lista é o recuo quando a busca falha e é
- * também de onde saem os textos dos cartões, que a tabela não guarda.
+ * Textos da escolha de plano. Os preços não ficam aqui: saem da tabela
+ * `seat_pricing` (com recuo para DEFAULT_SEAT_PRICING em `lib/seatPricing`).
  */
-export type PlanCard = {
-  id: string;
-  name: string;
-  maxUsers: number;
-  priceCents: number;
-  currency: 'BRL';
-  requiresCompany: boolean;
-  tagline: string;
-  features: string[];
-};
+export type PlanChoiceId = 'solo' | 'team';
 
-export const FALLBACK_PLANS: PlanCard[] = [
-  {
-    id: 'individual',
-    name: 'Individual',
-    maxUsers: 1,
-    priceCents: 1499,
-    currency: 'BRL',
-    requiresCompany: false,
+export const PLANS_COPY = {
+  eyebrow: 'Planos',
+  titleLead: 'Pague só pelas',
+  titleAccent: 'pessoas que usam',
+  intro:
+    'Todos os planos dão acesso ao aplicativo inteiro, cobrado por mês e por pessoa. Quem compra já entra como responsável pela equipe.',
+  perMonth: '/mês',
+  choose: 'Escolher',
+  fallbackNotice: 'Mostrando a tabela de preços salva no site; os valores são os mesmos.',
+  loading: 'Carregando planos…',
+  solo: {
+    name: 'Somente eu',
     tagline: 'Para quem desenha e prototipa sozinho.',
     features: [
       'Todo o aplicativo, sem recursos cortados',
@@ -29,45 +23,17 @@ export const FALLBACK_PLANS: PlanCard[] = [
       'Publicação na biblioteca pública',
     ],
   },
-  {
-    id: 'startup',
-    name: 'Start-up — pequenas empresas e iniciativas',
-    maxUsers: 4,
-    priceCents: 2999,
-    currency: 'BRL',
-    requiresCompany: true,
-    tagline: 'Para times pequenos que trabalham juntos no mesmo produto.',
+  team: {
+    name: 'Tenho uma equipe',
+    tagline: 'Para times que trabalham juntos no mesmo produto.',
+    from: 'a partir de',
+    perSeatMonth: 'por pessoa/mês',
+    range: (max: number) => `2 a ${max} pessoas`,
     features: [
       'Equipe com organização própria',
       'Quem compra administra a equipe e convida as pessoas',
       'Projetos compartilhados com a organização',
+      'Desconto automático a cada faixa de pessoas',
     ],
   },
-  {
-    id: 'empresas',
-    name: 'Empresas',
-    maxUsers: 20,
-    priceCents: 5999,
-    currency: 'BRL',
-    requiresCompany: true,
-    tagline: 'Para empresas com vários times e projetos ao mesmo tempo.',
-    features: [
-      'Equipe com organização própria',
-      'Gestores que adicionam e removem pessoas',
-      'Projetos compartilhados com a organização',
-    ],
-  },
-];
-
-export const PLANS_COPY = {
-  eyebrow: 'Planos',
-  titleLead: 'Escolha o plano da',
-  titleAccent: 'sua equipe',
-  intro:
-    'Todos os planos dão acesso ao aplicativo inteiro; o que muda é quantas pessoas usam a mesma equipe. Quem compra já entra como responsável pela equipe.',
-  ownerIncluded: 'responsável incluso',
-  choose: 'Escolher',
-  perPeriod: 'por enquanto, sem custo',
-  fallbackNotice: 'Mostrando a lista de planos salva no site; os valores são os mesmos.',
-  loading: 'Carregando planos…',
 };

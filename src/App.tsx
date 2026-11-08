@@ -13,6 +13,7 @@ import { DownloadModal } from './components/DownloadModal';
 import { PricingSection } from './components/PricingSection';
 import { PlansPage } from './pages/PlansPage';
 import { CheckoutPage } from './pages/CheckoutPage';
+import { PayLinkPage } from './pages/PayLinkPage';
 import { CheckoutResultPage } from './pages/CheckoutResultPage';
 import { CreatePasswordPage } from './pages/CreatePasswordPage';
 import { useRoute, type Route } from './lib/router';
@@ -114,9 +115,11 @@ function renderPage(route: Exclude<Route, { name: 'home' }>) {
     case 'planos':
       return <PlansPage />;
     case 'compra':
-      return <CheckoutPage key={route.planId ?? ''} planId={route.planId} />;
+      return <CheckoutPage key={route.choice ?? ''} initialChoice={route.choice} />;
+    case 'compra-pagar':
+      return <PayLinkPage orderId={route.orderId} token={route.token} />;
     case 'compra-confirmada':
-      return <CheckoutResultPage variant="confirmada" free={route.free} approved={route.approved} orderId={route.orderId} />;
+      return <CheckoutResultPage variant="confirmada" approved={route.approved} orderId={route.orderId} />;
     case 'compra-pendente':
       return <CheckoutResultPage variant="pendente" />;
     case 'compra-erro':

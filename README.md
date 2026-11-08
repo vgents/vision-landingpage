@@ -32,7 +32,7 @@ React 19 · Vite 6 · Tailwind CSS 4 · lucide-react
 public/                 favicon, logo e imagem de compartilhamento
 src/
   data/softwareData.ts  conteúdo textual da landing
-  data/plans.ts         planos (recuo estático) e textos dos cartões
+  data/plans.ts         textos dos cartões de plano (preços vêm de lib/seatPricing)
   data/checkout.ts      textos da compra, dos resultados e de Criar senha
   data/cloud.ts         URL do Supabase e chave pública (anon)
   lib/                  lógica pura (rotas, planos, compra, Criar senha), testada com Vitest
@@ -51,9 +51,10 @@ funcionalidades, FAQ, planos e textos da compra saem dali — os componentes só
 | Caminho | O quê |
 | --- | --- |
 | `/` | landing (com a seção de planos) |
-| `/planos` | planos, lidos da tabela `plans` do Supabase, com recuo estático |
-| `/compra?plano=<id>` | formulário de compra; chama a Edge Function `checkout-create` |
-| `/compra/confirmada`, `/compra/pendente`, `/compra/erro` | retornos (as `back_urls` do Mercado Pago e o pedido grátis) |
+| `/planos` | Somente eu e Tenho uma equipe; preços por pessoa/mês da tabela `seat_pricing`, com recuo estático (`DEFAULT_SEAT_PRICING`) |
+| `/compra?escolha=solo\|team` | formulário (quantidade 2–20 em equipe); chama `checkout-create` e mostra "confira seu e-mail". `?plano=` antigo ainda mapeia |
+| `/compra/pagar?pedido=&t=` | destino do link do e-mail; chama `checkout-pay` e vai ao Mercado Pago |
+| `/compra/confirmada`, `/compra/pendente`, `/compra/erro` | retornos (as `back_urls` do Mercado Pago) |
 | `/criar-senha` | destino do link do e-mail de acesso; define a senha e chama `account-confirm` |
 
 O roteamento é por caminho, sem biblioteca (`src/lib/router.ts`). O site só conhece a URL pública

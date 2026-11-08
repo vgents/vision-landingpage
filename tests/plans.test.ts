@@ -1,65 +1,46 @@
 import { describe, expect, test } from 'vitest';
 import { SUPABASE_ANON_KEY } from '../src/data/cloud';
-import { FALLBACK_PLANS } from '../src/data/plans';
-import { fetchPlans, formatPrice, seatsLabel } from '../src/lib/plans';
+import { fetchSeatPricing, formatPrice } from '../src/lib/plans';
+import { DEFAULT_SEAT_PRICING } from '../src/lib/seatPricing';
 
-const startupRow = {
-  id: 'startup',
-  name: 'Start-up',
-  max_users: 4,
-  price_cents: 0,
-  currency: 'BRL',
-  requires_company: true,
-  sort: 2,
-};
+const row = { base_cents: 1599, tier2_from: 3, tier2_discount_bp: 500, tier3_from: 8, tier3_discount_bp: 900, max_seats: 30 };
 
-function fakeFetch(status: number, body: unknown, seen?: { headers?: Record<string, string> }): typeof fetch {
-  return (async (_url: RequestInfo | URL, init?: RequestInit) => {
-    if (seen) seen.headers = init?.headers as Record<string, string>;
+function fakeFetch(status: number, body: unknown, seen?: { headers?: Record<string, string>; url?: string }): typeof fetch {
+  return (async (url: RequestInfo | URL, init?: RequestInit) => {
+    if (seen) {
+      seen.headers = init?.headers as Record<string, string>;
+      seen.url = String(url);
+    }
     return new Response(JSON.stringify(body), { status });
   }) as typeof fetch;
 }
 
-describe('fetchPlans', () => {
-  test('remote plans keep fallback copy', async () => {
-    const res = await fetchPlans(fakeFetch(200, [startupRow]));
-    expect(res.source).toBe('remote');
-    expect(res.plans[0].name).toBe('Start-up');
-    expect(res.plans[0].maxUsers).toBe(4);
-    expect(res.plans[0].requiresCompany).toBe(true);
-    expect(res.plans[0].tagline).toBe(FALLBACK_PLANS.find((p) => p.id === 'startup')!.tagline);
-  });
-
-  test('network failure uses fallback', async () => {
-    const res = await fetchPlans((async () => {
-      throw new TypeError('offline');
-    }) as typeof fetch);
-    expect(res.source).toBe('fallback');
-    expect(res.plans.map((p) => p.id)).toEqual(['individual', 'startup', 'empresas']);
-  });
-
-  test('empty list uses fallback', async () => {
-    expect((await fetchPlans(fakeFetch(200, []))).source).toBe('fallback');
-  });
-
-  test('non-200 uses fallback', async () => {
-    expect((await fetchPlans(fakeFetch(500, { message: 'x' }))).source).toBe('fallback');
-  });
-
-  test('anon headers are sent', async () => {
-    const seen: { headers?: Record<string, string> } = {};
-    await fetchPlans(fakeFetch(200, [startupRow], seen));
+describe('fetchSeatPricing', () => {
+  test('remote row wins', async () => {
+    const seen: { headers?: Record<string, string>; url?: string } = {};
+    const res = await fetchSeatPricing(fakeFetch(200, [{ ...row, extra: 1 }], seen));
+    expect(res).toEqual({ pricing: row, source: 'remote' });
+    expect(seen.url).toMatch(/\/rest\/v1\/seat_pricing\?select=\*$/);
     expect(seen.headers?.apikey).toBe(SUPABASE_ANON_KEY);
+  });
+  test('failures use the default table', async () => {
+    const bad = [
+      fakeFetch(200, []),
+      fakeFetch(200, [{ base_cents: 'x' }]),
+      fakeFetch(500, {}),
+      (async () => {
+        throw new TypeError('offline');
+      }) as typeof fetch,
+    ];
+    for (const f of bad) {
+      expect(await fetchSeatPricing(f)).toEqual({ pricing: DEFAULT_SEAT_PRICING, source: 'fallback' });
+    }
   });
 });
 
-describe('formatting', () => {
-  test('price', () => {
-    expect(formatPrice(0)).toBe('R$ 0');
-    expect(formatPrice(12990)).toBe('R$ 129,90');
-  });
-  test('seats', () => {
-    expect(seatsLabel(1)).toBe('1 usuário');
-    expect(seatsLabel(4)).toBe('até 4 usuários');
+describe('formatPrice', () => {
+  test('brl', () => {
+    expect(formatPrice(1499)).toBe('R$ 14,99');
+    expect(formatPrice(26680)).toBe('R$ 266,80');
   });
 });

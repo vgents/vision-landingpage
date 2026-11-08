@@ -1,14 +1,13 @@
 import { FUNCTIONS_URL, SUPABASE_ANON_KEY } from '../data/cloud';
 import { CHECKOUT_ERROR_DEFAULT, CHECKOUT_ERROR_MESSAGES, CHECKOUT_FIELD_MESSAGES } from '../data/checkout';
-import type { PlanCard } from '../data/plans';
+import type { PlanChoice } from './seatPricing';
 
 export type CheckoutForm = { buyerName: string; buyerEmail: string; companyName: string; acceptTerms: boolean };
 
 export type CheckoutErrors = Partial<Record<keyof CheckoutForm, string>>;
 
 export type CheckoutOutcome =
-  | { kind: 'check_email'; orderId: string }
-  | { kind: 'redirect'; url: string }
+  | { kind: 'check_email'; orderId: string; email: string }
   | { kind: 'error'; code: string; message: string; field?: keyof CheckoutForm };
 
 const MAX_TEXT = 120;
@@ -30,13 +29,13 @@ const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
 export const normalizeEmail = (email: string): string => email.trim().toLowerCase();
 
-export function validateCheckoutForm(form: CheckoutForm, plan: PlanCard): CheckoutErrors {
+export function validateCheckoutForm(form: CheckoutForm, choice: PlanChoice): CheckoutErrors {
   const errors: CheckoutErrors = {};
   const name = form.buyerName.trim();
   if (!name || name.length > MAX_TEXT) errors.buyerName = CHECKOUT_FIELD_MESSAGES.buyerName;
   if (!EMAIL_RE.test(normalizeEmail(form.buyerEmail))) errors.buyerEmail = CHECKOUT_FIELD_MESSAGES.buyerEmail;
   const company = form.companyName.trim();
-  if (plan.requiresCompany && (!company || company.length > MAX_TEXT)) {
+  if (choice === 'team' && (!company || company.length > MAX_TEXT)) {
     errors.companyName = CHECKOUT_FIELD_MESSAGES.companyName;
   }
   if (!form.acceptTerms) errors.acceptTerms = CHECKOUT_FIELD_MESSAGES.acceptTerms;
@@ -62,21 +61,7 @@ function errorOutcome(code: string, serverField?: unknown): CheckoutOutcome {
   return { kind: 'error', code, message: checkoutErrorMessage(code) };
 }
 
-/** Cria o pedido em `checkout-create` e traduz a resposta para a tela. */
-export async function submitCheckout(
-  planId: string,
-  form: CheckoutForm,
-  fetchImpl: typeof fetch = fetch,
-): Promise<CheckoutOutcome> {
-  const company = form.companyName.trim();
-  const body: Record<string, unknown> = {
-    plan_id: planId,
-    buyer_name: form.buyerName.trim(),
-    buyer_email: normalizeEmail(form.buyerEmail),
-    ...(company ? { company_name: company } : {}),
-    accept_terms: true,
-  };
-
+async function postCreate(body: Record<string, unknown>, fetchImpl: typeof fetch): Promise<CheckoutOutcome> {
   let res: Response;
   try {
     res = await fetchImpl(`${FUNCTIONS_URL}/checkout-create`, {
@@ -95,13 +80,70 @@ export async function submitCheckout(
       data?.field,
     );
   }
-  if (data?.next === 'check_email' && typeof data.order_id === 'string') {
-    return { kind: 'check_email', orderId: data.order_id };
-  }
-  if (data?.next === 'redirect' && typeof data.redirect_url === 'string' && isAllowedCheckoutUrl(data.redirect_url)) {
-    return { kind: 'redirect', url: data.redirect_url };
+  if (data?.next === 'check_email' && typeof data.order_id === 'string' && typeof data.email === 'string') {
+    return { kind: 'check_email', orderId: data.order_id, email: data.email };
   }
   return errorOutcome('server_error');
+}
+
+/**
+ * Cria o pedido em `checkout-create`. O corpo leva só escolha e quantidade:
+ * o preço é sempre calculado no servidor.
+ */
+export function submitCheckout(
+  choice: PlanChoice,
+  seats: number,
+  form: CheckoutForm,
+  fetchImpl: typeof fetch = fetch,
+): Promise<CheckoutOutcome> {
+  const company = form.companyName.trim();
+  return postCreate(
+    {
+      choice,
+      seats: choice === 'solo' ? 1 : seats,
+      buyer_name: form.buyerName.trim(),
+      buyer_email: normalizeEmail(form.buyerEmail),
+      ...(choice === 'team' && company ? { company_name: company } : {}),
+      accept_terms: true,
+    },
+    fetchImpl,
+  );
+}
+
+/** Reenvia o e-mail do pedido já criado (mesmo endpoint, outro corpo). */
+export function resendCheckout(orderId: string, email: string, fetchImpl: typeof fetch = fetch): Promise<CheckoutOutcome> {
+  return postCreate({ resend_order_id: orderId, buyer_email: normalizeEmail(email) }, fetchImpl);
+}
+
+export type PayOutcome = { kind: 'redirect'; url: string } | { kind: 'error'; code: string; message: string };
+
+/** Troca o link do e-mail (`pedido` + `t`) pelo endereço de pagamento do Mercado Pago. */
+export async function submitPayLink(
+  orderId: string,
+  token: string,
+  fetchImpl: typeof fetch = fetch,
+): Promise<PayOutcome> {
+  const fail = (code: string): PayOutcome => ({ kind: 'error', code, message: checkoutErrorMessage(code) });
+  let res: Response;
+  try {
+    res = await fetchImpl(`${FUNCTIONS_URL}/checkout-pay`, {
+      method: 'POST',
+      headers: { apikey: SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ order_id: orderId, token }),
+    });
+  } catch {
+    return fail('network_error');
+  }
+  const data = (await res.json().catch(() => null)) as Record<string, unknown> | null;
+  if (res.ok) {
+    if (data?.next === 'redirect' && typeof data.redirect_url === 'string' && isAllowedCheckoutUrl(data.redirect_url)) {
+      return { kind: 'redirect', url: data.redirect_url };
+    }
+    return fail('server_error');
+  }
+  const byStatus: Record<number, string> = { 410: 'expired', 409: 'already_paid', 404: 'invalid_link', 429: 'rate_limited', 502: 'mp_unavailable' };
+  const code = byStatus[res.status] ?? (typeof data?.error === 'string' && data.error in CHECKOUT_ERROR_MESSAGES ? data.error : 'server_error');
+  return fail(code);
 }
 
 /**

@@ -4,8 +4,13 @@ import { isAuthFragment, parseRoute } from '../src/lib/router';
 describe('parseRoute', () => {
   test('known paths, trailing slash ignored', () => {
     expect(parseRoute('/planos/', '', '')).toEqual({ name: 'planos' });
-    expect(parseRoute('/compra', '?plano=startup', '')).toEqual({ name: 'compra', planId: 'startup' });
-    expect(parseRoute('/compra', '', '')).toEqual({ name: 'compra', planId: null });
+    expect(parseRoute('/compra', '?plano=startup', '')).toEqual({ name: 'compra', choice: 'team' });
+    expect(parseRoute('/compra', '', '')).toEqual({ name: 'compra', choice: null });
+    expect(parseRoute('/compra', '?escolha=team', '')).toEqual({ name: 'compra', choice: 'team' });
+    expect(parseRoute('/compra', '?escolha=solo', '')).toEqual({ name: 'compra', choice: 'solo' });
+    expect(parseRoute('/compra', '?escolha=x', '')).toEqual({ name: 'compra', choice: null });
+    expect(parseRoute('/compra', '?plano=individual', '')).toEqual({ name: 'compra', choice: 'solo' });
+    expect(parseRoute('/compra', '?plano=empresas', '')).toEqual({ name: 'compra', choice: 'team' });
     expect(parseRoute('/compra/pendente', '', '')).toEqual({ name: 'compra-pendente' });
     expect(parseRoute('/compra/erro/', '', '')).toEqual({ name: 'compra-erro' });
     expect(parseRoute('/criar-senha', '', '')).toEqual({ name: 'criar-senha' });
@@ -15,21 +20,24 @@ describe('parseRoute', () => {
     expect(parseRoute('/compra/confirmada', '?external_reference=0b5d3c1e-7a9f-4c2e-8d41-6f1a2b3c4d5e&collection_status=approved', '')).toEqual({
       name: 'compra-confirmada',
       orderId: '0b5d3c1e-7a9f-4c2e-8d41-6f1a2b3c4d5e',
-      free: false,
       approved: true,
     });
-    expect(parseRoute('/compra/confirmada', '?pedido=0b5d3c1e-7a9f-4c2e-8d41-6f1a2b3c4d5e&tipo=gratis', '')).toEqual({
+    expect(parseRoute('/compra/confirmada', '?pedido=0b5d3c1e-7a9f-4c2e-8d41-6f1a2b3c4d5e', '')).toEqual({
       name: 'compra-confirmada',
       orderId: '0b5d3c1e-7a9f-4c2e-8d41-6f1a2b3c4d5e',
-      free: true,
       approved: false,
     });
     expect(parseRoute('/compra/confirmada', '', '')).toEqual({
       name: 'compra-confirmada',
       orderId: null,
-      free: false,
       approved: false,
     });
+  });
+
+  test('pay link reads order and token', () => {
+    const id = '0b5d3c1e-7a9f-4c2e-8d41-6f1a2b3c4d5e';
+    expect(parseRoute('/compra/pagar', `?pedido=${id}&t=abc`, '')).toEqual({ name: 'compra-pagar', orderId: id, token: 'abc' });
+    expect(parseRoute('/compra/pagar/', '?pedido=zz', '')).toEqual({ name: 'compra-pagar', orderId: null, token: null });
   });
 
   test('order id that is not a UUID is not shown', () => {

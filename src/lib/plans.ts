@@ -1,62 +1,43 @@
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from '../data/cloud';
-import { FALLBACK_PLANS, type PlanCard } from '../data/plans';
+import { DEFAULT_SEAT_PRICING, type SeatPricing } from './seatPricing';
 
-type PlanRow = {
-  id: string;
-  name: string;
-  max_users: number;
-  price_cents: number;
-  currency: string;
-  requires_company: boolean;
-  sort: number;
-};
+export const SEAT_PRICING_ENDPOINT = `${SUPABASE_URL}/rest/v1/seat_pricing?select=*`;
 
-export const PLANS_ENDPOINT = `${SUPABASE_URL}/rest/v1/plans?select=id,name,max_users,price_cents,currency,requires_company,sort&order=sort`;
+const FIELDS: (keyof SeatPricing)[] = [
+  'base_cents',
+  'tier2_from',
+  'tier2_discount_bp',
+  'tier3_from',
+  'tier3_discount_bp',
+  'max_seats',
+];
 
-function isPlanRow(value: unknown): value is PlanRow {
+function isSeatPricing(value: unknown): value is SeatPricing {
   if (typeof value !== 'object' || value === null) return false;
   const row = value as Record<string, unknown>;
-  return (
-    typeof row.id === 'string' &&
-    typeof row.name === 'string' &&
-    typeof row.max_users === 'number' &&
-    typeof row.price_cents === 'number' &&
-    typeof row.requires_company === 'boolean'
-  );
-}
-
-function toCard(row: PlanRow): PlanCard {
-  const copy = FALLBACK_PLANS.find((plan) => plan.id === row.id);
-  return {
-    id: row.id,
-    name: row.name,
-    maxUsers: row.max_users,
-    priceCents: row.price_cents,
-    currency: 'BRL',
-    requiresCompany: row.requires_company,
-    tagline: copy?.tagline ?? '',
-    features: copy?.features ?? [],
-  };
+  return FIELDS.every((key) => typeof row[key] === 'number' && Number.isFinite(row[key]));
 }
 
 /**
- * Planos ativos e listados (a RLS filtra). Qualquer falha — rede, status, corpo
- * inesperado ou lista vazia — cai na lista estática do site.
+ * Tabela de preço por pessoa (linha única, leitura pública). Qualquer falha —
+ * rede, status ou corpo inesperado — cai na tabela estática do site.
  */
-export async function fetchPlans(
+export async function fetchSeatPricing(
   fetchImpl: typeof fetch = fetch,
-): Promise<{ plans: PlanCard[]; source: 'remote' | 'fallback' }> {
-  const fallback = { plans: FALLBACK_PLANS, source: 'fallback' as const };
+): Promise<{ pricing: SeatPricing; source: 'remote' | 'fallback' }> {
+  const fallback = { pricing: DEFAULT_SEAT_PRICING, source: 'fallback' as const };
   try {
-    const res = await fetchImpl(PLANS_ENDPOINT, {
+    const res = await fetchImpl(SEAT_PRICING_ENDPOINT, {
       headers: { apikey: SUPABASE_ANON_KEY, Accept: 'application/json' },
     });
     if (res.status !== 200) return fallback;
     const body: unknown = await res.json();
-    if (!Array.isArray(body)) return fallback;
-    const rows = body.filter(isPlanRow);
-    if (rows.length === 0) return fallback;
-    return { plans: rows.map(toCard), source: 'remote' };
+    if (!Array.isArray(body) || !isSeatPricing(body[0])) return fallback;
+    const row = body[0];
+    return {
+      pricing: Object.fromEntries(FIELDS.map((key) => [key, row[key]])) as unknown as SeatPricing,
+      source: 'remote',
+    };
   } catch {
     return fallback;
   }
@@ -64,12 +45,7 @@ export async function fetchPlans(
 
 const BRL = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
-/** `0` → `R$ 0`; `12990` → `R$ 129,90`. Espaço comum, não o não separável do Intl. */
+/** `1499` → `R$ 14,99`. Espaço comum, não o não separável do Intl. */
 export function formatPrice(cents: number): string {
-  if (cents === 0) return 'R$ 0';
   return BRL.format(cents / 100).replace(/ /g, ' ');
-}
-
-export function seatsLabel(n: number): string {
-  return n === 1 ? '1 usuário' : `até ${n} usuários`;
 }

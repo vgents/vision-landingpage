@@ -4,6 +4,7 @@ const TITLES: Record<Route['name'], string> = {
   home: 'Vision Design',
   planos: 'Planos · Vision Design',
   compra: 'Compra · Vision Design',
+  'compra-pagar': 'Pagamento · Vision Design',
   'compra-confirmada': 'Pedido recebido · Vision Design',
   'compra-pendente': 'Pagamento pendente · Vision Design',
   'compra-erro': 'Pagamento não concluído · Vision Design',
@@ -13,6 +14,7 @@ const TITLES: Record<Route['name'], string> = {
 /** Rotas com dados de pedido/sessão: fora de buscadores e sem Referer. */
 const PRIVATE: ReadonlySet<Route['name']> = new Set([
   'compra',
+  'compra-pagar',
   'compra-confirmada',
   'compra-pendente',
   'compra-erro',

@@ -1,17 +1,16 @@
 import { describe, expect, test } from 'vitest';
 import { SUPABASE_ANON_KEY } from '../src/data/cloud';
-import { FALLBACK_PLANS } from '../src/data/plans';
 import {
   checkoutErrorMessage,
   isAllowedCheckoutUrl,
+  resendCheckout,
+  submitPayLink,
   singleFlight,
   submitCheckout,
   validateCheckoutForm,
   type CheckoutForm,
 } from '../src/lib/checkout';
 
-const INDIVIDUAL = FALLBACK_PLANS.find((p) => p.id === 'individual')!;
-const STARTUP = FALLBACK_PLANS.find((p) => p.id === 'startup')!;
 const ok: CheckoutForm = { buyerName: 'Ana', buyerEmail: 'ana@x.com', companyName: 'Acme', acceptTerms: true };
 
 type Seen = { url?: string; init?: RequestInit };
@@ -25,83 +24,60 @@ function fakeFetch(status: number, body: unknown, seen: Seen = {}): typeof fetch
 
 describe('validateCheckoutForm', () => {
   test('company required only when the plan asks for it', () => {
-    expect(validateCheckoutForm({ ...ok, companyName: '' }, STARTUP)).toHaveProperty('companyName');
-    expect(validateCheckoutForm({ ...ok, companyName: '' }, INDIVIDUAL)).toEqual({});
+    expect(validateCheckoutForm({ ...ok, companyName: '' }, 'team')).toHaveProperty('companyName');
+    expect(validateCheckoutForm({ ...ok, companyName: '' }, 'solo')).toEqual({});
   });
   test('terms, name and e-mail', () => {
-    expect(validateCheckoutForm({ ...ok, acceptTerms: false }, INDIVIDUAL)).toHaveProperty('acceptTerms');
-    expect(validateCheckoutForm({ ...ok, buyerName: '  ' }, INDIVIDUAL)).toHaveProperty('buyerName');
-    expect(validateCheckoutForm({ ...ok, buyerName: 'a'.repeat(121) }, INDIVIDUAL)).toHaveProperty('buyerName');
-    expect(validateCheckoutForm({ ...ok, buyerEmail: 'ana@x' }, INDIVIDUAL)).toHaveProperty('buyerEmail');
-    expect(validateCheckoutForm({ ...ok, buyerEmail: ' Ana@X.com ' }, INDIVIDUAL)).toEqual({});
-    expect(validateCheckoutForm(ok, STARTUP)).toEqual({});
+    expect(validateCheckoutForm({ ...ok, acceptTerms: false }, 'solo')).toHaveProperty('acceptTerms');
+    expect(validateCheckoutForm({ ...ok, buyerName: '  ' }, 'solo')).toHaveProperty('buyerName');
+    expect(validateCheckoutForm({ ...ok, buyerName: 'a'.repeat(121) }, 'solo')).toHaveProperty('buyerName');
+    expect(validateCheckoutForm({ ...ok, buyerEmail: 'ana@x' }, 'solo')).toHaveProperty('buyerEmail');
+    expect(validateCheckoutForm({ ...ok, buyerEmail: ' Ana@X.com ' }, 'solo')).toEqual({});
+    expect(validateCheckoutForm(ok, 'team')).toEqual({});
   });
 });
 
+const ORDER = '0b5d3c1e-7a9f-4c2e-8d41-6f1a2b3c4d5e';
+const created = { order_id: 'o1', next: 'check_email', email: 'ana@x.com' };
+
 describe('submitCheckout', () => {
-  test('sends normalized email and omits empty company', async () => {
+  test('team body carries choice, seats and company, never a price', async () => {
     const seen: Seen = {};
-    await submitCheckout(
-      'individual',
-      { ...ok, buyerName: ' Ana ', buyerEmail: ' Ana@X.com ', companyName: '  ' },
-      fakeFetch(200, { order_id: 'o1', status: 'awaiting_confirmation', next: 'check_email' }, seen),
-    );
+    await submitCheckout('team', 5, { ...ok, buyerName: ' Ana ', buyerEmail: ' Ana@X.com ' }, fakeFetch(200, created, seen));
     expect(seen.url).toMatch(/\/functions\/v1\/checkout-create$/);
     expect(seen.init?.method).toBe('POST');
     expect((seen.init?.headers as Record<string, string>).apikey).toBe(SUPABASE_ANON_KEY);
     const body = JSON.parse(String(seen.init?.body));
-    expect(body).toEqual({ plan_id: 'individual', buyer_name: 'Ana', buyer_email: 'ana@x.com', accept_terms: true });
+    expect(body).toEqual({ choice: 'team', seats: 5, buyer_name: 'Ana', buyer_email: 'ana@x.com', company_name: 'Acme', accept_terms: true });
+    expect(Object.keys(body).filter((k) => /price|cents|amount|total/i.test(k))).toEqual([]);
   });
 
-  test('sends company when filled', async () => {
+  test('solo forces one seat and drops company', async () => {
     const seen: Seen = {};
-    await submitCheckout('startup', ok, fakeFetch(200, { order_id: 'o1', next: 'check_email' }, seen));
-    expect(JSON.parse(String(seen.init?.body)).company_name).toBe('Acme');
+    await submitCheckout('solo', 9, ok, fakeFetch(200, created, seen));
+    expect(JSON.parse(String(seen.init?.body))).toEqual({ choice: 'solo', seats: 1, buyer_name: 'Ana', buyer_email: 'ana@x.com', accept_terms: true });
   });
 
-  test('free response becomes check_email', async () => {
-    const res = await submitCheckout(
-      'individual',
-      ok,
-      fakeFetch(200, { order_id: 'o1', status: 'awaiting_confirmation', next: 'check_email' }),
-    );
-    expect(res).toEqual({ kind: 'check_email', orderId: 'o1' });
-  });
-
-  test('paid response becomes redirect', async () => {
-    const res = await submitCheckout(
-      'empresas',
-      ok,
-      fakeFetch(200, { order_id: 'o2', status: 'pending', next: 'redirect', redirect_url: 'https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=1' }),
-    );
-    expect(res).toEqual({ kind: 'redirect', url: 'https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=1' });
+  test('check_email carries order and e-mail', async () => {
+    expect(await submitCheckout('solo', 1, ok, fakeFetch(200, created))).toEqual({ kind: 'check_email', orderId: 'o1', email: 'ana@x.com' });
   });
 
   test('server error maps to local copy', async () => {
-    const res = await submitCheckout('individual', ok, fakeFetch(409, { error: 'already_in_team', message: 'x' }));
-    expect(res.kind).toBe('error');
-    if (res.kind !== 'error') return;
-    expect(res.code).toBe('already_in_team');
-    expect(res.message).toBe(checkoutErrorMessage('already_in_team'));
-    expect(res.message).not.toBe('x');
+    const res = await submitCheckout('solo', 1, ok, fakeFetch(409, { error: 'already_has_solo', message: 'x' }));
+    expect(res).toMatchObject({ kind: 'error', code: 'already_has_solo', message: 'Este e-mail já tem o plano Somente eu ativo. Entre no app.' });
   });
 
   test('validation error points to the form field', async () => {
-    const res = await submitCheckout(
-      'startup',
-      ok,
-      fakeFetch(400, { error: 'validation_error', field: 'company_name', message: 'x' }),
-    );
+    const res = await submitCheckout('team', 2, ok, fakeFetch(400, { error: 'validation_error', field: 'company_name', message: 'x' }));
     expect(res).toMatchObject({ kind: 'error', code: 'validation_error', field: 'companyName' });
   });
 
   test('unexpected 200 body is an error, never a silent success', async () => {
-    const res = await submitCheckout('individual', ok, fakeFetch(200, { ok: true }));
-    expect(res.kind).toBe('error');
+    expect((await submitCheckout('solo', 1, ok, fakeFetch(200, { ok: true }))).kind).toBe('error');
   });
 
   test('network failure is reported', async () => {
-    const res = await submitCheckout('individual', ok, (async () => {
+    const res = await submitCheckout('solo', 1, ok, (async () => {
       throw new TypeError('offline');
     }) as typeof fetch);
     expect(res).toMatchObject({ kind: 'error', code: 'network_error' });
@@ -109,17 +85,44 @@ describe('submitCheckout', () => {
 
   test('every known code has its own copy', () => {
     const fallback = checkoutErrorMessage('???');
-    for (const code of [
-      'validation_error',
-      'invalid_plan',
-      'already_in_team',
-      'rate_limited',
-      'mp_unavailable',
-      'email_failed',
-      'server_misconfigured',
-      'network_error',
-    ]) {
+    for (const code of ['validation_error', 'already_has_solo', 'already_in_team', 'rate_limited', 'mp_unavailable', 'email_failed', 'server_misconfigured', 'network_error', 'expired', 'already_paid', 'invalid_link']) {
       expect(checkoutErrorMessage(code)).not.toBe(fallback);
+    }
+  });
+});
+
+describe('resendCheckout', () => {
+  test('sends resend body to the same endpoint', async () => {
+    const seen: Seen = {};
+    const res = await resendCheckout('o1', ' Ana@X.com ', fakeFetch(200, created, seen));
+    expect(seen.url).toMatch(/checkout-create$/);
+    expect(JSON.parse(String(seen.init?.body))).toEqual({ resend_order_id: 'o1', buyer_email: 'ana@x.com' });
+    expect(res.kind).toBe('check_email');
+  });
+  test('410 is expired', async () => {
+    expect(await resendCheckout('o1', 'a@x.com', fakeFetch(410, { error: 'expired' }))).toMatchObject({ kind: 'error', code: 'expired' });
+  });
+});
+
+describe('submitPayLink', () => {
+  const mp = 'https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=1';
+  test('posts order and token, redirects only to allowed hosts', async () => {
+    const seen: Seen = {};
+    expect(await submitPayLink(ORDER, 'tok', fakeFetch(200, { next: 'redirect', redirect_url: mp }, seen))).toEqual({ kind: 'redirect', url: mp });
+    expect(seen.url).toMatch(/checkout-pay$/);
+    expect(JSON.parse(String(seen.init?.body))).toEqual({ order_id: ORDER, token: 'tok' });
+    expect(await submitPayLink(ORDER, 'tok', fakeFetch(200, { next: 'redirect', redirect_url: 'https://evil.example/x' }))).toMatchObject({ kind: 'error', code: 'server_error' });
+  });
+  test('statuses map to copy', async () => {
+    const cases: [number, string, string][] = [
+      [410, 'expired', 'Este link venceu. Faça o pedido de novo.'],
+      [409, 'already_paid', 'Pagamento já confirmado. Confira seu e-mail para entrar.'],
+      [404, 'invalid_link', 'Link inválido ou substituído por um mais recente. Use o último e-mail ou o botão Pagar mensalidade no app.'],
+      [429, 'rate_limited', checkoutErrorMessage('rate_limited')],
+      [502, 'mp_unavailable', checkoutErrorMessage('mp_unavailable')],
+    ];
+    for (const [status, code, message] of cases) {
+      expect(await submitPayLink(ORDER, 't', fakeFetch(status, {}))).toEqual({ kind: 'error', code, message });
     }
   });
 });
@@ -164,11 +167,6 @@ describe('isAllowedCheckoutUrl', () => {
       expect(isAllowedCheckoutUrl(u)).toBe(false);
     }
   });
-  test('submitCheckout refuses a redirect to a foreign host', async () => {
-    const res = await submitCheckout('individual', ok, (async () =>
-      new Response(JSON.stringify({ next: 'redirect', redirect_url: 'https://evil.example/pay' }), { status: 200 })) as typeof fetch);
-    expect(res).toMatchObject({ kind: 'error', code: 'server_error' });
-  });
 });
 
 describe('singleFlight on failure', () => {
@@ -184,7 +182,7 @@ describe('singleFlight on failure', () => {
 describe('429 rate limit', () => {
   test('429 with or without a body shows the friendly message', async () => {
     for (const body of [{ error: 'rate_limited' }, {}]) {
-      const res = await submitCheckout('individual', ok, fakeFetch(429, body));
+      const res = await submitCheckout('solo', 1, ok, fakeFetch(429, body));
       expect(res).toMatchObject({ kind: 'error', code: 'rate_limited' });
       expect((res as { message: string }).message).toMatch(/Muitas tentativas.*minutos/);
     }

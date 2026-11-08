@@ -7,8 +7,9 @@ import { useEffect, useState, type MouseEvent } from 'react';
 export type Route =
   | { name: 'home' }
   | { name: 'planos' }
-  | { name: 'compra'; planId: string | null }
-  | { name: 'compra-confirmada'; orderId: string | null; free: boolean; approved: boolean }
+  | { name: 'compra'; choice: 'solo' | 'team' | null }
+  | { name: 'compra-pagar'; orderId: string | null; token: string | null }
+  | { name: 'compra-confirmada'; orderId: string | null; approved: boolean }
   | { name: 'compra-pendente' }
   | { name: 'compra-erro' }
   | { name: 'criar-senha' };
@@ -35,6 +36,16 @@ function clean(value: string | null): string | null {
   return trimmed ? trimmed : null;
 }
 
+/** `?escolha=solo|team`; o antigo `?plano=<id>` (individual / startup / empresas) vira a escolha equivalente. */
+function choiceOf(params: URLSearchParams): 'solo' | 'team' | null {
+  const choice = clean(params.get('escolha'));
+  if (choice === 'solo' || choice === 'team') return choice;
+  const legacy = clean(params.get('plano'));
+  if (legacy === 'individual') return 'solo';
+  if (legacy === 'startup' || legacy === 'empresas') return 'team';
+  return null;
+}
+
 export function parseRoute(pathname: string, search: string, hash: string): Route {
   const path = pathname.replace(/\/+$/, '') || '/';
   const params = new URLSearchParams(search);
@@ -43,12 +54,13 @@ export function parseRoute(pathname: string, search: string, hash: string): Rout
     case '/planos':
       return { name: 'planos' };
     case '/compra':
-      return { name: 'compra', planId: clean(params.get('plano')) };
+      return { name: 'compra', choice: choiceOf(params) };
+    case '/compra/pagar':
+      return { name: 'compra-pagar', orderId: orderIdOf(params.get('pedido')), token: clean(params.get('t')) };
     case '/compra/confirmada':
       return {
         name: 'compra-confirmada',
         orderId: orderIdOf(params.get('pedido')) ?? orderIdOf(params.get('external_reference')),
-        free: params.get('tipo') === 'gratis',
         // Retorno do Mercado Pago: só `approved` sustenta o texto de aprovação.
         approved: (params.get('collection_status') ?? params.get('status')) === 'approved',
       };
