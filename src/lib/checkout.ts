@@ -1,5 +1,6 @@
 import { FUNCTIONS_URL, SUPABASE_ANON_KEY } from '../data/cloud';
 import { CHECKOUT_ERROR_DEFAULT, CHECKOUT_ERROR_MESSAGES, CHECKOUT_FIELD_MESSAGES, PAY_COPY } from '../data/checkout';
+import { parseOrderSummary, type PayOrderKind, type PayOrderSummary } from './payment';
 import type { PlanChoice } from './seatPricing';
 
 export type CheckoutForm = { buyerName: string; buyerEmail: string; companyName: string; acceptTerms: boolean };
@@ -115,9 +116,10 @@ export function resendCheckout(orderId: string, email: string, fetchImpl: typeof
   return postCreate({ resend_order_id: orderId, buyer_email: normalizeEmail(email) }, fetchImpl);
 }
 
-export type PayOrderKind = 'new' | 'renewal' | 'seats';
+export type { PayOrderKind } from './payment';
 
 export type PayOutcome =
+  | { kind: 'pay'; order: PayOrderSummary }
   | { kind: 'redirect'; url: string }
   | { kind: 'error'; code: string; message: string; orderKind?: PayOrderKind };
 
@@ -139,7 +141,10 @@ export function payLinkView(outcome: Extract<PayOutcome, { kind: 'error' }>): {
   return { tone: 'error', title: PAY_COPY.errorTitle, message: outcome.message, showNewOrder: outcome.code === 'expired' };
 }
 
-/** Troca o link do e-mail (`pedido` + `t`) pelo endereço de pagamento do Mercado Pago. */
+/**
+ * Troca o link do e-mail (`pedido` + `t`) pelo resumo do pedido a pagar na
+ * página (`next: 'pay'`) ou, no modo de reversão, pelo endereço do Mercado Pago.
+ */
 export async function submitPayLink(
   orderId: string,
   token: string,
@@ -158,6 +163,10 @@ export async function submitPayLink(
   }
   const data = (await res.json().catch(() => null)) as Record<string, unknown> | null;
   if (res.ok) {
+    if (data?.next === 'pay') {
+      const order = parseOrderSummary(data.order);
+      return order ? { kind: 'pay', order } : fail('server_error');
+    }
     if (data?.next === 'redirect' && typeof data.redirect_url === 'string' && isAllowedCheckoutUrl(data.redirect_url)) {
       return { kind: 'redirect', url: data.redirect_url };
     }

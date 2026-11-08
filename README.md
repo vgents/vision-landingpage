@@ -53,7 +53,7 @@ funcionalidades, FAQ, planos e textos da compra saem dali — os componentes só
 | `/` | landing (com a seção de planos) |
 | `/planos` | Somente eu e Tenho uma equipe; preços por pessoa/mês da tabela `seat_pricing`, com recuo estático (`DEFAULT_SEAT_PRICING`) |
 | `/compra?escolha=solo\|team` | formulário (quantidade 2–20 em equipe); chama `checkout-create` e mostra "confira seu e-mail". `?plano=` antigo ainda mapeia |
-| `/compra/pagar?pedido=&t=` | destino do link do e-mail; chama `checkout-pay` e vai ao Mercado Pago |
+| `/compra/pagar?pedido=&t=` | destino do link do e-mail; chama `checkout-pay` e mostra o pagamento ali mesmo (checkout transparente): abas Cartão (Card Payment Brick, 1x) e Pix (QR Code + copia e cola, consulta `checkout-status` a cada 5 s). Em modo de reversão (`next: 'redirect'`) ainda vai ao Mercado Pago |
 | `/compra/confirmada`, `/compra/pendente`, `/compra/erro` | retornos (as `back_urls` do Mercado Pago) |
 | `/criar-senha` | destino do link do e-mail de acesso; define a senha e chama `account-confirm` |
 
@@ -76,8 +76,14 @@ isso em vez de prometer o contrário.
 | Variável | Obrigatória | Para quê |
 | --- | --- | --- |
 | `VITE_DOWNLOAD_ORIGIN` | Não | Sobrescreve a origem de onde os instaladores são servidos, sem barra no fim |
+| `VITE_MP_PUBLIC_KEY` | Sim, para cartão | Chave **pública** do Mercado Pago (`TEST-…` no sandbox, `APP_USR-…` em produção), usada pelo Card Payment Brick em `/compra/pagar`. Sem ela a aba Cartão diz que o pagamento com cartão está indisponível e só o Pix funciona |
 
-O site funciona sem configuração nenhuma: a origem padrão está em `DEFAULT_RELEASE_FEED`, em
+`VITE_MP_PUBLIC_KEY` é a chave pública por desenho (vai para o bundle); o access token do Mercado
+Pago nunca entra no site. Configure no Vercel (Project → Settings → Environment Variables) e faça um
+novo deploy: variáveis `VITE_*` são lidas no build. Para rodar local, copie `.env.example` para
+`.env.local`.
+
+O download funciona sem configuração nenhuma: a origem padrão está em `DEFAULT_RELEASE_FEED`, em
 `src/data/softwareData.ts`. Defina a variável apenas para apontar para outro endpoint — um domínio
 próprio, por exemplo — sem precisar mexer no código.
 

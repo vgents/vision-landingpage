@@ -8,6 +8,11 @@ interface ImportMetaEnv {
    * no repositório e trocar de endpoint não exige um commit.
    */
   readonly VITE_DOWNLOAD_ORIGIN?: string;
+  /**
+   * Chave PÚBLICA do Mercado Pago (Card Payment Brick). Sem ela o cartão fica
+   * indisponível na página de pagamento e só o Pix funciona.
+   */
+  readonly VITE_MP_PUBLIC_KEY?: string;
 }
 
 interface ImportMeta {

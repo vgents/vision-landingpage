@@ -38,11 +38,50 @@ export const PAY_COPY = {
   eyebrow: 'Pagamento',
   loading: 'Abrindo o pagamento…',
   redirecting: 'Redirecionando para o Mercado Pago…',
+  opening: 'Abrindo o pagamento',
   errorTitle: 'Não foi possível abrir o pagamento',
   newOrder: 'Fazer o pedido de novo',
   paidTitle: 'Pagamento confirmado',
   expiredBillingMessage: 'Este link venceu. Gere um novo em Minha equipe → Pagar mensalidade no app.',
   retry: 'Tentar de novo',
+};
+
+/** Pagamento na própria página (checkout transparente): abas Cartão e Pix. */
+export const PAYMENT_COPY = {
+  tabsLabel: 'Forma de pagamento',
+  tabCard: 'Cartão',
+  tabPix: 'Pix',
+  amountLabel: 'Valor',
+  cardLoading: 'Carregando o formulário do cartão…',
+  cardUnavailable: 'Pagamento com cartão indisponível no momento. Use o Pix.',
+  cardSdkFailed: 'Não foi possível carregar o formulário do cartão. Recarregue a página ou use o Pix.',
+  cardInstallments: 'Cobrança à vista, em 1x.',
+  pixIntro: 'Gere o QR Code e pague pelo app do seu banco. A confirmação aparece aqui sozinha.',
+  pixGenerate: 'Gerar Pix',
+  pixGenerating: 'Gerando o Pix…',
+  pixRegenerate: 'Gerar novo Pix',
+  pixQrAlt: 'QR Code do Pix',
+  pixCodeLabel: 'Pix copia e cola',
+  pixCopy: 'Copiar',
+  pixCopied: 'Copiado',
+  pixExpiresIn: (time: string) => `Expira em ${time}`,
+  pixExpired: 'Este Pix expirou. Gere um novo para pagar.',
+  pixWaiting: 'Aguardando o pagamento…',
+  pending: 'Pagamento em análise',
+  pendingDefault: 'Estamos confirmando o pagamento. Esta página atualiza sozinha.',
+  rejectedTitle: 'Pagamento recusado',
+  rejectedDefault: 'O pagamento foi recusado. Confira os dados ou tente outra forma de pagamento.',
+  rejectedRetry: 'Tente de novo com outro cartão ou pague com Pix.',
+  approvedTitle: 'Pagamento confirmado',
+  approvedTeam: 'Pagamento confirmado. Pode voltar ao Vision — a equipe já está atualizada.',
+  approvedNew: 'Pagamento confirmado. Enviamos o acesso para o seu e-mail.',
+  approvedNewNote: 'Não chegou em alguns minutos? Confira a caixa de spam.',
+  /** Erros de `checkout-process` que não existem em `CHECKOUT_ERROR_MESSAGES`. */
+  errors: {
+    attempt_reused: 'Gere o Pix de novo.',
+    validation_error: 'Confira os dados do pagamento e tente de novo.',
+    server_error: 'Não foi possível concluir o pagamento agora. Tente de novo em alguns minutos.',
+  } as Record<string, string>,
 };
 
 export const CHECKOUT_FIELD_MESSAGES = {
