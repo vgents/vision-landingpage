@@ -4,6 +4,7 @@ import {
   monthlyTotalCents,
   seatBreakdown,
   seatPriceCents,
+  teamFromPriceCents,
   validateSeatChoice,
 } from '../src/lib/seatPricing';
 
@@ -33,5 +34,12 @@ describe('seatPricing (mesma tabela do servidor)', () => {
     expect(validateSeatChoice(P, 'team', 1)).toEqual({ ok: false, field: 'seats' });
     expect(validateSeatChoice(P, 'team', 21)).toEqual({ ok: false, field: 'seats' });
     expect(validateSeatChoice(P, 'team', 20)).toMatchObject({ ok: true });
+  });
+});
+
+describe('cartão Equipe', () => {
+  test('"a partir de" usa o menor preço por pessoa (faixa 3)', () => {
+    expect(teamFromPriceCents(P)).toBe(1319);
+    expect(teamFromPriceCents({ ...P, tier3_discount_bp: 2000 })).toBe(1199);
   });
 });

@@ -1,5 +1,5 @@
 import { FUNCTIONS_URL, SUPABASE_ANON_KEY } from '../data/cloud';
-import { CHECKOUT_ERROR_DEFAULT, CHECKOUT_ERROR_MESSAGES, CHECKOUT_FIELD_MESSAGES } from '../data/checkout';
+import { CHECKOUT_ERROR_DEFAULT, CHECKOUT_ERROR_MESSAGES, CHECKOUT_FIELD_MESSAGES, PAY_COPY } from '../data/checkout';
 import type { PlanChoice } from './seatPricing';
 
 export type CheckoutForm = { buyerName: string; buyerEmail: string; companyName: string; acceptTerms: boolean };
@@ -115,7 +115,29 @@ export function resendCheckout(orderId: string, email: string, fetchImpl: typeof
   return postCreate({ resend_order_id: orderId, buyer_email: normalizeEmail(email) }, fetchImpl);
 }
 
-export type PayOutcome = { kind: 'redirect'; url: string } | { kind: 'error'; code: string; message: string };
+export type PayOrderKind = 'new' | 'renewal' | 'seats';
+
+export type PayOutcome =
+  | { kind: 'redirect'; url: string }
+  | { kind: 'error'; code: string; message: string; orderKind?: PayOrderKind };
+
+const PAY_ORDER_KINDS: readonly string[] = ['new', 'renewal', 'seats'];
+
+/** O que a página do link mostra para um erro: tom, título, texto e se oferece pedir de novo. */
+export function payLinkView(outcome: Extract<PayOutcome, { kind: 'error' }>): {
+  tone: 'success' | 'error';
+  title: string;
+  message: string;
+  showNewOrder: boolean;
+} {
+  if (outcome.code === 'already_paid') {
+    return { tone: 'success', title: PAY_COPY.paidTitle, message: outcome.message, showNewOrder: false };
+  }
+  if (outcome.code === 'expired' && (outcome.orderKind === 'renewal' || outcome.orderKind === 'seats')) {
+    return { tone: 'error', title: PAY_COPY.errorTitle, message: PAY_COPY.expiredBillingMessage, showNewOrder: false };
+  }
+  return { tone: 'error', title: PAY_COPY.errorTitle, message: outcome.message, showNewOrder: outcome.code === 'expired' };
+}
 
 /** Troca o link do e-mail (`pedido` + `t`) pelo endereço de pagamento do Mercado Pago. */
 export async function submitPayLink(
@@ -143,7 +165,9 @@ export async function submitPayLink(
   }
   const byStatus: Record<number, string> = { 410: 'expired', 409: 'already_paid', 404: 'invalid_link', 429: 'rate_limited', 502: 'mp_unavailable' };
   const code = byStatus[res.status] ?? (typeof data?.error === 'string' && data.error in CHECKOUT_ERROR_MESSAGES ? data.error : 'server_error');
-  return fail(code);
+  const orderKind = typeof data?.kind === 'string' && PAY_ORDER_KINDS.includes(data.kind) ? (data.kind as PayOrderKind) : null;
+  const outcome = fail(code);
+  return orderKind && outcome.kind === 'error' ? { ...outcome, orderKind } : outcome;
 }
 
 /**

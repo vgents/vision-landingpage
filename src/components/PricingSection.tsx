@@ -3,7 +3,7 @@ import { Check, Users, BadgeCheck } from 'lucide-react';
 import { PLANS_COPY } from '../data/plans';
 import { fetchSeatPricing, formatPrice } from '../lib/plans';
 import { handleLinkClick } from '../lib/router';
-import { DEFAULT_SEAT_PRICING, seatPriceCents, type SeatPricing } from '../lib/seatPricing';
+import { DEFAULT_SEAT_PRICING, teamFromPriceCents, type SeatPricing } from '../lib/seatPricing';
 
 interface PricingSectionProps {
   /** `id` da seção, para âncora na landing. */
@@ -49,7 +49,7 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ id, notice }) =>
       name: PLANS_COPY.team.name,
       tagline: PLANS_COPY.team.tagline,
       lead: PLANS_COPY.team.from,
-      price: formatPrice(seatPriceCents(pricing, pricing.tier2_from)),
+      price: formatPrice(teamFromPriceCents(pricing)),
       unit: PLANS_COPY.team.perSeatMonth,
       seats: PLANS_COPY.team.range(pricing.max_seats),
       features: PLANS_COPY.team.features,

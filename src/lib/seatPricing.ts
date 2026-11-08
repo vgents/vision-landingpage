@@ -31,6 +31,11 @@ export function seatPriceCents(p: SeatPricing, seatIndex: number): number {
   return Math.round((p.base_cents * (10000 - discountBp(p, seatIndex))) / 10000);
 }
 
+/** Preço "a partir de" do cartão Equipe: o menor por pessoa (faixa 3). */
+export function teamFromPriceCents(p: SeatPricing): number {
+  return seatPriceCents(p, p.tier3_from);
+}
+
 export function monthlyTotalCents(p: SeatPricing, seats: number): number {
   let total = 0;
   for (let i = 1; i <= seats; i += 1) total += seatPriceCents(p, i);

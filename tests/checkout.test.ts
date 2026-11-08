@@ -3,6 +3,7 @@ import { SUPABASE_ANON_KEY } from '../src/data/cloud';
 import {
   checkoutErrorMessage,
   isAllowedCheckoutUrl,
+  payLinkView,
   resendCheckout,
   submitPayLink,
   singleFlight,
@@ -186,5 +187,40 @@ describe('429 rate limit', () => {
       expect(res).toMatchObject({ kind: 'error', code: 'rate_limited' });
       expect((res as { message: string }).message).toMatch(/Muitas tentativas.*minutos/);
     }
+  });
+});
+
+describe('payLinkView (link vencido ou já pago)', () => {
+  test('o kind do pedido vem do corpo do erro', async () => {
+    expect(await submitPayLink(ORDER, 't', fakeFetch(410, { error: 'expired', kind: 'renewal' }))).toMatchObject({ code: 'expired', orderKind: 'renewal' });
+    expect(await submitPayLink(ORDER, 't', fakeFetch(409, { error: 'already_paid', kind: 'seats' }))).toMatchObject({ code: 'already_paid', orderKind: 'seats' });
+    expect(await submitPayLink(ORDER, 't', fakeFetch(410, { error: 'expired', kind: 'outro' }))).not.toHaveProperty('orderKind');
+  });
+
+  test('vencido de mensalidade ou vagas manda gerar outro no app, sem "fazer o pedido de novo"', () => {
+    for (const orderKind of ['renewal', 'seats'] as const) {
+      const view = payLinkView({ kind: 'error', code: 'expired', message: 'x', orderKind });
+      expect(view).toMatchObject({
+        tone: 'error',
+        message: 'Este link venceu. Gere um novo em Minha equipe → Pagar mensalidade no app.',
+        showNewOrder: false,
+      });
+    }
+  });
+
+  test('vencido de pedido novo mantém o texto e o botão de pedir de novo', () => {
+    const message = checkoutErrorMessage('expired');
+    expect(payLinkView({ kind: 'error', code: 'expired', message, orderKind: 'new' })).toMatchObject({ tone: 'error', message, showNewOrder: true });
+    expect(payLinkView({ kind: 'error', code: 'expired', message })).toMatchObject({ tone: 'error', message, showNewOrder: true });
+  });
+
+  test('já pago é uma página de sucesso', () => {
+    const view = payLinkView({ kind: 'error', code: 'already_paid', message: checkoutErrorMessage('already_paid') });
+    expect(view).toMatchObject({ tone: 'success', message: 'Pagamento já confirmado. Confira seu e-mail para entrar.', showNewOrder: false });
+    expect(view.title).not.toBe('Não foi possível abrir o pagamento');
+  });
+
+  test('outros erros seguem como erro', () => {
+    expect(payLinkView({ kind: 'error', code: 'invalid_link', message: 'm' })).toMatchObject({ tone: 'error', message: 'm', showNewOrder: false, title: 'Não foi possível abrir o pagamento' });
   });
 });

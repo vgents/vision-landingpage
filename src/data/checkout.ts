@@ -40,6 +40,8 @@ export const PAY_COPY = {
   redirecting: 'Redirecionando para o Mercado Pago…',
   errorTitle: 'Não foi possível abrir o pagamento',
   newOrder: 'Fazer o pedido de novo',
+  paidTitle: 'Pagamento confirmado',
+  expiredBillingMessage: 'Este link venceu. Gere um novo em Minha equipe → Pagar mensalidade no app.',
   retry: 'Tentar de novo',
 };
 
