@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { AlertCircle, Loader2 } from 'lucide-react';
 import { PAYMENT_COPY } from '../../data/checkout';
 import {
+  cardErrorMessage,
   cardFormToInput,
   loadMercadoPagoSdk,
   mercadoPagoPublicKey,
@@ -40,7 +41,7 @@ type Props = PaymentCallbacks & { order: PayOrderSummary; orderId: string; token
  * Card Payment Brick do Mercado Pago. Os dados do cartão nunca passam pelo
  * site: o Brick devolve um token, que vai ao `checkout-process`.
  */
-export const CardPayment: React.FC<Props> = ({ order, orderId, token, onApproved, onPending, onFatal }) => {
+export const CardPayment: React.FC<Props> = ({ order, orderId, token, onApproved, onPending, onFatal, onBusyChange, onCardSubmit }) => {
   const publicKey = mercadoPagoPublicKey();
   const [mountKey, setMountKey] = useState(0);
   const [ready, setReady] = useState(false);
@@ -48,8 +49,8 @@ export const CardPayment: React.FC<Props> = ({ order, orderId, token, onApproved
   const [notice, setNotice] = useState<string | null>(null);
 
   // Os callbacks mudam a cada render da página; o Brick guarda os da criação.
-  const latest = useRef({ order, orderId, token, onApproved, onPending, onFatal });
-  latest.current = { order, orderId, token, onApproved, onPending, onFatal };
+  const latest = useRef({ order, orderId, token, onApproved, onPending, onFatal, onBusyChange, onCardSubmit });
+  latest.current = { order, orderId, token, onApproved, onPending, onFatal, onBusyChange, onCardSubmit };
 
   const containerId = `mp-card-brick-${mountKey}`;
 
@@ -62,17 +63,23 @@ export const CardPayment: React.FC<Props> = ({ order, orderId, token, onApproved
 
     const onSubmit = async (formData: CardBrickFormData) => {
       const { order: o, orderId: id, token: t } = latest.current;
-      const outcome = await processPayment(id, t, { ...cardFormToInput(formData, o.buyer_email), attempt_id: newAttemptId() });
-      if (!alive) return;
-      const cb = latest.current;
-      if (outcome.kind === 'approved') cb.onApproved();
-      else if (outcome.kind === 'pending') cb.onPending(outcome.message);
-      else if (outcome.kind === 'error' && FATAL_PAYMENT_CODES.has(outcome.code)) cb.onFatal(outcome);
-      else {
-        // Recusado ou erro passageiro: mostra o motivo e um Brick novo para tentar de novo.
-        setNotice(outcome.message);
-        setMountKey((k) => k + 1);
+      latest.current.onCardSubmit();
+      latest.current.onBusyChange(true);
+      let outcome;
+      try {
+        outcome = await processPayment(id, t, { ...cardFormToInput(formData, o.buyer_email), attempt_id: newAttemptId() });
+      } finally {
+        latest.current.onBusyChange(false);
       }
+      // O resultado do servidor sempre chega à página, mesmo se este Brick já saiu da tela.
+      const cb = latest.current;
+      if (outcome.kind === 'approved') return cb.onApproved();
+      if (outcome.kind === 'pending') return cb.onPending(outcome.message);
+      if (outcome.kind === 'error' && FATAL_PAYMENT_CODES.has(outcome.code)) return cb.onFatal(outcome);
+      if (!alive) return;
+      // Recusado ou erro passageiro: mostra o motivo e um Brick novo para tentar de novo.
+      setNotice(outcome.kind === 'error' ? cardErrorMessage(outcome) : outcome.message);
+      setMountKey((k) => k + 1);
     };
 
     loadMercadoPagoSdk()

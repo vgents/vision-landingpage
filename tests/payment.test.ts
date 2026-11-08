@@ -3,6 +3,7 @@ import { SUPABASE_ANON_KEY } from '../src/data/cloud';
 import { submitPayLink } from '../src/lib/checkout';
 import {
   approvedMessage,
+  cardErrorMessage,
   cardFormToInput,
   formatBRL,
   formatCountdown,
@@ -147,8 +148,23 @@ describe('pollPaymentStatus', () => {
   test('a paid order reads as approved', async () => {
     expect(await pollPaymentStatus(ORDER, 'tok', fakeFetch(409, { error: 'already_paid' }))).toBe('approved');
   });
+  test('a link the server no longer knows is final, not polled forever', async () => {
+    expect(await pollPaymentStatus(ORDER, 'tok', fakeFetch(404, { error: 'invalid_link' }))).toBe('invalid_link');
+    expect(await pollPaymentStatus(ORDER, 'tok', fakeFetch(400, { error: 'validation_error' }))).toBe('invalid_link');
+  });
+  test('rate limit and server failures keep polling', async () => {
+    expect(await pollPaymentStatus(ORDER, 'tok', fakeFetch(429, { error: 'rate_limited' }))).toBe('pending');
+    expect(await pollPaymentStatus(ORDER, 'tok', fakeFetch(502, {}))).toBe('pending');
+  });
   test('an expired link reads as expired', async () => {
     expect(await pollPaymentStatus(ORDER, 'tok', fakeFetch(410, { error: 'expired' }))).toBe('expired');
+  });
+});
+
+describe('cardErrorMessage', () => {
+  test('attempt_reused on the card says try again, not "Gere o Pix"', () => {
+    expect(cardErrorMessage({ kind: 'error', code: 'attempt_reused', message: 'Gere o Pix de novo.' })).toBe('Tente de novo.');
+    expect(cardErrorMessage({ kind: 'error', code: 'rate_limited', message: 'x' })).toBe('x');
   });
 });
 

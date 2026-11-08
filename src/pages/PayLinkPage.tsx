@@ -50,12 +50,13 @@ export const PayLinkPage: React.FC<{ orderId: string | null; token: string | nul
     setState({ status: 'error', outcome: { ...error, ...(orderKind ? { orderKind } : {}) } });
   };
 
-  // Cartão em análise: segue consultando até sair uma decisão.
+  // Cartão em análise: segue consultando até sair uma decisão (o Pix do pedido já foi cancelado).
   useStatusPolling(state.status === 'pending', orderId ?? '', token ?? '', (status) => {
     if (state.status !== 'pending') return;
     const order = state.order;
     if (status === 'approved') setState({ status: 'approved', order });
-    else if (status === 'rejected') setState({ status: 'pay', order, notice: PAYMENT_COPY.rejectedDefault });
+    else if (status === 'invalid_link') fail({ kind: 'error', code: 'invalid_link', message: checkoutErrorMessage('invalid_link') });
+    else if (status === 'rejected') setState({ status: 'pay', order: { ...order, pix: null }, notice: PAYMENT_COPY.rejectedDefault });
     else fail({ kind: 'error', code: 'expired', message: checkoutErrorMessage('expired') });
   });
 
@@ -100,9 +101,15 @@ export const PayLinkPage: React.FC<{ orderId: string | null; token: string | nul
               orderId={orderId}
               token={token}
               notice={state.notice}
-              onApproved={() => setState({ status: 'approved', order: state.order })}
-              onPending={(message) => setState({ status: 'pending', order: state.order, message })}
+              onApproved={() => setState((s) => (s.status === 'pay' ? { status: 'approved', order: s.order } : s))}
+              onPending={(message) =>
+                setState((s) => (s.status === 'pay' ? { status: 'pending', order: { ...s.order, pix: null }, message } : s))
+              }
               onFatal={fail}
+              onCardSubmit={() =>
+                // O servidor cancela o Pix pendente antes de um cartão: o QR do pedido não volta mais.
+                setState((s) => (s.status === 'pay' && s.order.pix ? { ...s, order: { ...s.order, pix: null } } : s))
+              }
             />
           )}
         </div>
@@ -141,12 +148,18 @@ const PayPanel: React.FC<{
   onApproved: () => void;
   onPending: (message: string) => void;
   onFatal: (error: PaymentError) => void;
-}> = ({ order, orderId, token, notice, onApproved, onPending, onFatal }) => {
+  onCardSubmit: () => void;
+}> = ({ order, orderId, token, notice, onApproved, onPending, onFatal, onCardSubmit }) => {
   // Pix já aberto no pedido (ou cartão sem chave pública): abre direto no Pix.
   const [tab, setTab] = useState<Tab>(() => (order.pix || !mercadoPagoPublicKey() ? 'pix' : 'card'));
   const tabRefs = useRef<Record<Tab, HTMLButtonElement | null>>({ card: null, pix: null });
 
+  // Envio de cartão ou geração de Pix em andamento: as abas ficam travadas.
+  const [busy, setBusy] = useState(false);
+  const [cardSubmits, setCardSubmits] = useState(0);
+
   const onKeyDown = (event: React.KeyboardEvent) => {
+    if (busy) return;
     if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
     event.preventDefault();
     const next: Tab = tab === 'card' ? 'pix' : 'card';
@@ -154,7 +167,16 @@ const PayPanel: React.FC<{
     tabRefs.current[next]?.focus();
   };
 
-  const callbacks = { onApproved, onPending, onFatal };
+  const callbacks = {
+    onApproved,
+    onPending,
+    onFatal,
+    onBusyChange: setBusy,
+    onCardSubmit: () => {
+      setCardSubmits((n) => n + 1);
+      onCardSubmit();
+    },
+  };
 
   return (
     <>
@@ -178,7 +200,8 @@ const PayPanel: React.FC<{
             aria-controls={`pay-panel-${id}`}
             tabIndex={tab === id ? 0 : -1}
             onClick={() => setTab(id)}
-            className={`px-4 py-3 rounded-xl border text-sm font-medium transition-colors inline-flex items-center justify-center gap-2 ${
+            disabled={busy}
+            className={`px-4 py-3 rounded-xl border text-sm font-medium transition-colors disabled:opacity-60 disabled:cursor-wait inline-flex items-center justify-center gap-2 ${
               tab === id
                 ? 'bg-accent-soft/50 border-accent/60 text-cream-strong'
                 : 'bg-ink-deep/70 border-cream/12 text-cream/75 hover:border-cream/25'
@@ -196,7 +219,7 @@ const PayPanel: React.FC<{
       </div>
       {/* O Pix fica montado: um QR aberto continua sendo consultado mesmo com a aba Cartão à vista. */}
       <div id="pay-panel-pix" role="tabpanel" aria-labelledby="pay-tab-pix" hidden={tab !== 'pix'} className="min-w-0">
-        <PixPayment order={order} orderId={orderId} token={token} {...callbacks} />
+        <PixPayment order={order} orderId={orderId} token={token} cardSubmits={cardSubmits} {...callbacks} />
       </div>
     </>
   );

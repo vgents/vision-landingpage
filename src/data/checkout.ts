@@ -56,6 +56,7 @@ export const PAYMENT_COPY = {
   cardUnavailable: 'Pagamento com cartão indisponível no momento. Use o Pix.',
   cardSdkFailed: 'Não foi possível carregar o formulário do cartão. Recarregue a página ou use o Pix.',
   cardInstallments: 'Cobrança à vista, em 1x.',
+  cardRetry: 'Tente de novo.',
   pixIntro: 'Gere o QR Code e pague pelo app do seu banco. A confirmação aparece aqui sozinha.',
   pixGenerate: 'Gerar Pix',
   pixGenerating: 'Gerando o Pix…',

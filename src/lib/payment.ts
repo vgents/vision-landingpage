@@ -40,7 +40,8 @@ export type ProcessOutcome =
   | { kind: 'rejected'; message: string }
   | { kind: 'error'; code: string; message: string };
 
-export type PaymentStatus = 'pending' | 'approved' | 'rejected' | 'expired';
+/** `invalid_link`: o servidor não reconhece mais o link (404/4xx) — final, não se consulta de novo. */
+export type PaymentStatus = 'pending' | 'approved' | 'rejected' | 'expired' | 'invalid_link';
 
 const PAY_ORDER_KINDS: readonly string[] = ['new', 'renewal', 'seats'];
 
@@ -128,20 +129,27 @@ export async function processPayment(
 }
 
 /**
- * Consulta `checkout-status`. Falha de rede ou resposta estranha conta como
- * `pending`: a próxima consulta tenta de novo, e nada é afirmado sem o servidor.
+ * Consulta `checkout-status`. Falha de rede, 429 e 5xx contam como `pending`:
+ * a próxima consulta tenta de novo, e nada é afirmado sem o servidor. Outros
+ * 4xx (link desconhecido) são finais: `invalid_link`, para não consultar para sempre.
  */
 export async function pollPaymentStatus(orderId: string, token: string, fetchImpl: typeof fetch = fetch): Promise<PaymentStatus> {
   try {
     const { res, data } = await post('checkout-status', { order_id: orderId, token }, fetchImpl);
     if (res.status === 409 && data?.error === 'already_paid') return 'approved';
     if (res.status === 410) return 'expired';
+    if (res.status >= 400 && res.status < 500 && res.status !== 429) return 'invalid_link';
     if (!res.ok) return 'pending';
     const status = data?.status;
     return status === 'approved' || status === 'rejected' || status === 'expired' ? status : 'pending';
   } catch {
     return 'pending';
   }
+}
+
+/** Mensagem de erro na aba Cartão: `attempt_reused` fala de Pix, então lá vira "Tente de novo.". */
+export function cardErrorMessage(outcome: Extract<ProcessOutcome, { kind: 'error' }>): string {
+  return outcome.code === 'attempt_reused' ? PAYMENT_COPY.cardRetry : outcome.message;
 }
 
 /** Formato do `onSubmit` do Card Payment Brick. */

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Check, Copy, Loader2, QrCode, RefreshCw } from 'lucide-react';
 import { PAYMENT_COPY } from '../../data/checkout';
+import { checkoutErrorMessage } from '../../lib/checkout';
 import {
   formatCountdown,
   newAttemptId,
@@ -13,16 +14,30 @@ import { Notice } from './CardPayment';
 import { FATAL_PAYMENT_CODES, type PaymentCallbacks } from './types';
 import { useStatusPolling } from './useStatusPolling';
 
-type Props = PaymentCallbacks & { order: PayOrderSummary; orderId: string; token: string };
+type Props = PaymentCallbacks & { order: PayOrderSummary; orderId: string; token: string; cardSubmits: number };
 
 /** Pix: gera o QR Code, mostra o copia e cola e o prazo, e consulta o status até aprovar ou expirar. */
-export const PixPayment: React.FC<Props> = ({ order, orderId, token, onApproved, onPending, onFatal }) => {
+export const PixPayment: React.FC<Props> = ({ order, orderId, token, onApproved, onPending, onFatal, onBusyChange, cardSubmits }) => {
   const [pix, setPix] = useState<PixData | null>(order.pix);
   const [secondsLeft, setSecondsLeft] = useState(() => (order.pix ? pixSecondsLeft(order.pix.expires_at) : 0));
   const [expired, setExpired] = useState(() => !!order.pix && pixSecondsLeft(order.pix.expires_at) === 0);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const generatingRef = useRef(false);
+  const mountedRef = useRef(true);
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
+  // Cada envio de cartão incrementa `cardSubmits`: o servidor cancela o Pix pendente, o QR some.
+  useEffect(() => {
+    if (cardSubmits === 0) return;
+    setPix(null);
+    setExpired(false);
+  }, [cardSubmits]);
 
   // Contagem regressiva até `expires_at`.
   useEffect(() => {
@@ -39,6 +54,7 @@ export const PixPayment: React.FC<Props> = ({ order, orderId, token, onApproved,
 
   useStatusPolling(!!pix && !expired, orderId, token, (status) => {
     if (status === 'approved') onApproved();
+    else if (status === 'invalid_link') onFatal({ kind: 'error', code: 'invalid_link', message: checkoutErrorMessage('invalid_link') });
     else if (status === 'expired') setExpired(true);
     else {
       setPix(null);
@@ -51,18 +67,25 @@ export const PixPayment: React.FC<Props> = ({ order, orderId, token, onApproved,
     generatingRef.current = true;
     setGenerating(true);
     setError(null);
-    const outcome = await processPayment(orderId, token, { method: 'pix', payer: { email: order.buyer_email }, attempt_id: newAttemptId() });
-    generatingRef.current = false;
-    setGenerating(false);
+    onBusyChange(true);
+    let outcome;
+    try {
+      outcome = await processPayment(orderId, token, { method: 'pix', payer: { email: order.buyer_email }, attempt_id: newAttemptId() });
+    } finally {
+      generatingRef.current = false;
+      onBusyChange(false);
+    }
     if (outcome.kind === 'approved') return onApproved();
+    if (outcome.kind === 'error' && FATAL_PAYMENT_CODES.has(outcome.code)) return onFatal(outcome);
+    if (outcome.kind === 'pending' && !outcome.pix) return onPending(outcome.message);
+    if (!mountedRef.current) return;
+    setGenerating(false);
     if (outcome.kind === 'pending' && outcome.pix) {
       setPix(outcome.pix);
       setSecondsLeft(pixSecondsLeft(outcome.pix.expires_at));
       setExpired(pixSecondsLeft(outcome.pix.expires_at) === 0);
       return;
     }
-    if (outcome.kind === 'pending') return onPending(outcome.message);
-    if (outcome.kind === 'error' && FATAL_PAYMENT_CODES.has(outcome.code)) return onFatal(outcome);
     setError(outcome.message);
   }
 
