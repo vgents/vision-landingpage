@@ -7,11 +7,14 @@ import {
   cardFormToInput,
   formatBRL,
   formatCountdown,
+  openPayState,
   parseOrderSummary,
   pixSecondsLeft,
+  pollDelayMs,
   pollPaymentStatus,
   processPayment,
 } from '../src/lib/payment';
+import { PAYMENT_COPY } from '../src/data/checkout';
 
 const ORDER = '0b5d3c1e-7a9f-4c2e-8d41-6f1a2b3c4d5e';
 
@@ -33,7 +36,7 @@ const order = { order_id: ORDER, kind: 'renewal', title: 'Mensalidade da equipe 
 describe('submitPayLink: next pay', () => {
   test('returns the order summary', async () => {
     const res = await submitPayLink(ORDER, 'tok', fakeFetch(200, { next: 'pay', order }));
-    expect(res).toEqual({ kind: 'pay', order: { ...order, kind: 'renewal', pix: null } });
+    expect(res).toEqual({ kind: 'pay', order: { ...order, kind: 'renewal', pix: null, in_flight: false } });
   });
   test('keeps an open Pix from the summary', async () => {
     const res = await submitPayLink(ORDER, 'tok', fakeFetch(200, { next: 'pay', order: { ...order, pix } }));
@@ -56,6 +59,29 @@ describe('parseOrderSummary', () => {
   test('accepts the server shape', () => {
     expect(parseOrderSummary({ ...order, kind: 'new' })?.kind).toBe('new');
     expect(parseOrderSummary({ ...order, amount_cents: -1 })).toBeNull();
+  });
+});
+
+describe('card in review (in_flight)', () => {
+  test('in_flight comes from the server; missing or not true means false', () => {
+    expect(parseOrderSummary({ ...order, in_flight: true })?.in_flight).toBe(true);
+    expect(parseOrderSummary(order)?.in_flight).toBe(false);
+    expect(parseOrderSummary({ ...order, in_flight: 'yes' })?.in_flight).toBe(false);
+  });
+  test('an order with a card in review opens in the pending view; otherwise in the pay view', () => {
+    const inReview = parseOrderSummary({ ...order, in_flight: true })!;
+    expect(openPayState(inReview)).toEqual({ status: 'pending', order: inReview, message: PAYMENT_COPY.pendingDefault });
+    const open = parseOrderSummary(order)!;
+    expect(openPayState(open)).toEqual({ status: 'pay', order: open });
+  });
+});
+
+describe('pollDelayMs', () => {
+  test('10 s for the first 5 minutes, then 20 s', () => {
+    expect(pollDelayMs(0)).toBe(10_000);
+    expect(pollDelayMs(4 * 60_000 + 59_000)).toBe(10_000);
+    expect(pollDelayMs(5 * 60_000)).toBe(20_000);
+    expect(pollDelayMs(60 * 60_000)).toBe(20_000);
   });
 });
 

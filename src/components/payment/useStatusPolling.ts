@@ -1,10 +1,9 @@
 import { useEffect, useRef } from 'react';
-import { pollPaymentStatus, type PaymentStatus } from '../../lib/payment';
-
-export const POLL_INTERVAL_MS = 5000;
+import { pollDelayMs, pollPaymentStatus, type PaymentStatus } from '../../lib/payment';
 
 /**
- * Consulta `checkout-status` a cada 5 s enquanto `active`. Para quando a aba do
+ * Consulta `checkout-status` enquanto `active`: a cada 10 s nos primeiros 5 min,
+ * depois a cada 20 s (`pollDelayMs`). Para quando a aba do
  * navegador fica oculta e volta ao ficar visível (consultando na hora). Chama
  * `onFinal` uma vez com `approved`, `rejected` ou `expired` e para.
  */
@@ -22,6 +21,7 @@ export function useStatusPolling(
     let alive = true;
     let timer: ReturnType<typeof setTimeout> | null = null;
     let inFlight = false;
+    const startedAt = Date.now();
 
     const clear = () => {
       if (timer) clearTimeout(timer);
@@ -29,7 +29,7 @@ export function useStatusPolling(
     };
     const schedule = () => {
       clear();
-      if (alive && !document.hidden) timer = setTimeout(tick, POLL_INTERVAL_MS);
+      if (alive && !document.hidden) timer = setTimeout(tick, pollDelayMs(Date.now() - startedAt));
     };
     async function tick() {
       if (!alive || inFlight || document.hidden) return;

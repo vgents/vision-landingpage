@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { AlertCircle, CheckCircle2, CreditCard, Loader2, QrCode } from 'lucide-react';
 import { PAY_COPY, PAYMENT_COPY } from '../data/checkout';
 import { checkoutErrorMessage, payLinkView, submitPayLink, type PayOutcome } from '../lib/checkout';
-import { approvedMessage, formatBRL, mercadoPagoPublicKey, type PayOrderSummary } from '../lib/payment';
+import { approvedMessage, formatBRL, mercadoPagoPublicKey, openPayState, type PayOrderSummary } from '../lib/payment';
 import { handleLinkClick } from '../lib/router';
 import { CardPayment, Notice } from '../components/payment/CardPayment';
 import { PixPayment } from '../components/payment/PixPayment';
@@ -38,7 +38,8 @@ export const PayLinkPage: React.FC<{ orderId: string | null; token: string | nul
         window.location.assign(outcome.url);
         return;
       }
-      setState(outcome.kind === 'pay' ? { status: 'pay', order: outcome.order } : { status: 'error', outcome });
+      // Cartão em análise: abre na espera, que consulta a situação (nada de pagar de novo).
+      setState(outcome.kind === 'pay' ? openPayState(outcome.order) : { status: 'error', outcome });
     });
     return () => {
       alive = false;
@@ -56,7 +57,7 @@ export const PayLinkPage: React.FC<{ orderId: string | null; token: string | nul
     const order = state.order;
     if (status === 'approved') setState({ status: 'approved', order });
     else if (status === 'invalid_link') fail({ kind: 'error', code: 'invalid_link', message: checkoutErrorMessage('invalid_link') });
-    else if (status === 'rejected') setState({ status: 'pay', order: { ...order, pix: null }, notice: PAYMENT_COPY.rejectedDefault });
+    else if (status === 'rejected') setState({ status: 'pay', order: { ...order, pix: null, in_flight: false }, notice: PAYMENT_COPY.rejectedDefault });
     else fail({ kind: 'error', code: 'expired', message: checkoutErrorMessage('expired') });
   });
 

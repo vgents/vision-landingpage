@@ -19,6 +19,8 @@ export type PayOrderSummary = {
   amount_cents: number;
   buyer_email: string;
   pix: PixData | null;
+  /** Cartão em análise no Mercado Pago: a página abre na espera e não oferece outro pagamento. */
+  in_flight: boolean;
 };
 
 export type PayerIdentification = { type: string; number: string };
@@ -70,7 +72,22 @@ export function parseOrderSummary(value: unknown): PayOrderSummary | null {
     pix = parsePix(value.pix);
     if (!pix) return null;
   }
-  return { order_id, kind: kind as PayOrderKind, title, amount_cents, buyer_email, pix };
+  return { order_id, kind: kind as PayOrderKind, title, amount_cents, buyer_email, pix, in_flight: value.in_flight === true };
+}
+
+/**
+ * Como a página abre o pedido: cartão em análise (página recarregada no meio)
+ * vai direto para a espera, que consulta a situação; senão, para o pagamento.
+ */
+export function openPayState(
+  order: PayOrderSummary,
+): { status: 'pending'; order: PayOrderSummary; message: string } | { status: 'pay'; order: PayOrderSummary } {
+  return order.in_flight ? { status: 'pending', order, message: PAYMENT_COPY.pendingDefault } : { status: 'pay', order };
+}
+
+/** Intervalo da consulta de situação: 10 s nos primeiros 5 min, depois 20 s (cabe no limite do servidor). */
+export function pollDelayMs(elapsedMs: number): number {
+  return elapsedMs < 5 * 60_000 ? 10_000 : 20_000;
 }
 
 function paymentErrorMessage(code: string): string {
