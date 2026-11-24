@@ -59,6 +59,14 @@ export const APP_VERSION = RELEASES.mac.current;
  */
 export const SHOW_PREVIOUS_VERSIONS = false;
 
+/**
+ * Downloads pausados (decisão do dono em 2026-11-24): enquanto a versão com as
+ * receitas na nuvem não sai, o site não oferece instalador nenhum. Com `true`,
+ * todas as plataformas aparecem como "Em breve" e nenhum pedido de download é
+ * feito. Para reabrir, volte para `false`.
+ */
+export const DOWNLOADS_PAUSED = true;
+
 /** Contagens de catálogo exibidas no site. */
 export const CATALOG = {
   designSystems: 151,

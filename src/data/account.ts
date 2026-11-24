@@ -40,6 +40,7 @@ export const ACCOUNT_COPY = {
     'not-found': 'Este instalador não está disponível agora. Tente de novo mais tarde.',
     'server-error': 'Não foi possível gerar o link de download. Tente de novo.',
     network: 'Não foi possível conectar. Verifique a internet e tente de novo.',
+    paused: 'Os downloads estão pausados enquanto preparamos a próxima versão. Volte em breve.',
   },
   buttonSignedOut: 'Entrar para baixar',
   preparing: 'Preparando o download…',

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ACCOUNT_COPY } from '../data/account';
+import { DOWNLOADS_PAUSED } from '../data/softwareData';
 import { currentAccessToken, signOut } from './account';
 import { requestDownload, type ArtifactType, type PlatformKey } from './download';
 import { navigate } from './router';
@@ -22,6 +23,7 @@ export function loginPathFor(target: DownloadTarget): string {
  * (401) encerra a sessão da aba e pede para entrar de novo.
  */
 export async function startDownload(target: DownloadTarget): Promise<{ started: true } | { started: false; message: string | null }> {
+  if (DOWNLOADS_PAUSED) return { started: false, message: ACCOUNT_COPY.download.paused };
   const token = await currentAccessToken();
   if (!token) {
     navigate(loginPathFor(target));

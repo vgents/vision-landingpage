@@ -2,7 +2,7 @@ import React from 'react';
 import {
   Download, Play, Apple, Monitor, HardDrive, Terminal, Palette, Figma, ArrowDown
 } from 'lucide-react';
-import { APP_VERSION, CATALOG } from '../data/softwareData';
+import { APP_VERSION, CATALOG, DOWNLOADS_PAUSED } from '../data/softwareData';
 import { availabilityLine, downloadTarget } from '../data/platforms';
 import { OperatingSystem, SupportedOS } from '../types';
 
@@ -93,9 +93,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenDownload, detect
             >
               <ArrowDown className="w-5 h-5 transition-transform group-hover:translate-y-1" />
               <span className="text-left">
-                <span className="block text-sm leading-tight">Ver plataformas disponíveis</span>
+                <span className="block text-sm leading-tight">{DOWNLOADS_PAUSED ? 'Downloads em breve' : 'Ver plataformas disponíveis'}</span>
                 <span className="block text-[11px] font-medium opacity-70">
-                  macOS, Windows e Linux publicados
+                  {DOWNLOADS_PAUSED ? 'Estamos preparando a próxima versão' : 'macOS, Windows e Linux publicados'}
                 </span>
               </span>
             </a>

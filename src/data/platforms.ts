@@ -1,5 +1,5 @@
 import { OperatingSystem, PlatformProfile, RequirementItem, SupportedOS } from '../types';
-import { CATALOG, RELEASES, SHOW_PREVIOUS_VERSIONS } from './softwareData';
+import { CATALOG, DOWNLOADS_PAUSED, RELEASES, SHOW_PREVIOUS_VERSIONS } from './softwareData';
 
 /**
  * Perfis de plataforma: o conteúdo do site que muda conforme o sistema do
@@ -43,7 +43,7 @@ const MAC: PlatformProfile = {
   name: 'macOS',
   fullName: 'macOS 12 Monterey ou superior',
   icon: 'Apple',
-  status: 'available',
+  status: DOWNLOADS_PAUSED ? 'coming-soon' : 'available',
   version: RELEASES.mac.current,
   fileSize: SIZES.macAtual,
   fileFormat: 'Imagem .DMG',
@@ -95,7 +95,7 @@ const WINDOWS: PlatformProfile = {
   name: 'Windows',
   fullName: 'Windows 10 ou 11',
   icon: 'Monitor',
-  status: 'available',
+  status: DOWNLOADS_PAUSED ? 'coming-soon' : 'available',
   version: RELEASES.windows.current,
   fileSize: SIZES.winAtual,
   fileFormat: 'Instalador .EXE (NSIS)',
@@ -147,7 +147,7 @@ const LINUX: PlatformProfile = {
   name: 'Linux',
   fullName: 'Linux x86-64 (AppImage)',
   icon: 'Terminal',
-  status: 'available',
+  status: DOWNLOADS_PAUSED ? 'coming-soon' : 'available',
   version: RELEASES.linux.current,
   fileSize: SIZES.linuxAtual,
   fileFormat: 'Executável .AppImage',
@@ -219,6 +219,7 @@ export function referenceProfile(os: OperatingSystem): PlatformProfile {
 
 /** Frase de disponibilidade sob o CTA principal, do ponto de vista do visitante. */
 export function availabilityLine(os: OperatingSystem): string {
+  if (DOWNLOADS_PAUSED) return 'Downloads pausados enquanto preparamos a próxima versão';
   switch (os) {
     case 'mac':
       return 'Detectamos que você está no macOS. Windows e Linux também publicados';
@@ -233,6 +234,7 @@ export function availabilityLine(os: OperatingSystem): string {
 
 /** Versão curta da frase acima, para o rodapé e o menu mobile. */
 export function availabilityShort(os: OperatingSystem): string {
+  if (DOWNLOADS_PAUSED) return 'Downloads pausados por enquanto';
   const target = downloadTarget(os);
   if (target) return `${target.fullName} · os três sistemas no ar`;
   return 'macOS, Windows e Linux publicados';
