@@ -1,5 +1,5 @@
 import { OperatingSystem, PlatformProfile, RequirementItem, SupportedOS } from '../types';
-import { CATALOG, RELEASES } from './softwareData';
+import { CATALOG, RELEASES, SHOW_PREVIOUS_VERSIONS } from './softwareData';
 
 /**
  * Perfis de plataforma: o conteúdo do site que muda conforme o sistema do
@@ -182,6 +182,10 @@ const LINUX: PlatformProfile = {
     }
   ]
 };
+
+/** Opções de download exibidas: sem as versões anteriores enquanto `SHOW_PREVIOUS_VERSIONS` for falso. */
+export const visibleReleases = (profile: PlatformProfile, showPrevious: boolean = SHOW_PREVIOUS_VERSIONS) =>
+  profile.releases.filter((r) => showPrevious || !r.download.version);
 
 export const PLATFORMS: PlatformProfile[] = [MAC, WINDOWS, LINUX];
 

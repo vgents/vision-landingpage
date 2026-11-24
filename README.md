@@ -82,13 +82,11 @@ Pago nunca entra no site. Configure no Vercel (Project → Settings → Environm
 novo deploy: variáveis `VITE_*` são lidas no build. Para rodar local, copie `.env.example` para
 `.env.local`.
 
-O download funciona sem configuração nenhuma: a origem padrão está em `DEFAULT_RELEASE_FEED`, em
-`src/data/softwareData.ts`. Defina a variável apenas para apontar para outro endpoint — um domínio
-próprio, por exemplo — sem precisar mexer no código.
-
-Esse endereço é público por natureza: ele acaba no bundle de qualquer forma, porque o navegador
-precisa dele para baixar o arquivo. Não é lugar para nada que precise ficar em segredo, e a
-variável de ambiente não o torna secreto.
+O download exige conta: o botão leva a `/entrar` e, com sessão, chama a Edge Function
+`release-download` (mesmo projeto Supabase), que devolve um link assinado e curto do bucket privado.
+O site não guarda nenhum endereço público de instalador e não há variável de ambiente para isso. As
+versões anteriores ficam escondidas (`SHOW_PREVIOUS_VERSIONS` em `src/data/softwareData.ts`) até
+serem copiadas para o bucket privado.
 
 ## Publicando uma versão nova
 

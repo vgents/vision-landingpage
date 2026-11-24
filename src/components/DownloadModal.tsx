@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { X, Download, Apple, Terminal, Monitor, ShieldAlert, Clock } from 'lucide-react';
-import { PLATFORM_BY_OS, PUBLISHED } from '../data/platforms';
+import { PLATFORM_BY_OS, PUBLISHED, visibleReleases } from '../data/platforms';
 import { SupportedOS } from '../types';
 import { ACCOUNT_COPY } from '../data/account';
 import { useDownloadAction, useSignedIn } from '../lib/useAccount';
@@ -23,7 +23,7 @@ export const DownloadModal: React.FC<DownloadModalProps> = ({ isOpen, onClose, s
   const isAvailable = option.status === 'available';
   const Icon = OS_ICON[option.icon];
   /** A versão de recuo só existe onde há mais de uma no ar. */
-  const fallback = option.releases[1];
+  const fallback = visibleReleases(option)[1];
 
   useEffect(() => {
     if (!isOpen) return;
@@ -174,8 +174,7 @@ export const DownloadModal: React.FC<DownloadModalProps> = ({ isOpen, onClose, s
                     </>
                   ) : (
                     <>
-                      Esta é a primeira versão de {option.name} publicada, então ainda não há uma
-                      anterior para recuar. A partir da próxima, as duas ficam no ar.
+                      O download é liberado para quem tem conta: o link é gerado na hora e vale por poucos minutos.
                     </>
                   )}
                 </p>

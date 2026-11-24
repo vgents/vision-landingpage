@@ -52,6 +52,13 @@ export const RELEASES = {
  */
 export const APP_VERSION = RELEASES.mac.current;
 
+/**
+ * As versões anteriores (recuo) ficam escondidas do site: o bucket privado só
+ * tem a versão atual de cada plataforma. O dono liga isto depois de copiar essas
+ * versões para o bucket privado (`<canal>/versions/<v>/...` com o metadata).
+ */
+export const SHOW_PREVIOUS_VERSIONS = false;
+
 /** Contagens de catálogo exibidas no site. */
 export const CATALOG = {
   designSystems: 151,

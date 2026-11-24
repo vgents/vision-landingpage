@@ -3,7 +3,7 @@ import {
   Monitor, Apple, Terminal, Download, Cpu, HardDrive,
   RefreshCw, ShieldAlert, Clock, History
 } from 'lucide-react';
-import { PLATFORMS, referenceProfile } from '../data/platforms';
+import { PLATFORMS, referenceProfile, visibleReleases } from '../data/platforms';
 import { OperatingSystem, SupportedOS } from '../types';
 import { ACCOUNT_COPY } from '../data/account';
 import { useDownloadAction, useSignedIn } from '../lib/useAccount';
@@ -24,7 +24,7 @@ export const DownloadCenter: React.FC<DownloadCenterProps> = ({ onOpenDownload, 
   const { start, busy, message } = useDownloadAction();
   const signedIn = useSignedIn();
   const profile = referenceProfile(detectedOS);
-  const releases = profile.releases;
+  const releases = visibleReleases(profile);
   const hasFallback = releases.length > 1;
 
   return (
