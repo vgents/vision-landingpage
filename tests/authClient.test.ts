@@ -1,5 +1,6 @@
 import { describe, expect, test, vi } from 'vitest';
-import { createAuthClient, expiringStorage, type StorageLike } from '../src/lib/authClient';
+import { readFileSync } from 'node:fs';
+import { EXPIRY_MARGIN_MS, createAuthClient, expiringStorage, type StorageLike } from '../src/lib/authClient';
 import { visibleReleases, PLATFORMS } from '../src/data/platforms';
 import { SHOW_PREVIOUS_VERSIONS } from '../src/data/softwareData';
 
@@ -38,6 +39,19 @@ describe('landing auth client never refreshes', () => {
     const { client, fetchSpy } = await clientWith(session(30));
     expect((await client.auth.getSession()).data.session).toBeNull();
     expect(fetchSpy).not.toHaveBeenCalled();
+  });
+  test('session ~75 s from expiry (inside auth-js 90 s margin) reads as signed-out, no call', async () => {
+    const { client, fetchSpy } = await clientWith(session(75));
+    expect((await client.auth.getSession()).data.session).toBeNull();
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+  test('our margin exceeds the installed auth-js margin', () => {
+    const src = readFileSync('node_modules/@supabase/auth-js/dist/main/lib/constants.js', 'utf8');
+    const m = /AUTO_REFRESH_TICK_DURATION_MS = (\d+) \* (\d+)/.exec(src);
+    const tick = Number(m?.[1]) * Number(m?.[2]);
+    const n = Number(/AUTO_REFRESH_TICK_THRESHOLD = (\d+)/.exec(src)?.[1]);
+    expect(tick * n).toBeGreaterThan(0);
+    expect(EXPIRY_MARGIN_MS).toBeGreaterThan(tick * n);
   });
   test('valid stored session returns the token with no network call', async () => {
     const { client, fetchSpy } = await clientWith(session(3000));

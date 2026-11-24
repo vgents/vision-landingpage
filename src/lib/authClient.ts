@@ -1,8 +1,15 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from '../data/cloud';
 
-/** Folga: uma sessão que vence em menos que isto já conta como vencida. */
-export const EXPIRY_MARGIN_MS = 60_000;
+/**
+ * Folga: uma sessão que vence em menos que isto já conta como vencida. Precisa
+ * ser MAIOR que a margem do próprio auth-js (2.119.0: 3 ticks x 30 s = 90 s,
+ * `lib/constants` EXPIRY_MARGIN_MS, não exportada), senão `getSession()` renova
+ * uma sessão que o wrapper deixou passar. Daí os 120 s. O supabase-js está
+ * fixado em versão exata no package.json e o teste `authClient` confere a
+ * margem instalada, para uma atualização não alargá-la em silêncio.
+ */
+export const EXPIRY_MARGIN_MS = 120_000;
 
 export interface StorageLike {
   getItem(key: string): string | null;
@@ -11,7 +18,7 @@ export interface StorageLike {
 }
 
 /**
- * Armazenamento que nunca entrega uma sessão vencida (ou prestes a vencer).
+ * Armazenamento que nunca entrega uma sessão vencida (ou prestes a vencer, ver EXPIRY_MARGIN_MS).
  * `autoRefreshToken: false` só desliga o temporizador: o `getSession()` do
  * supabase-js ainda renova uma sessão dentro da margem de expiração. A landing
  * nunca renova (colidiria com a sessão única do app), então o cliente jamais
