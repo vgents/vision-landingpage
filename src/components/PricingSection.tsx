@@ -61,13 +61,13 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ id, notice }) =>
     <section id={id} className="py-16 sm:py-24 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-accent-soft/50 border border-accent/25 text-accent-strong text-xs uppercase tracking-widest mb-4">
+          <div className="inline-flex items-center gap-2 text-accent text-xs font-bold uppercase tracking-[0.08em] mb-4">
             <BadgeCheck className="w-3.5 h-3.5" />
             <span>{PLANS_COPY.eyebrow}</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-light text-cream-strong tracking-tight mb-5">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-cream-strong tracking-[-0.035em] mb-5">
             {PLANS_COPY.titleLead}{' '}
-            <span className="text-gradient-aurora font-semibold">{PLANS_COPY.titleAccent}</span>
+            <span className="text-gradient-aurora font-extrabold">{PLANS_COPY.titleAccent}</span>
           </h2>
           <p className="text-cream/75 text-sm sm:text-base leading-relaxed">{PLANS_COPY.intro}</p>
         </div>
@@ -122,8 +122,8 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ id, notice }) =>
                   onClick={(event) => handleLinkClick(event, href)}
                   className={`w-full py-3.5 rounded-xl font-semibold text-sm transition-colors flex items-center justify-center gap-2 ${
                     card.highlighted
-                      ? 'bg-accent hover:bg-accent-strong text-ink-deep shadow-lg shadow-accent/20'
-                      : 'bg-cream/5 hover:bg-cream/10 border border-cream/15 text-cream'
+                      ? 'bg-accent hover:bg-accent-strong text-on-accent shadow-lg shadow-accent/20'
+                      : 'bg-panel hover:bg-accent-tint border border-cream/20 hover:border-accent hover:text-accent shadow-sm text-cream-strong'
                   }`}
                 >
                   {PLANS_COPY.choose}

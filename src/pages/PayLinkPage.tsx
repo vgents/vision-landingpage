@@ -70,7 +70,7 @@ export const PayLinkPage: React.FC<{ orderId: string | null; token: string | nul
           {state.status === 'loading' && (
             <>
               <Eyebrow />
-              <h1 className="text-2xl sm:text-3xl font-light text-cream-strong tracking-tight mb-5">{PAY_COPY.opening}</h1>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-cream-strong tracking-[-0.035em] mb-5">{PAY_COPY.opening}</h1>
               <Loader2 className="w-6 h-6 text-accent animate-spin mx-auto" aria-label={PAY_COPY.loading} />
             </>
           )}
@@ -120,13 +120,13 @@ export const PayLinkPage: React.FC<{ orderId: string | null; token: string | nul
 };
 
 const Eyebrow: React.FC = () => (
-  <p className="text-[11px] uppercase tracking-widest text-accent-strong mb-2">{PAY_COPY.eyebrow}</p>
+  <p className="text-xs font-bold uppercase tracking-[0.08em] text-accent mb-2">{PAY_COPY.eyebrow}</p>
 );
 
 const OrderHeader: React.FC<{ order: PayOrderSummary }> = ({ order }) => (
   <header className="mb-6">
     <Eyebrow />
-    <h1 className="text-2xl sm:text-3xl font-light text-cream-strong tracking-tight mb-2 break-words">{order.title}</h1>
+    <h1 className="text-2xl sm:text-3xl font-extrabold text-cream-strong tracking-[-0.035em] mb-2 break-words">{order.title}</h1>
     <p className="text-sm text-muted">
       {PAYMENT_COPY.amountLabel}{' '}
       <span className="text-2xl font-semibold text-cream-strong ml-1 tabular-nums" data-amount-cents={order.amount_cents}>
@@ -229,7 +229,7 @@ const PayPanel: React.FC<{
 const Approved: React.FC<{ order: PayOrderSummary }> = ({ order }) => (
   <>
     <Eyebrow />
-    <h1 className="text-2xl sm:text-3xl font-light text-cream-strong tracking-tight mb-5">{PAYMENT_COPY.approvedTitle}</h1>
+    <h1 className="text-2xl sm:text-3xl font-extrabold text-cream-strong tracking-[-0.035em] mb-5">{PAYMENT_COPY.approvedTitle}</h1>
     <div
       role="status"
       data-tone="success"
@@ -247,7 +247,7 @@ const PayErrorView: React.FC<{ view: ReturnType<typeof payLinkView>; code: strin
   const Icon = success ? CheckCircle2 : AlertCircle;
   return (
     <>
-      <h1 className="text-2xl sm:text-3xl font-light text-cream-strong tracking-tight mb-5">{view.title}</h1>
+      <h1 className="text-2xl sm:text-3xl font-extrabold text-cream-strong tracking-[-0.035em] mb-5">{view.title}</h1>
       <div
         role={success ? 'status' : 'alert'}
         data-error-code={code}
@@ -266,7 +266,7 @@ const PayErrorView: React.FC<{ view: ReturnType<typeof payLinkView>; code: strin
           <a
             href="/planos"
             onClick={(event) => handleLinkClick(event, '/planos')}
-            className="px-5 py-3 rounded-xl bg-accent hover:bg-accent-strong text-ink-deep font-semibold text-sm shadow-lg shadow-accent/20 transition-colors inline-flex"
+            className="px-5 py-3 rounded-xl bg-accent hover:bg-accent-strong text-on-accent font-semibold text-sm shadow-lg shadow-accent/20 transition-colors inline-flex"
           >
             {PAY_COPY.newOrder}
           </a>

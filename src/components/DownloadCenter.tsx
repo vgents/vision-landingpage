@@ -31,12 +31,12 @@ export const DownloadCenter: React.FC<DownloadCenterProps> = ({ onOpenDownload, 
     <section id="downloads" className="py-16 sm:py-24 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-accent-soft/50 border border-accent/25 text-accent-strong text-xs uppercase tracking-widest mb-4">
+          <div className="inline-flex items-center gap-2 text-accent text-xs font-bold uppercase tracking-[0.08em] mb-4">
             <Download className="w-3.5 h-3.5" />
             <span>Versão {profile.version}</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-light text-cream-strong tracking-tight mb-5">
-            Baixe o <span className="text-gradient-aurora font-semibold">Vision Design</span>
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-cream-strong tracking-[-0.035em] mb-5">
+            Baixe o <span className="text-gradient-aurora font-extrabold">Vision Design</span>
           </h2>
           <p className="text-cream/75 text-sm sm:text-base leading-relaxed">
             macOS, Windows e Linux têm instalador publicado e suportado por igual. No mac e no
@@ -63,7 +63,7 @@ export const DownloadCenter: React.FC<DownloadCenterProps> = ({ onOpenDownload, 
                 }`}
               >
                 {isDetected && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-accent text-ink-deep text-[11px] font-bold shadow-lg whitespace-nowrap">
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-accent text-on-accent text-[11px] font-bold shadow-lg whitespace-nowrap">
                     Seu sistema
                   </span>
                 )}
@@ -109,7 +109,7 @@ export const DownloadCenter: React.FC<DownloadCenterProps> = ({ onOpenDownload, 
                 {isAvailable ? (
                   <button
                     onClick={() => onOpenDownload(opt.os)}
-                    className="w-full py-3.5 rounded-xl bg-accent hover:bg-accent-strong text-ink-deep font-semibold text-sm shadow-lg shadow-accent/20 transition-colors flex items-center justify-center gap-2 group"
+                    className="w-full py-3.5 rounded-xl bg-accent hover:bg-accent-strong text-on-accent font-semibold text-sm shadow-lg shadow-accent/20 transition-colors flex items-center justify-center gap-2 group"
                   >
                     <Download className="w-4 h-4 transition-transform group-hover:-translate-y-0.5" />
                     <span>{opt.ctaLabel}</span>
@@ -128,7 +128,7 @@ export const DownloadCenter: React.FC<DownloadCenterProps> = ({ onOpenDownload, 
         {/* Versões no ar para o sistema em foco: a atual e a anterior, quando há */}
         <div className="max-w-4xl mx-auto mb-6">
           <div className="text-center mb-6">
-            <span className="text-[11px] uppercase tracking-widest text-accent-strong">
+            <span className="text-xs font-bold uppercase tracking-[0.08em] text-accent">
               Versões para {profile.name}
             </span>
             <h3 className="text-lg sm:text-xl font-medium text-cream-strong mb-2 mt-1.5">
@@ -194,8 +194,8 @@ export const DownloadCenter: React.FC<DownloadCenterProps> = ({ onOpenDownload, 
                   onClick={() => start(release.download)}
                   className={`w-full py-3 rounded-xl font-semibold text-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-60 ${
                     release.autoUpdate
-                      ? 'bg-accent hover:bg-accent-strong text-ink-deep shadow-lg shadow-accent/20'
-                      : 'bg-cream/5 hover:bg-cream/10 border border-cream/15 text-cream'
+                      ? 'bg-accent hover:bg-accent-strong text-on-accent shadow-lg shadow-accent/20'
+                      : 'bg-panel hover:bg-accent-tint border border-cream/20 hover:border-accent hover:text-accent shadow-sm text-cream-strong'
                   }`}
                 >
                   <Download className="w-4 h-4" />

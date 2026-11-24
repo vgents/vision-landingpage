@@ -32,8 +32,8 @@ export const CheckoutResultPage: React.FC<CheckoutResultPageProps> = ({ variant,
           <span className={`inline-flex w-14 h-14 rounded-2xl border items-center justify-center mb-5 ${TONE[variant]}`}>
             <Icon className="w-7 h-7" />
           </span>
-          <p className="text-[11px] uppercase tracking-widest text-accent-strong mb-2">{copy.eyebrow}</p>
-          <h1 className="text-2xl sm:text-4xl font-light text-cream-strong tracking-tight mb-4">{copy.title}</h1>
+          <p className="text-xs font-bold uppercase tracking-[0.08em] text-accent mb-2">{copy.eyebrow}</p>
+          <h1 className="text-2xl sm:text-4xl font-extrabold text-cream-strong tracking-[-0.035em] mb-4">{copy.title}</h1>
           <p className="text-sm sm:text-base text-cream/80 leading-relaxed mb-3">{copy.body}</p>
           {copy.note && <p className="text-xs text-muted leading-relaxed mb-3">{copy.note}</p>}
           {orderId && (
@@ -47,7 +47,7 @@ export const CheckoutResultPage: React.FC<CheckoutResultPageProps> = ({ variant,
               <a
                 href="/planos"
                 onClick={(event) => handleLinkClick(event, '/planos')}
-                className="px-5 py-3 rounded-xl bg-accent hover:bg-accent-strong text-ink-deep font-semibold text-sm shadow-lg shadow-accent/20 transition-colors inline-flex items-center justify-center gap-2"
+                className="px-5 py-3 rounded-xl bg-accent hover:bg-accent-strong text-on-accent font-semibold text-sm shadow-lg shadow-accent/20 transition-colors inline-flex items-center justify-center gap-2"
               >
                 <RotateCcw className="w-4 h-4" />
                 {RESULT_COPY.retry}
@@ -58,8 +58,8 @@ export const CheckoutResultPage: React.FC<CheckoutResultPageProps> = ({ variant,
               onClick={(event) => handleLinkClick(event, '/#downloads')}
               className={`px-5 py-3 rounded-xl font-semibold text-sm transition-colors inline-flex items-center justify-center gap-2 ${
                 variant === 'erro'
-                  ? 'bg-cream/5 hover:bg-cream/10 border border-cream/15 text-cream'
-                  : 'bg-accent hover:bg-accent-strong text-ink-deep shadow-lg shadow-accent/20'
+                  ? 'bg-panel hover:bg-accent-tint border border-cream/20 hover:border-accent hover:text-accent shadow-sm text-cream-strong'
+                  : 'bg-accent hover:bg-accent-strong text-on-accent shadow-lg shadow-accent/20'
               }`}
             >
               <Download className="w-4 h-4" />

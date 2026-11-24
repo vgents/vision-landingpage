@@ -18,7 +18,7 @@ import { DEFAULT_SEAT_PRICING, monthlyTotalCents, seatBreakdown, type PlanChoice
 const EMPTY_FORM: CheckoutForm = { buyerName: '', buyerEmail: '', companyName: '', acceptTerms: false };
 
 const inputClass =
-  'w-full px-4 py-3 rounded-xl bg-ink-deep/70 border text-cream-strong placeholder:text-soft text-base sm:text-sm outline-none transition-colors focus:border-accent/60';
+  'w-full px-4 py-3 rounded-[10px] bg-panel border text-cream-strong placeholder:text-faint text-base sm:text-sm outline-none shadow-sm transition-[border-color,box-shadow] focus:border-accent focus:ring-4 focus:ring-accent/20';
 
 type Sent = { orderId: string; email: string };
 
@@ -110,7 +110,7 @@ export const CheckoutPage: React.FC<{ initialChoice: PlanChoice | null }> = ({ i
             <span className="inline-flex w-14 h-14 rounded-2xl border items-center justify-center mb-5 bg-ok/10 border-ok/25 text-ok">
               <MailCheck className="w-7 h-7" />
             </span>
-            <h1 className="text-2xl sm:text-4xl font-light text-cream-strong tracking-tight mb-4">{CHECKOUT_COPY.checkEmailTitle}</h1>
+            <h1 className="text-2xl sm:text-4xl font-extrabold text-cream-strong tracking-[-0.035em] mb-4">{CHECKOUT_COPY.checkEmailTitle}</h1>
             <p className="text-sm sm:text-base text-cream/80 leading-relaxed mb-3">
               Enviamos o link para <strong className="text-cream-strong break-all">{sent.email}</strong>. Abra seu e-mail para pagar.
             </p>
@@ -124,7 +124,7 @@ export const CheckoutPage: React.FC<{ initialChoice: PlanChoice | null }> = ({ i
                 type="button"
                 onClick={handleResend}
                 disabled={resendState === 'sending'}
-                className="px-5 py-3 rounded-xl bg-accent hover:bg-accent-strong disabled:opacity-60 disabled:cursor-wait text-ink-deep font-semibold text-sm shadow-lg shadow-accent/20 transition-colors inline-flex items-center justify-center gap-2"
+                className="px-5 py-3 rounded-xl bg-accent hover:bg-accent-strong disabled:opacity-60 disabled:cursor-wait text-on-accent font-semibold text-sm shadow-lg shadow-accent/20 transition-colors inline-flex items-center justify-center gap-2"
               >
                 {resendState === 'sending' && <Loader2 className="w-4 h-4 animate-spin" />}
                 {resendState === 'sending' ? CHECKOUT_COPY.resending : CHECKOUT_COPY.resend}
@@ -132,7 +132,7 @@ export const CheckoutPage: React.FC<{ initialChoice: PlanChoice | null }> = ({ i
               <button
                 type="button"
                 onClick={() => setSent(null)}
-                className="px-5 py-3 rounded-xl bg-cream/5 hover:bg-cream/10 border border-cream/15 text-cream font-semibold text-sm transition-colors"
+                className="px-5 py-3 rounded-xl bg-panel hover:bg-accent-tint border border-cream/20 hover:border-accent hover:text-accent shadow-sm text-cream-strong font-semibold text-sm transition-colors"
               >
                 {CHECKOUT_COPY.wrongEmail}
               </button>
@@ -162,7 +162,7 @@ export const CheckoutPage: React.FC<{ initialChoice: PlanChoice | null }> = ({ i
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
           <aside className="lg:col-span-4 glass-card rounded-3xl p-5 sm:p-7" data-checkout-plan={choice}>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-soft/50 border border-accent/25 text-accent-strong text-[11px] uppercase tracking-widest mb-4">
+            <div className="inline-flex items-center gap-2 text-accent text-xs font-bold uppercase tracking-[0.08em] mb-4">
               <ShoppingBag className="w-3.5 h-3.5" />
               <span>{CHECKOUT_COPY.eyebrow}</span>
             </div>
@@ -194,7 +194,7 @@ export const CheckoutPage: React.FC<{ initialChoice: PlanChoice | null }> = ({ i
           </aside>
 
           <section className="lg:col-span-8 glass-panel rounded-3xl p-5 sm:p-8">
-            <h1 className="text-2xl sm:text-3xl font-light text-cream-strong tracking-tight mb-3">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-cream-strong tracking-[-0.035em] mb-3">
               {CHECKOUT_COPY.title}
             </h1>
             <p className="text-sm text-cream/75 leading-relaxed mb-7">{CHECKOUT_COPY.intro}</p>
@@ -233,7 +233,7 @@ export const CheckoutPage: React.FC<{ initialChoice: PlanChoice | null }> = ({ i
                       aria-label={CHECKOUT_COPY.seatsMinus}
                       onClick={() => setSeats((n) => clampSeats(n - 1))}
                       disabled={seats <= minSeats}
-                      className="w-11 rounded-xl border border-cream/15 bg-cream/5 hover:bg-cream/10 disabled:opacity-40 text-cream flex items-center justify-center"
+                      className="w-11 rounded-xl bg-panel hover:bg-accent-tint border border-cream/20 hover:border-accent hover:text-accent shadow-sm disabled:opacity-40 text-cream-strong flex items-center justify-center"
                     >
                       <Minus className="w-4 h-4" />
                     </button>
@@ -252,7 +252,7 @@ export const CheckoutPage: React.FC<{ initialChoice: PlanChoice | null }> = ({ i
                       aria-label={CHECKOUT_COPY.seatsPlus}
                       onClick={() => setSeats((n) => clampSeats(n + 1))}
                       disabled={seats >= pricing.max_seats}
-                      className="w-11 rounded-xl border border-cream/15 bg-cream/5 hover:bg-cream/10 disabled:opacity-40 text-cream flex items-center justify-center"
+                      className="w-11 rounded-xl bg-panel hover:bg-accent-tint border border-cream/20 hover:border-accent hover:text-accent shadow-sm disabled:opacity-40 text-cream-strong flex items-center justify-center"
                     >
                       <Plus className="w-4 h-4" />
                     </button>
@@ -339,7 +339,7 @@ export const CheckoutPage: React.FC<{ initialChoice: PlanChoice | null }> = ({ i
                     onChange={(e) => update('acceptTerms', e.target.checked)}
                     aria-invalid={!!errors.acceptTerms}
                     aria-describedby={errors.acceptTerms ? 'accept-terms-error' : undefined}
-                    className="mt-0.5 w-4 h-4 accent-[#d97a56] shrink-0"
+                    className="mt-0.5 w-4 h-4 accent-[#4b3fd9] shrink-0"
                   />
                   <span>
                     {CHECKOUT_COPY.termsLead}{' '}
@@ -370,7 +370,7 @@ export const CheckoutPage: React.FC<{ initialChoice: PlanChoice | null }> = ({ i
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-3.5 rounded-xl bg-accent hover:bg-accent-strong disabled:opacity-60 disabled:cursor-wait text-ink-deep font-semibold text-sm shadow-lg shadow-accent/20 transition-colors flex items-center justify-center gap-2"
+                className="w-full py-3.5 rounded-xl bg-accent hover:bg-accent-strong disabled:opacity-60 disabled:cursor-wait text-on-accent font-semibold text-sm shadow-lg shadow-accent/20 transition-colors flex items-center justify-center gap-2"
               >
                 {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
                 {submitting ? CHECKOUT_COPY.submitting : CHECKOUT_COPY.submit}

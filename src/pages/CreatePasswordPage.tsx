@@ -18,7 +18,7 @@ type PageState =
   | { step: 'done'; orgName?: string; planName?: string };
 
 const inputClass =
-  'w-full px-4 py-3 rounded-xl bg-ink-deep/70 border border-cream/12 text-cream-strong text-base sm:text-sm outline-none transition-colors focus:border-accent/60';
+  'w-full px-4 py-3 rounded-[10px] bg-panel border border-cream/20 hover:border-cream/30 text-cream-strong text-base sm:text-sm outline-none shadow-sm transition-[border-color,box-shadow] focus:border-accent focus:ring-4 focus:ring-accent/20';
 
 function confirmErrorMessage(code: Extract<ConfirmOutcome, { ok: false }>['code']): string {
   if (code === 'unauthorized') return COPY.confirmUnauthorized;
@@ -113,7 +113,7 @@ export const CreatePasswordPage: React.FC = () => {
     <main className="pt-28 sm:pt-32 pb-16 sm:pb-24 min-h-[70vh]">
       <div className="max-w-xl mx-auto px-4 sm:px-6">
         <div className="glass-panel rounded-3xl p-6 sm:p-10" data-create-password={state.step}>
-          <p className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-soft/50 border border-accent/25 text-accent-strong text-[11px] uppercase tracking-widest mb-5">
+          <p className="inline-flex items-center gap-2 text-accent text-xs font-bold uppercase tracking-[0.08em] mb-5">
             <KeyRound className="w-3.5 h-3.5" />
             {COPY.eyebrow}
           </p>
@@ -130,7 +130,7 @@ export const CreatePasswordPage: React.FC = () => {
               <span className="inline-flex w-12 h-12 rounded-2xl border bg-warn/10 border-warn/25 text-warn items-center justify-center mb-4">
                 <LinkIcon className="w-6 h-6" />
               </span>
-              <h1 className="text-2xl sm:text-3xl font-light text-cream-strong tracking-tight mb-3">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-cream-strong tracking-[-0.035em] mb-3">
                 {state.step === 'error' ? COPY.errorTitle : COPY.expiredTitle}
               </h1>
               <p className="text-sm text-cream/80 leading-relaxed">
@@ -142,7 +142,7 @@ export const CreatePasswordPage: React.FC = () => {
           {state.step === 'form' && (
             <form onSubmit={handleSubmit} noValidate className="space-y-5">
               <div>
-                <h1 className="text-2xl sm:text-3xl font-light text-cream-strong tracking-tight mb-3">
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-cream-strong tracking-[-0.035em] mb-3">
                   {state.linkType === 'invite' ? COPY.inviteTitle : COPY.recoveryTitle}
                 </h1>
                 <p className="text-sm text-cream/75 leading-relaxed">
@@ -202,7 +202,7 @@ export const CreatePasswordPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={saving}
-                className="w-full py-3.5 rounded-xl bg-accent hover:bg-accent-strong disabled:opacity-60 disabled:cursor-wait text-ink-deep font-semibold text-sm shadow-lg shadow-accent/20 transition-colors flex items-center justify-center gap-2"
+                className="w-full py-3.5 rounded-xl bg-accent hover:bg-accent-strong disabled:opacity-60 disabled:cursor-wait text-on-accent font-semibold text-sm shadow-lg shadow-accent/20 transition-colors flex items-center justify-center gap-2"
               >
                 {saving && <Loader2 className="w-4 h-4 animate-spin" />}
                 {saving ? COPY.saving : state.linkType === 'invite' ? COPY.submitInvite : COPY.submitRecovery}
@@ -215,7 +215,7 @@ export const CreatePasswordPage: React.FC = () => {
               <span className="inline-flex w-12 h-12 rounded-2xl border bg-ok/10 border-ok/25 text-ok items-center justify-center mb-4">
                 <CheckCircle2 className="w-6 h-6" />
               </span>
-              <h1 className="text-2xl sm:text-3xl font-light text-cream-strong tracking-tight mb-3">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-cream-strong tracking-[-0.035em] mb-3">
                 {COPY.doneTitle}
               </h1>
               {(state.orgName || state.planName) && (
@@ -233,7 +233,7 @@ export const CreatePasswordPage: React.FC = () => {
               <a
                 href="/#downloads"
                 onClick={(event) => handleLinkClick(event, '/#downloads')}
-                className="w-full py-3.5 rounded-xl bg-accent hover:bg-accent-strong text-ink-deep font-semibold text-sm shadow-lg shadow-accent/20 transition-colors flex items-center justify-center gap-2"
+                className="w-full py-3.5 rounded-xl bg-accent hover:bg-accent-strong text-on-accent font-semibold text-sm shadow-lg shadow-accent/20 transition-colors flex items-center justify-center gap-2"
               >
                 <Download className="w-4 h-4" />
                 {COPY.download}

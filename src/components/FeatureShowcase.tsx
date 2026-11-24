@@ -29,12 +29,12 @@ export const FeatureShowcase: React.FC = () => {
     <section id="recursos" className="py-16 sm:py-24 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-accent-soft/50 border border-accent/25 text-accent-strong text-xs uppercase tracking-widest mb-4">
+          <div className="inline-flex items-center gap-2 text-accent text-xs font-bold uppercase tracking-[0.08em] mb-4">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Funcionalidades</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-light text-cream-strong tracking-tight mb-5">
-            O que existe <span className="text-gradient-aurora font-semibold">dentro do app</span>
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-cream-strong tracking-[-0.035em] mb-5">
+            O que existe <span className="text-gradient-aurora font-extrabold">dentro do app</span>
           </h2>
           <p className="text-cream/75 text-sm sm:text-base leading-relaxed">
             Nada de módulo genérico: cada etapa foi construída para um problema específico de quem
@@ -53,7 +53,7 @@ export const FeatureShowcase: React.FC = () => {
                 onClick={() => setActiveFeatureId(item.id)}
                 className={`shrink-0 min-h-11 px-4 sm:px-5 py-3 rounded-2xl font-medium text-sm transition-all duration-300 flex items-center gap-2.5 ${
                   isActive
-                    ? 'bg-accent text-ink-deep shadow-lg shadow-accent/25'
+                    ? 'bg-accent text-on-accent shadow-lg shadow-accent/25'
                     : 'bg-cream/5 hover:bg-cream/10 text-cream/75 hover:text-cream-strong border border-cream/8'
                 }`}
               >
@@ -71,7 +71,7 @@ export const FeatureShowcase: React.FC = () => {
                 {activeFeature.category}
               </span>
 
-              <h3 className="text-xl sm:text-3xl font-light text-cream-strong leading-tight">
+              <h3 className="text-xl sm:text-3xl font-extrabold tracking-[-0.03em] text-cream-strong leading-tight">
                 {activeFeature.title}
               </h3>
 
@@ -259,7 +259,7 @@ export const FeatureShowcase: React.FC = () => {
                       </span>
                     </div>
                     <div className="grid grid-cols-4 gap-2">
-                      {['#d97a56', '#e0a95c', '#6fbf87', '#8aa5f0'].map((color) => (
+                      {['#4b3fd9', '#ff7a59', '#1f9d6b', '#7a4fe0'].map((color) => (
                         <div key={color} className="rounded-lg overflow-hidden border border-cream/10">
                           <div className="h-10" style={{ backgroundColor: color }} />
                           <div className="px-1.5 py-1 bg-panel text-[9px] text-muted text-center">

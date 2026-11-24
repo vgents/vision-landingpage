@@ -94,7 +94,7 @@ export const PixPayment: React.FC<Props> = ({ order, orderId, token, onApproved,
       type="button"
       onClick={generate}
       disabled={generating}
-      className="w-full sm:w-auto px-5 py-3 rounded-xl bg-accent hover:bg-accent-strong disabled:opacity-60 disabled:cursor-wait text-ink-deep font-semibold text-sm shadow-lg shadow-accent/20 transition-colors inline-flex items-center justify-center gap-2"
+      className="w-full sm:w-auto px-5 py-3 rounded-xl bg-accent hover:bg-accent-strong disabled:opacity-60 disabled:cursor-wait text-on-accent font-semibold text-sm shadow-lg shadow-accent/20 transition-colors inline-flex items-center justify-center gap-2"
     >
       {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Icon className="w-4 h-4" />}
       {generating ? PAYMENT_COPY.pixGenerating : label}
@@ -183,12 +183,12 @@ const PixCode: React.FC<{ code: string }> = ({ code }) => {
           readOnly
           value={code}
           onFocus={(e) => e.currentTarget.select()}
-          className="min-w-0 flex-1 px-4 py-3 rounded-xl bg-ink-deep/70 border border-cream/12 text-cream text-xs font-mono outline-none focus:border-accent/60"
+          className="min-w-0 flex-1 px-4 py-3 rounded-[10px] bg-panel border border-cream/20 text-cream text-xs font-mono outline-none shadow-sm focus:border-accent focus:ring-4 focus:ring-accent/20"
         />
         <button
           type="button"
           onClick={copy}
-          className="shrink-0 px-4 rounded-xl border border-cream/15 bg-cream/5 hover:bg-cream/10 text-cream text-sm inline-flex items-center gap-2"
+          className="shrink-0 px-4 rounded-xl bg-panel hover:bg-accent-tint border border-cream/20 hover:border-accent hover:text-accent shadow-sm text-cream-strong text-sm inline-flex items-center gap-2"
         >
           {copied ? <Check className="w-4 h-4 text-ok" /> : <Copy className="w-4 h-4" />}
           <span aria-live="polite">{copied ? PAYMENT_COPY.pixCopied : PAYMENT_COPY.pixCopy}</span>

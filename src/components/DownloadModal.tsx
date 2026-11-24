@@ -72,7 +72,7 @@ export const DownloadModal: React.FC<DownloadModalProps> = ({ isOpen, onClose, s
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#14161f]/55 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
@@ -145,7 +145,7 @@ export const DownloadModal: React.FC<DownloadModalProps> = ({ isOpen, onClose, s
                     option.artifactType &&
                     start({ platformKey: option.platformKey, artifactType: option.artifactType })
                   }
-                  className="w-full py-3.5 rounded-xl bg-accent hover:bg-accent-strong text-ink-deep font-semibold text-sm shadow-lg shadow-accent/20 transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
+                  className="w-full py-3.5 rounded-xl bg-accent hover:bg-accent-strong text-on-accent font-semibold text-sm shadow-lg shadow-accent/20 transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
                 >
                   <Download className="w-4 h-4" />
                   {busy
@@ -191,7 +191,7 @@ export const DownloadModal: React.FC<DownloadModalProps> = ({ isOpen, onClose, s
               </p>
               <button
                 onClick={onClose}
-                className="w-full py-3.5 rounded-xl bg-cream/5 hover:bg-cream/10 border border-cream/10 text-cream font-medium text-sm transition-colors"
+                className="w-full py-3.5 rounded-xl bg-panel hover:bg-accent-tint border border-cream/20 hover:border-accent hover:text-accent shadow-sm text-cream font-medium text-sm transition-colors"
               >
                 Entendi
               </button>

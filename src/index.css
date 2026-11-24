@@ -2,49 +2,95 @@
 
 /*
  * Vision Design — tokens de marca.
- * Espelham o dark mode do aplicativo: superfícies quentes quase-neutras
- * com um único acento terracota.
+ * Visual alinhado à UX Vision Academy: tema claro, papel quente, um índigo
+ * como cor de ação e um coral de apoio. Os nomes dos tokens são herdados do
+ * tema escuro antigo e mantidos de propósito (os componentes só usam tokens):
+ * `ink` é o fundo da página e `cream` é a cor do texto.
  */
 @theme {
-  --font-sans: 'Cairo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-heading: 'Cairo', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-heading: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
 
   /* Superfícies */
-  --color-ink: #1a1917;
-  --color-ink-deep: #131211;
-  --color-panel: #222120;
-  --color-subtle: #272523;
-  --color-elevated: #2a2825;
+  --color-ink: #fbfaf7;
+  --color-ink-deep: #f4f2ec;
+  --color-panel: #ffffff;
+  --color-subtle: #f4f2ec;
+  --color-elevated: #ffffff;
 
   /* Texto */
-  --color-cream: #e8e4dc;
-  --color-cream-strong: #f2ede4;
-  --color-muted: #9a9690;
-  --color-soft: #6e6b65;
-  --color-faint: #4e4b46;
+  --color-cream: #2c2f3b;
+  --color-cream-strong: #14161f;
+  --color-muted: #5a5e6e;
+  --color-soft: #646877;
+  --color-faint: #8a8d9a;
 
-  /* Acento */
-  --color-accent: #d97a56;
-  --color-accent-strong: #e8896a;
-  --color-accent-soft: #3d2318;
-  --color-accent-tint: #2e1a12;
+  /* Acento (índigo da Academy) */
+  --color-accent: #4b3fd9;
+  --color-accent-strong: #3e33c2;
+  --color-accent-soft: #eceafd;
+  --color-accent-tint: #f5f4fe;
+  --color-on-accent: #ffffff;
 
-  /* Semânticos — estado, não marca */
-  --color-ok: #6fbf87;
-  --color-info: #8aa5f0;
-  --color-warn: #e0a95c;
+  /* Semânticos — estado, não marca (tons escuros para passar AA no claro) */
+  --color-ok: #17805a;
+  --color-info: #2f5fd0;
+  --color-warn: #b8461f;
+  --color-danger: #c8372d;
+
+  /* Forma e elevação (régua da Academy) */
+  --radius-3xl: 1.25rem;
+  --shadow-sm: 0 1px 2px rgba(20, 22, 31, 0.04), 0 2px 8px rgba(20, 22, 31, 0.04);
+  --shadow-md: 0 2px 4px rgba(20, 22, 31, 0.04), 0 12px 32px rgba(20, 22, 31, 0.09);
+  --shadow-lg: 0 4px 8px rgba(20, 22, 31, 0.05), 0 24px 56px rgba(30, 24, 110, 0.12);
+  --shadow-xl: 0 4px 8px rgba(20, 22, 31, 0.05), 0 24px 56px rgba(30, 24, 110, 0.14);
+  --shadow-2xl: 0 4px 8px rgba(20, 22, 31, 0.05), 0 24px 56px rgba(30, 24, 110, 0.16);
+}
+
+/*
+ * Faixa escura (rodapé): a Academy fecha a página em tinta. Como as utilities
+ * do Tailwind leem as variáveis, basta redefinir os tokens no escopo.
+ */
+.theme-ink {
+  --color-ink: #14161f;
+  --color-ink-deep: #14161f;
+  --color-panel: #1d2030;
+  --color-cream: #e4e3ee;
+  --color-cream-strong: #ffffff;
+  --color-muted: #b4b6c4;
+  --color-soft: #9a9dad;
+  --color-accent: #a99fff;
+  --color-accent-strong: #c6c0ff;
+  --color-accent-soft: #2b2580;
+  --color-on-accent: #14161f;
+  background:
+    radial-gradient(90% 120% at 0% 0%, #2b2580 0%, transparent 60%),
+    #14161f;
 }
 
 @layer base {
+  html {
+    color-scheme: light;
+  }
+
   body {
     font-family: var(--font-sans);
     background-color: var(--color-ink);
     color: var(--color-cream);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  h1, h2, h3, .font-heading {
+  h1, h2, h3, h4, .font-heading {
     font-family: var(--font-heading);
-    letter-spacing: -0.015em;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  ::selection {
+    background: var(--color-accent-soft);
+    color: #2a2196;
   }
 
   /* O header é fixo: sem isso, a navegação por âncora esconde o topo da seção. */
@@ -63,58 +109,74 @@
   }
 }
 
-/* Superfícies de vidro */
+/* Superfícies: cartões brancos, borda de papel e sombra baixa (Academy). */
 .glass-panel {
-  background: rgba(34, 33, 32, 0.72);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(232, 228, 220, 0.09);
+  background: var(--color-panel);
+  border: 1px solid #e7e4dc;
+  box-shadow: 0 1px 2px rgba(20, 22, 31, 0.04), 0 8px 24px rgba(20, 22, 31, 0.06);
 }
 
 .glass-card {
-  background: rgba(39, 37, 35, 0.5);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(232, 228, 220, 0.08);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.35);
+  background: var(--color-panel);
+  border: 1px solid #e7e4dc;
+  box-shadow: 0 1px 2px rgba(20, 22, 31, 0.04), 0 2px 8px rgba(20, 22, 31, 0.04);
 }
 
 .glass-card-hover {
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    transform 140ms cubic-bezier(0.23, 1, 0.32, 1),
+    box-shadow 140ms cubic-bezier(0.23, 1, 0.32, 1),
+    border-color 140ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .glass-card-hover:hover {
-  background: rgba(42, 40, 37, 0.62);
-  border-color: rgba(217, 122, 86, 0.32);
-  box-shadow: 0 12px 40px -10px rgba(217, 122, 86, 0.22);
-  transform: translateY(-2px);
+  border-color: #d7d3c8;
+  box-shadow: 0 2px 4px rgba(20, 22, 31, 0.04), 0 12px 32px rgba(20, 22, 31, 0.09);
+  transform: translateY(-3px);
+  transition-duration: 200ms;
+}
+
+/*
+ * Botão principal: o mesmo degradê índigo com brilho interno da Academy.
+ * Vale para todo `bg-accent` com texto `text-on-accent`.
+ */
+.bg-accent.text-on-accent {
+  background-image: linear-gradient(180deg, #5549e3 0%, #4b3fd9 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 1px 2px rgba(42, 33, 150, 0.3), 0 6px 16px rgba(75, 63, 217, 0.28);
+}
+
+.bg-accent.text-on-accent:hover:not(:disabled) {
+  background-image: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 2px 4px rgba(42, 33, 150, 0.3), 0 10px 24px rgba(75, 63, 217, 0.32);
+}
+
+.theme-ink .bg-accent.text-on-accent {
+  background-image: none;
+  box-shadow: none;
 }
 
 /*
  * Nomes herdados do scaffold: mantidos de propósito para não reescrever
- * todos os componentes de uma vez. O gradiente agora é quente.
+ * todos os componentes de uma vez. O degradê é o mesmo destaque da Academy.
  */
 .text-gradient-aurora {
-  background: linear-gradient(100deg, #f2ede4 0%, #e8896a 45%, #d97a56 100%);
+  background: linear-gradient(90deg, #4b3fd9 0%, #7a4fe0 55%, #d9532f 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .text-gradient-purple {
-  background: linear-gradient(135deg, #f2ede4 0%, #e8896a 60%, #d97a56 100%);
+  background: linear-gradient(135deg, #2a2196 0%, #4b3fd9 60%, #7a4fe0 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .bg-aurora-glow {
-  background: radial-gradient(
-    circle at 50% 20%,
-    rgba(217, 122, 86, 0.16) 0%,
-    rgba(224, 169, 92, 0.08) 35%,
-    rgba(26, 25, 23, 0) 70%
-  );
+  background:
+    radial-gradient(closest-side, rgba(116, 104, 240, 0.18), transparent 70%),
+    radial-gradient(closest-side at 30% 70%, rgba(255, 122, 89, 0.14), transparent 70%);
 }
 
 .border-glow {
@@ -125,12 +187,7 @@
   content: '';
   position: absolute;
   inset: -1px;
-  background: linear-gradient(
-    90deg,
-    rgba(217, 122, 86, 0.5),
-    rgba(224, 169, 92, 0.4),
-    rgba(217, 122, 86, 0.2)
-  );
+  background: linear-gradient(90deg, rgba(75, 63, 217, 0.45), rgba(122, 79, 224, 0.35), rgba(255, 122, 89, 0.25));
   border-radius: inherit;
   z-index: -1;
   opacity: 0.6;
@@ -150,9 +207,9 @@
 
 /* Foco visível e consistente em toda a página */
 :where(a, button, input, [tabindex]):focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 3px solid rgba(75, 63, 217, 0.45);
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: 8px;
 }
 
 ::-webkit-scrollbar {
@@ -164,10 +221,19 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(217, 122, 86, 0.28);
+  background: #d7d3c8;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(217, 122, 86, 0.5);
+  background: #b9b4a6;
+}
+
+.theme-ink :where(a, button, input, [tabindex]):focus-visible {
+  outline-color: #a99fff;
+}
+
+/* O título recebe foco por programa a cada troca de rota (leitor de tela); não é um controle, então sem anel. */
+h1[tabindex='-1']:focus {
+  outline: none;
 }

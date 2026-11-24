@@ -26,12 +26,12 @@ export const FaqSection: React.FC<FaqSectionProps> = ({ detectedOS }) => {
     <section id="faq" className="py-16 sm:py-24 relative">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-accent-soft/50 border border-accent/25 text-accent-strong text-xs uppercase tracking-widest mb-4">
+          <div className="inline-flex items-center gap-2 text-accent text-xs font-bold uppercase tracking-[0.08em] mb-4">
             <HelpCircle className="w-3.5 h-3.5" />
             <span>Dúvidas</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-light text-cream-strong tracking-tight mb-5">
-            Perguntas <span className="text-gradient-aurora font-semibold">frequentes</span>
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-cream-strong tracking-[-0.035em] mb-5">
+            Perguntas <span className="text-gradient-aurora font-extrabold">frequentes</span>
           </h2>
           <p className="text-cream/75 text-sm sm:text-base leading-relaxed">
             O que costuma aparecer antes da instalação — motor de IA, onde ficam os arquivos e o que

@@ -69,7 +69,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDownload, detectedOS }) =>
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'bg-ink/90 backdrop-blur-xl border-b border-cream/10 py-3 shadow-2xl shadow-black/40'
+          ? 'bg-ink/85 backdrop-blur-xl backdrop-saturate-150 border-b border-cream/10 py-3'
           : 'bg-transparent py-4 sm:py-5'
       }`}
     >
@@ -81,22 +81,22 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDownload, detectedOS }) =>
             className="flex items-center gap-3 group shrink-0" aria-label="Vision Design, início">
             <VisionLogo size={36} className="transition-transform duration-300 group-hover:scale-105" />
             <span className="flex flex-col leading-none">
-              <span className="font-heading text-lg sm:text-xl text-cream-strong">
-                Vision <span className="font-semibold text-accent">Design</span>
+              <span className="font-heading font-extrabold tracking-[-0.03em] text-lg sm:text-xl text-cream-strong">
+                Vision <span className="font-extrabold text-accent">Design</span>
               </span>
-              <span className="text-[11px] tracking-widest text-muted uppercase mt-1">
+              <span className="text-[11px] font-semibold tracking-[0.08em] text-muted uppercase mt-1">
                 v{target?.version ?? APP_VERSION}
               </span>
             </span>
           </a>
 
-          <nav className="hidden lg:flex items-center gap-4 xl:gap-7 text-sm text-cream/80">
+          <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1 text-sm font-semibold text-cream">
             {NAV_LINKS.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
                 onClick={(event) => handleLinkClick(event, link.href)}
-                className="py-2 whitespace-nowrap hover:text-cream-strong transition-colors"
+                className="px-2 xl:px-3 py-2 rounded-lg whitespace-nowrap hover:bg-ink-deep hover:text-cream-strong transition-colors"
               >
                 {link.label}
               </a>
@@ -104,9 +104,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDownload, detectedOS }) =>
           </nav>
 
           <div className="hidden lg:flex items-center gap-3 xl:gap-4 shrink-0">
-            {/* A pílula só cabe a partir de xl — em 1024px ela empurrava o CTA para fora da tela. */}
-            <span className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent/25 bg-accent-soft/40 text-accent-strong text-xs whitespace-nowrap">
-              <PillIcon className="w-3.5 h-3.5" />
+            {/* A pílula só cabe a partir de 2xl — com a Inter (mais larga) ela empurrava o CTA para fora em 1440px. */}
+            <span className="hidden 2xl:flex items-center gap-2 px-3 py-1.5 rounded-full border border-cream/10 bg-panel shadow-sm text-cream text-xs font-semibold whitespace-nowrap">
+              <PillIcon className="w-3.5 h-3.5 text-ok" />
               <span>{pillLabel}</span>
             </span>
 
@@ -114,7 +114,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDownload, detectedOS }) =>
               <button
                 type="button"
                 onClick={() => void signOut()}
-                className="py-2 text-sm text-cream/80 hover:text-cream-strong transition-colors whitespace-nowrap"
+                className="px-3 py-2 rounded-lg text-sm font-semibold text-accent hover:bg-accent-soft transition-colors whitespace-nowrap"
               >
                 {ACCOUNT_COPY.navLogout}
               </button>
@@ -122,7 +122,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDownload, detectedOS }) =>
               <a
                 href="/entrar"
                 onClick={(event) => handleLinkClick(event, '/entrar')}
-                className="py-2 text-sm text-cream/80 hover:text-cream-strong transition-colors whitespace-nowrap"
+                className="px-3 py-2 rounded-lg text-sm font-semibold text-accent hover:bg-accent-soft transition-colors whitespace-nowrap"
               >
                 {ACCOUNT_COPY.navLogin}
               </a>
@@ -131,7 +131,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDownload, detectedOS }) =>
             {target ? (
               <button
                 onClick={() => onOpenDownload(target.os)}
-                className="group px-4 xl:px-5 py-2.5 rounded-xl bg-accent hover:bg-accent-strong text-ink-deep font-semibold text-sm shadow-lg shadow-accent/20 transition-all active:scale-95 flex items-center gap-2 whitespace-nowrap"
+                className="group px-4 xl:px-5 py-2.5 rounded-[10px] bg-accent hover:bg-accent-strong text-on-accent font-semibold text-sm transition-all active:translate-y-px flex items-center gap-2 whitespace-nowrap"
               >
                 <Download className="w-4 h-4 transition-transform group-hover:-translate-y-0.5" />
                 <span>{target.ctaLabel}</span>
@@ -140,7 +140,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDownload, detectedOS }) =>
               <a
                 href="/#downloads"
                 onClick={(event) => handleLinkClick(event, '/#downloads')}
-                className="group px-4 xl:px-5 py-2.5 rounded-xl bg-accent hover:bg-accent-strong text-ink-deep font-semibold text-sm shadow-lg shadow-accent/20 transition-all active:scale-95 flex items-center gap-2 whitespace-nowrap"
+                className="group px-4 xl:px-5 py-2.5 rounded-[10px] bg-accent hover:bg-accent-strong text-on-accent font-semibold text-sm transition-all active:translate-y-px flex items-center gap-2 whitespace-nowrap"
               >
                 <Download className="w-4 h-4 transition-transform group-hover:-translate-y-0.5" />
                 <span>Ver downloads</span>
@@ -213,7 +213,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDownload, detectedOS }) =>
                   setMobileMenuOpen(false);
                   onOpenDownload(target.os);
                 }}
-                className="w-full py-3.5 rounded-xl bg-accent hover:bg-accent-strong text-ink-deep font-semibold text-sm flex items-center justify-center gap-2 shadow-lg shadow-accent/20 transition-colors"
+                className="w-full py-3.5 rounded-xl bg-accent hover:bg-accent-strong text-on-accent font-semibold text-sm flex items-center justify-center gap-2 shadow-lg shadow-accent/20 transition-colors"
               >
                 <Download className="w-4 h-4" />
                 <span>
@@ -227,7 +227,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDownload, detectedOS }) =>
                   setMobileMenuOpen(false);
                   handleLinkClick(event, '/#downloads');
                 }}
-                className="w-full py-3.5 rounded-xl bg-accent hover:bg-accent-strong text-ink-deep font-semibold text-sm flex items-center justify-center gap-2 shadow-lg shadow-accent/20 transition-colors"
+                className="w-full py-3.5 rounded-xl bg-accent hover:bg-accent-strong text-on-accent font-semibold text-sm flex items-center justify-center gap-2 shadow-lg shadow-accent/20 transition-colors"
               >
                 <Download className="w-4 h-4" />
                 <span>Ver plataformas disponíveis</span>

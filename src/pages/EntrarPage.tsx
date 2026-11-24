@@ -22,7 +22,7 @@ type Tab = 'login' | 'signup';
 type Step = { name: 'form' } | { name: 'code'; email: string } | { name: 'done'; message: string | null };
 
 const inputClass =
-  'w-full px-4 py-3 rounded-xl bg-ink-deep/70 border border-cream/12 text-cream-strong text-base sm:text-sm outline-none transition-colors focus:border-accent/60';
+  'w-full px-4 py-3 rounded-[10px] bg-panel border border-cream/20 hover:border-cream/30 text-cream-strong text-base sm:text-sm outline-none shadow-sm transition-[border-color,box-shadow] focus:border-accent focus:ring-4 focus:ring-accent/20';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -133,17 +133,17 @@ export const EntrarPage: React.FC<EntrarPageProps> = ({ next, platform, version 
     <main className="pt-28 sm:pt-32 pb-16 sm:pb-24 min-h-[70vh]">
       <div className="max-w-xl mx-auto px-4 sm:px-6">
         <div className="glass-panel rounded-3xl p-6 sm:p-10" data-entrar={step.name}>
-          <p className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-soft/50 border border-accent/25 text-accent-strong text-[11px] uppercase tracking-widest mb-5">
+          <p className="inline-flex items-center gap-2 text-accent text-xs font-bold uppercase tracking-[0.08em] mb-5">
             <UserRound className="w-3.5 h-3.5" />
             {COPY.eyebrow}
           </p>
 
           {step.name === 'form' && (
             <>
-              <h1 className="text-2xl sm:text-3xl font-light text-cream-strong tracking-tight mb-3">{COPY.title}</h1>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-cream-strong tracking-[-0.035em] mb-3">{COPY.title}</h1>
               <p className="text-sm text-cream/75 leading-relaxed mb-6">{COPY.intro}</p>
 
-              <div role="tablist" className="grid grid-cols-2 gap-1 p-1 rounded-xl bg-ink-deep/70 border border-cream/10 mb-6">
+              <div role="tablist" className="grid grid-cols-2 gap-1 p-1 rounded-xl bg-ink-deep border border-cream/10 mb-6">
                 {(['login', 'signup'] as const).map((t) => (
                   <button
                     key={t}
@@ -155,7 +155,7 @@ export const EntrarPage: React.FC<EntrarPageProps> = ({ next, platform, version 
                       setError(null);
                     }}
                     className={`py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                      tab === t ? 'bg-accent text-ink-deep' : 'text-cream/80 hover:text-cream-strong'
+                      tab === t ? 'bg-accent text-on-accent' : 'text-cream/80 hover:text-cream-strong'
                     }`}
                   >
                     {t === 'login' ? COPY.tabLogin : COPY.tabSignup}
@@ -195,7 +195,7 @@ export const EntrarPage: React.FC<EntrarPageProps> = ({ next, platform, version 
 
           {step.name === 'code' && (
             <form onSubmit={submitCode} noValidate className="space-y-5">
-              <h1 className="text-2xl sm:text-3xl font-light text-cream-strong tracking-tight mb-3">{COPY.codeTitle}</h1>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-cream-strong tracking-[-0.035em] mb-3">{COPY.codeTitle}</h1>
               <p className="text-sm text-cream/75 leading-relaxed">{COPY.codeIntro(step.email)}</p>
               <div>
                 <label htmlFor="entrar-codigo" className="block text-sm text-cream/85 mb-1.5">{COPY.codeLabel}</label>
@@ -233,7 +233,7 @@ export const EntrarPage: React.FC<EntrarPageProps> = ({ next, platform, version 
 
           {step.name === 'done' && (
             <div className="space-y-5">
-              <h1 className="text-2xl sm:text-3xl font-light text-cream-strong tracking-tight">{COPY.signedIn}</h1>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-cream-strong tracking-[-0.035em]">{COPY.signedIn}</h1>
               {step.message ? (
                 <p className="flex items-start gap-2 text-sm text-cream/85" role="status">
                   <CheckCircle2 className="w-4 h-4 text-ok shrink-0 mt-0.5" />
@@ -245,7 +245,7 @@ export const EntrarPage: React.FC<EntrarPageProps> = ({ next, platform, version 
                   type="button"
                   onClick={retryDownload}
                   disabled={busy}
-                  className="w-full py-3.5 rounded-xl bg-accent hover:bg-accent-strong text-ink-deep font-semibold text-sm disabled:opacity-60"
+                  className="w-full py-3.5 rounded-xl bg-accent hover:bg-accent-strong text-on-accent font-semibold text-sm disabled:opacity-60"
                 >
                   {busy ? COPY.preparing : COPY.retryDownload}
                 </button>
@@ -253,7 +253,7 @@ export const EntrarPage: React.FC<EntrarPageProps> = ({ next, platform, version 
               <button
                 type="button"
                 onClick={() => navigate('/#downloads')}
-                className="w-full py-3.5 rounded-xl bg-cream/5 hover:bg-cream/10 border border-cream/10 text-cream text-sm font-medium"
+                className="w-full py-3.5 rounded-xl bg-panel hover:bg-accent-tint border border-cream/20 hover:border-accent hover:text-accent shadow-sm text-cream text-sm font-medium"
               >
                 {COPY.goDownloads}
               </button>
@@ -276,7 +276,7 @@ const SubmitButton: React.FC<{ busy: boolean; label: string }> = ({ busy, label 
   <button
     type="submit"
     disabled={busy}
-    className="w-full py-3.5 rounded-xl bg-accent hover:bg-accent-strong text-ink-deep font-semibold text-sm shadow-lg shadow-accent/20 transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
+    className="w-full py-3.5 rounded-xl bg-accent hover:bg-accent-strong text-on-accent font-semibold text-sm shadow-lg shadow-accent/20 transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
   >
     {busy ? (
       <>

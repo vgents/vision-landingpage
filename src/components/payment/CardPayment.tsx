@@ -16,22 +16,22 @@ import { FATAL_PAYMENT_CODES, type PaymentCallbacks } from './types';
 
 /** Cores do site (`src/index.css`) aplicadas ao Brick pelas opções de customização. */
 const BRICK_STYLE = {
-  theme: 'dark',
+  theme: 'default',
   customVariables: {
-    baseColor: '#d97a56',
-    baseColorFirstVariant: '#e8896a',
-    baseColorSecondVariant: '#3d2318',
-    formBackgroundColor: '#1a1917',
-    inputBackgroundColor: '#131211',
-    textPrimaryColor: '#f2ede4',
-    textSecondaryColor: '#9a9690',
-    outlinePrimaryColor: '#4e4b46',
-    outlineSecondaryColor: '#272523',
-    buttonTextColor: '#131211',
-    errorColor: '#e0a95c',
-    successColor: '#6fbf87',
-    borderRadiusMedium: '12px',
-    borderRadiusLarge: '16px',
+    baseColor: '#4b3fd9',
+    baseColorFirstVariant: '#3e33c2',
+    baseColorSecondVariant: '#eceafd',
+    formBackgroundColor: '#ffffff',
+    inputBackgroundColor: '#ffffff',
+    textPrimaryColor: '#14161f',
+    textSecondaryColor: '#5a5e6e',
+    outlinePrimaryColor: '#d7d3c8',
+    outlineSecondaryColor: '#e7e4dc',
+    buttonTextColor: '#ffffff',
+    errorColor: '#c8372d',
+    successColor: '#17805a',
+    borderRadiusMedium: '10px',
+    borderRadiusLarge: '14px',
   },
 };
 

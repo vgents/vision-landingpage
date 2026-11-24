@@ -74,7 +74,7 @@ const FLOW_NODES = [
 
 const NODE_TYPE_COLOR: Record<string, string> = {
   'Tela': 'text-cream border-cream/20 bg-cream/5',
-  'Erro': 'text-red-300 border-red-400/30 bg-red-400/10',
+  'Erro': 'text-danger border-danger/30 bg-danger/10',
   'Estado vazio': 'text-muted border-cream/15 bg-cream/5',
   'Sem permissão': 'text-warn border-warn/30 bg-warn/10',
   'Sucesso': 'text-ok border-ok/30 bg-ok/10',
@@ -124,12 +124,12 @@ export const InteractiveAppDemo: React.FC = () => {
     <section id="como-funciona" className="py-16 sm:py-20 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent-soft/50 border border-accent/25 text-accent-strong text-xs uppercase tracking-widest mb-4">
+          <div className="inline-flex items-center gap-2 text-accent text-xs font-bold uppercase tracking-[0.08em] mb-4">
             <LayoutGrid className="w-3.5 h-3.5" />
             <span>O fluxo, ponta a ponta</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-light text-cream-strong tracking-tight mb-4">
-            Quatro etapas, <span className="text-gradient-aurora font-semibold">uma ferramenta só</span>
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-cream-strong tracking-[-0.035em] mb-4">
+            Quatro etapas, <span className="text-gradient-aurora font-extrabold">uma ferramenta só</span>
           </h2>
           <p className="text-cream/75 text-sm sm:text-base leading-relaxed">
             Percorra abaixo as mesmas etapas que o Vision Design executa — da inception aprovada aos
@@ -139,11 +139,11 @@ export const InteractiveAppDemo: React.FC = () => {
 
         <div className="glass-panel rounded-2xl shadow-2xl overflow-hidden">
           {/* Barra de janela */}
-          <div className="bg-ink-deep px-4 py-3 border-b border-cream/10 flex items-center gap-3">
+          <div className="bg-ink px-4 py-3 border-b border-cream/10 flex items-center gap-3">
             <div className="flex items-center gap-2 shrink-0">
-              <span className="w-3 h-3 rounded-full bg-red-500/70" />
-              <span className="w-3 h-3 rounded-full bg-warn/70" />
-              <span className="w-3 h-3 rounded-full bg-ok/70" />
+              <span className="w-2.5 h-2.5 rounded-full bg-cream/20" />
+              <span className="w-2.5 h-2.5 rounded-full bg-cream/20" />
+              <span className="w-2.5 h-2.5 rounded-full bg-cream/20" />
             </div>
             <span className="text-xs text-muted truncate hidden sm:block">
               Vision Design · Portal de Bolsas · Versão {APP_VERSION}
@@ -162,7 +162,7 @@ export const InteractiveAppDemo: React.FC = () => {
                     onClick={() => setStage(item.id)}
                     className={`shrink-0 min-h-11 px-3.5 py-2.5 rounded-lg text-xs sm:text-sm transition-all flex items-center gap-2 ${
                       isActive
-                        ? 'bg-accent text-ink-deep font-semibold'
+                        ? 'bg-accent text-on-accent font-semibold'
                         : 'text-cream/70 hover:text-cream-strong hover:bg-cream/5'
                     }`}
                   >
@@ -271,7 +271,7 @@ export const InteractiveAppDemo: React.FC = () => {
                       onClick={() => setPersona(item)}
                       className={`min-h-10 px-3.5 py-1.5 rounded-lg text-xs border transition-all ${
                         persona === item
-                          ? 'bg-accent text-ink-deep border-accent font-semibold'
+                          ? 'bg-accent text-on-accent border-accent font-semibold'
                           : 'text-cream/70 border-cream/10 hover:border-cream/25'
                       }`}
                     >
@@ -378,7 +378,7 @@ export const InteractiveAppDemo: React.FC = () => {
                           className={`w-full min-h-11 py-2 rounded-lg text-xs font-medium border transition-all ${
                             isValid
                               ? 'text-cream/70 border-cream/15 hover:border-cream/30'
-                              : 'bg-accent text-ink-deep border-accent hover:bg-accent-strong font-semibold'
+                              : 'bg-accent text-on-accent border-accent hover:bg-accent-strong font-semibold'
                           }`}
                         >
                           {isValid ? 'Revogar validação' : 'Validar documento'}
@@ -426,7 +426,7 @@ export const InteractiveAppDemo: React.FC = () => {
                         onClick={() => setBreakpoint(item.id)}
                         className={`min-h-10 px-3.5 py-1.5 rounded-lg text-xs border transition-all flex items-center gap-1.5 ${
                           breakpoint === item.id
-                            ? 'bg-accent text-ink-deep border-accent font-semibold'
+                            ? 'bg-accent text-on-accent border-accent font-semibold'
                             : 'text-cream/70 border-cream/10 hover:border-cream/25'
                         }`}
                       >

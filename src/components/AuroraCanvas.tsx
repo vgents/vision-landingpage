@@ -38,34 +38,34 @@ export const AuroraCanvas: React.FC = () => {
 
     const render = () => {
       time += 0.008;
-      ctx.fillStyle = '#1a1917';
+      ctx.fillStyle = '#fbfaf7';
       ctx.fillRect(0, 0, width, height);
 
       // Draw primary glowing aurora ribbons using sine waves
       ctx.save();
-      ctx.globalCompositeOperation = 'screen';
+      ctx.globalCompositeOperation = 'source-over';
 
-      // Paleta quente da marca: terracota, âmbar e o mesmo terracota mais fechado.
+      // Paleta da UX Vision Academy em tom de papel: índigo, violeta e coral, bem suaves.
       const waves = [
         {
-          color1: 'rgba(217, 122, 86, 0.24)', // Terracota
-          color2: 'rgba(224, 169, 92, 0.13)', // Âmbar
+          color1: 'rgba(116, 104, 240, 0.07)', // Índigo
+          color2: 'rgba(255, 122, 89, 0.04)', // Coral
           yOffset: height * 0.28,
           amplitude: 80,
           frequency: 0.0012,
           speed: 1,
         },
         {
-          color1: 'rgba(232, 137, 106, 0.20)', // Terracota claro
-          color2: 'rgba(201, 100, 66, 0.16)', // Terracota do app
+          color1: 'rgba(122, 79, 224, 0.05)', // Violeta
+          color2: 'rgba(75, 63, 217, 0.05)', // Índigo da marca
           yOffset: height * 0.38,
           amplitude: 110,
           frequency: 0.0009,
           speed: -1.2,
         },
         {
-          color1: 'rgba(224, 169, 92, 0.13)', // Âmbar
-          color2: 'rgba(217, 122, 86, 0.18)', // Terracota
+          color1: 'rgba(255, 122, 89, 0.04)', // Coral
+          color2: 'rgba(116, 104, 240, 0.05)', // Índigo
           yOffset: height * 0.48,
           amplitude: 70,
           frequency: 0.0015,
@@ -92,7 +92,7 @@ export const AuroraCanvas: React.FC = () => {
         const grad = ctx.createLinearGradient(0, wave.yOffset - wave.amplitude, width, wave.yOffset + wave.amplitude * 2);
         grad.addColorStop(0, wave.color1);
         grad.addColorStop(0.6, wave.color2);
-        grad.addColorStop(1, 'rgba(26, 25, 23, 0)');
+        grad.addColorStop(1, 'rgba(251, 250, 247, 0)');
 
         ctx.fillStyle = grad;
         ctx.fill();
@@ -112,9 +112,7 @@ export const AuroraCanvas: React.FC = () => {
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(242, 237, 228, ${p.alpha * (0.6 + Math.sin(time + p.x) * 0.4)})`;
-        ctx.shadowColor = 'rgba(217, 122, 86, 0.8)';
-        ctx.shadowBlur = 8;
+        ctx.fillStyle = `rgba(75, 63, 217, ${0.35 * p.alpha * (0.6 + Math.sin(time + p.x) * 0.4)})`;
         ctx.fill();
       });
 

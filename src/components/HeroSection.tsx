@@ -47,22 +47,22 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenDownload, detect
 
   return (
     <section className="relative pt-28 pb-16 sm:pt-32 sm:pb-20 md:pt-44 md:pb-28 overflow-hidden">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[600px] pointer-events-none opacity-40 blur-3xl rounded-full bg-gradient-to-r from-accent/25 via-warn/15 to-accent/20 -z-10" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[600px] pointer-events-none opacity-40 blur-3xl rounded-full bg-gradient-to-r from-[#7468f0]/30 via-[#ff7a59]/15 to-[#7468f0]/20 -z-10" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-        <div className="inline-flex flex-wrap items-center justify-center gap-x-2 gap-y-1 px-4 py-2 rounded-full bg-accent-soft/50 border border-accent/25 backdrop-blur-md mb-7">
-          <span className="flex h-2 w-2 rounded-full bg-accent animate-ping" />
-          <span className="text-xs tracking-wider text-accent-strong">VERSÃO {target?.version ?? APP_VERSION}</span>
+        <div className="inline-flex flex-wrap items-center justify-center gap-x-2 gap-y-1 px-4 py-2 rounded-full bg-panel border border-cream/10 shadow-sm mb-7">
+          <span className="flex h-2 w-2 rounded-full bg-ok ring-4 ring-ok/15" />
+          <span className="text-xs font-bold tracking-[0.06em] text-cream-strong">VERSÃO {target?.version ?? APP_VERSION}</span>
           <span className="text-xs text-muted">·</span>
-          <span className="text-xs text-cream/80">Biblioteca pública e revisão de PR</span>
+          <span className="text-xs font-semibold text-cream">Biblioteca pública e revisão de PR</span>
         </div>
 
-        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-light tracking-tight text-cream-strong max-w-4xl mx-auto leading-[1.15] mb-6">
+        <h1 className="text-[2.3rem] sm:text-5xl lg:text-6xl font-extrabold tracking-[-0.045em] text-cream-strong max-w-4xl mx-auto leading-[1.06] mb-6">
           Do briefing ao{' '}
-          <span className="font-semibold text-gradient-aurora">protótipo funcional</span>
+          <span className="font-extrabold text-gradient-aurora">protótipo funcional</span>
         </h1>
 
-        <p className="text-base sm:text-lg text-cream/75 max-w-2xl mx-auto mb-9 leading-relaxed">
+        <p className="text-base sm:text-lg text-muted max-w-2xl mx-auto mb-9 leading-relaxed">
           Envie os documentos e acompanhe: lean inception, fluxo de usuário, telas em React que você
           edita clicando e a documentação de visão e requisitos. Tudo na sua máquina, dirigido pelo
           agente de IA que você já usa.
@@ -72,7 +72,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenDownload, detect
           {target && TargetIcon ? (
             <button
               onClick={() => onOpenDownload(target.os)}
-              className="px-7 py-4 rounded-2xl bg-accent hover:bg-accent-strong text-ink-deep font-semibold shadow-xl shadow-accent/25 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3 group"
+              className="px-7 py-4 rounded-xl bg-accent hover:bg-accent-strong text-on-accent font-semibold transition-all active:translate-y-px flex items-center justify-center gap-3 group"
             >
               <Download className="w-5 h-5 transition-transform group-hover:-translate-y-1" />
               <span className="text-left">
@@ -89,7 +89,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenDownload, detect
             /* Sem build para o sistema detectado: manda escolher em vez de prometer arquivo. */
             <a
               href="#downloads"
-              className="px-7 py-4 rounded-2xl bg-accent hover:bg-accent-strong text-ink-deep font-semibold shadow-xl shadow-accent/25 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3 group"
+              className="px-7 py-4 rounded-xl bg-accent hover:bg-accent-strong text-on-accent font-semibold transition-all active:translate-y-px flex items-center justify-center gap-3 group"
             >
               <ArrowDown className="w-5 h-5 transition-transform group-hover:translate-y-1" />
               <span className="text-left">
@@ -103,7 +103,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenDownload, detect
 
           <a
             href="#como-funciona"
-            className="px-7 py-4 rounded-2xl bg-cream/5 hover:bg-cream/10 border border-cream/10 text-cream hover:text-cream-strong font-medium backdrop-blur-md transition-all flex items-center justify-center gap-2.5 group"
+            className="px-7 py-4 rounded-xl bg-panel hover:bg-accent-tint border border-cream/20 hover:border-accent text-cream-strong hover:text-accent font-semibold shadow-sm transition-all flex items-center justify-center gap-2.5 group"
           >
             <span className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center group-hover:bg-accent/30 transition-colors shrink-0">
               <Play className="w-4 h-4 text-accent-strong fill-current translate-x-px" />
@@ -124,11 +124,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenDownload, detect
                 key={stat.label}
                 className="glass-card glass-card-hover p-5 sm:p-6 rounded-2xl relative overflow-hidden"
               >
-                <Icon className="absolute top-4 right-4 w-9 h-9 text-accent opacity-10" />
-                <div className="text-2xl sm:text-3xl font-light text-gradient-purple mb-1.5">
+                <span className="absolute top-4 right-4 grid place-items-center w-10 h-10 rounded-xl bg-accent-soft text-accent"><Icon className="w-5 h-5" /></span>
+                <div className="text-2xl sm:text-3xl font-extrabold tracking-[-0.03em] text-gradient-purple mb-1.5 pr-12">
                   {stat.value}
                 </div>
-                <div className="text-xs font-semibold text-cream uppercase tracking-wider mb-1.5">
+                <div className="text-xs font-semibold text-muted mb-1.5">
                   {stat.label}
                 </div>
                 <div className="text-xs text-muted leading-relaxed">{stat.detail}</div>

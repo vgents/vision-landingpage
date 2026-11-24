@@ -17,13 +17,13 @@ export const PublicLibrarySection: React.FC = () => {
     <section id="biblioteca" className="py-16 sm:py-24 relative bg-ink-deep/40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-accent-soft/50 border border-accent/25 text-accent-strong text-xs uppercase tracking-widest mb-4">
+          <div className="inline-flex items-center gap-2 text-accent text-xs font-bold uppercase tracking-[0.08em] mb-4">
             <Library className="w-3.5 h-3.5" />
             <span>Biblioteca</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-light text-cream-strong tracking-tight mb-5">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-cream-strong tracking-[-0.035em] mb-5">
             Comece de um projeto que{' '}
-            <span className="text-gradient-aurora font-semibold">já existe</span>
+            <span className="text-gradient-aurora font-extrabold">já existe</span>
           </h2>
           <p className="text-cream/75 text-sm sm:text-base leading-relaxed">
             Projetos publicados ficam disponíveis para qualquer pessoa copiar para o ambiente local
@@ -36,7 +36,7 @@ export const PublicLibrarySection: React.FC = () => {
           <div className="lg:col-span-7">
             <div className="glass-panel rounded-3xl p-4 sm:p-6">
               <div className="flex items-center gap-2 mb-4 scroll-x">
-                <span className="shrink-0 px-3 py-1.5 rounded-lg bg-accent text-ink-deep text-xs font-semibold">
+                <span className="shrink-0 px-3 py-1.5 rounded-lg bg-accent text-on-accent text-xs font-semibold">
                   Bibliotecas
                 </span>
                 <span className="shrink-0 px-3 py-1.5 rounded-lg text-cream/70 text-xs border border-cream/10">
