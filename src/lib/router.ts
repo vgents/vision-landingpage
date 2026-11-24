@@ -1,3 +1,4 @@
+import { isPlatformKey, type PlatformKey } from './download';
 import { useEffect, useState, type MouseEvent } from 'react';
 
 /**
@@ -12,7 +13,8 @@ export type Route =
   | { name: 'compra-confirmada'; orderId: string | null; approved: boolean }
   | { name: 'compra-pendente' }
   | { name: 'compra-erro' }
-  | { name: 'criar-senha' };
+  | { name: 'criar-senha' }
+  | { name: 'entrar'; next: 'download' | null; platform: PlatformKey | null; version: string | null };
 
 /**
  * Fragmento deixado pelo link do e-mail do Supabase Auth: sessão aberta
@@ -68,6 +70,17 @@ export function parseRoute(pathname: string, search: string, hash: string): Rout
       return { name: 'compra-pendente' };
     case '/compra/erro':
       return { name: 'compra-erro' };
+    case '/entrar': {
+      const platform = clean(params.get('platform'));
+      const version = clean(params.get('version'));
+      const wantsDownload = clean(params.get('next')) === 'download' && isPlatformKey(platform);
+      return {
+        name: 'entrar',
+        next: wantsDownload ? 'download' : null,
+        platform: wantsDownload ? (platform as PlatformKey) : null,
+        version: wantsDownload && version && /^[0-9A-Za-z.+-]{1,40}$/.test(version) ? version : null,
+      };
+    }
     case '/criar-senha':
       return { name: 'criar-senha' };
     default:

@@ -5,6 +5,9 @@ import { APP_VERSION } from '../data/softwareData';
 import { availabilityShort, downloadTarget } from '../data/platforms';
 import { OperatingSystem, SupportedOS } from '../types';
 import { handleLinkClick } from '../lib/router';
+import { ACCOUNT_COPY } from '../data/account';
+import { signOut } from '../lib/account';
+import { useSignedIn } from '../lib/useAccount';
 
 interface NavbarProps {
   onOpenDownload: (os?: SupportedOS) => void;
@@ -26,6 +29,7 @@ const NAV_LINKS = [
 export const Navbar: React.FC<NavbarProps> = ({ onOpenDownload, detectedOS }) => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const signedIn = useSignedIn();
   const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -106,6 +110,24 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDownload, detectedOS }) =>
               <span>{pillLabel}</span>
             </span>
 
+            {signedIn ? (
+              <button
+                type="button"
+                onClick={() => void signOut()}
+                className="py-2 text-sm text-cream/80 hover:text-cream-strong transition-colors whitespace-nowrap"
+              >
+                {ACCOUNT_COPY.navLogout}
+              </button>
+            ) : (
+              <a
+                href="/entrar"
+                onClick={(event) => handleLinkClick(event, '/entrar')}
+                className="py-2 text-sm text-cream/80 hover:text-cream-strong transition-colors whitespace-nowrap"
+              >
+                {ACCOUNT_COPY.navLogin}
+              </a>
+            )}
+
             {target ? (
               <button
                 onClick={() => onOpenDownload(target.os)}
@@ -160,6 +182,30 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDownload, detectedOS }) =>
                 </a>
               ))}
             </nav>
+
+            {signedIn ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  void signOut();
+                }}
+                className="w-full py-3 text-left text-cream hover:text-accent-strong transition-colors"
+              >
+                {ACCOUNT_COPY.navLogout}
+              </button>
+            ) : (
+              <a
+                href="/entrar"
+                onClick={(event) => {
+                  setMobileMenuOpen(false);
+                  handleLinkClick(event, '/entrar');
+                }}
+                className="block py-3 text-cream hover:text-accent-strong transition-colors"
+              >
+                {ACCOUNT_COPY.navLogin}
+              </a>
+            )}
 
             {target ? (
               <button

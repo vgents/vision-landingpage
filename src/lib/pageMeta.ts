@@ -9,6 +9,7 @@ const TITLES: Record<Route['name'], string> = {
   'compra-pendente': 'Pagamento pendente · Vision Design',
   'compra-erro': 'Pagamento não concluído · Vision Design',
   'criar-senha': 'Acesso ao Vision · Vision Design',
+  entrar: 'Entrar · Vision Design',
 };
 
 /** Rotas com dados de pedido/sessão: fora de buscadores e sem Referer. */
@@ -19,6 +20,7 @@ const PRIVATE: ReadonlySet<Route['name']> = new Set([
   'compra-pendente',
   'compra-erro',
   'criar-senha',
+  'entrar',
 ]);
 
 export const routeTitle = (name: Route['name']): string => TITLES[name];

@@ -1,3 +1,5 @@
+import type { ArtifactType, PlatformKey } from './lib/download';
+
 export type OperatingSystem = 'windows' | 'mac' | 'linux' | 'unknown';
 
 /** Sistemas que têm um perfil de plataforma, publicados ou não. */
@@ -26,7 +28,9 @@ export interface PlatformProfile {
   /** Preenchidos apenas quando status === 'available'. */
   version?: string;
   fileSize?: string;
-  url?: string;
+  /** Para o pedido de download (`release-download`); só quando status === 'available'. */
+  platformKey?: PlatformKey;
+  artifactType?: ArtifactType;
   /** Linha secundária do CTA do hero, ex. "x64 · 227 MB". */
   ctaDetail?: string;
   installSteps?: string[];
@@ -47,7 +51,8 @@ export interface ReleaseOption {
   fileSize: string;
   tagline: string;
   description: string;
-  url: string;
+  /** O que pedir à função de download; `version` só nas versões que não são a atual. */
+  download: { platformKey: PlatformKey; artifactType: ArtifactType; version?: string };
   /** Se a atualização automática aponta para esta versão. */
   autoUpdate: boolean;
 }

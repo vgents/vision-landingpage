@@ -27,8 +27,8 @@ import {
  * de versão.
  *
  * Antes de mexer nestes números, confira o que existe de verdade:
- * `curl -sI <RELEASE_FEED>/stable/versions/<versão>/vision-design-<versão>-mac-arm64.dmg`
- * (e o `-win-x64.exe`). O `stable/latest/metadata.json` não basta sozinho — ele
+ * a função `release-download` (ou o bucket privado) para
+ * `stable/versions/<versão>/vision-design-<versão>-mac-arm64.dmg` (e o `-win-x64.exe`). O `stable/latest/metadata.json` não basta sozinho — ele
  * descreve apenas a última publicação — e o `r2.dev` serve resposta em cache,
  * inclusive 404 antigo de arquivo que já subiu; use uma query única para furar
  * o cache ao conferir.
@@ -51,24 +51,6 @@ export const RELEASES = {
  * visitante (`PlatformProfile.version`), que pode ser outra.
  */
 export const APP_VERSION = RELEASES.mac.current;
-
-/**
- * Origem de onde os instaladores são servidos.
- *
- * O padrão é o endpoint público atual, para que o download funcione em
- * qualquer deploy sem configuração. `VITE_DOWNLOAD_ORIGIN` sobrescreve quando
- * definida — é por ali que se aponta para um domínio próprio, sem alterar
- * código.
- *
- * Este endereço é público por natureza: ele acaba no bundle de qualquer forma,
- * porque o navegador precisa dele para baixar o arquivo. Não é lugar de nada
- * que precise ficar em segredo.
- */
-const DEFAULT_RELEASE_FEED = 'https://pub-923c8384ed884da3b04baf53118725a1.r2.dev';
-
-export const RELEASE_FEED = (
-  import.meta.env.VITE_DOWNLOAD_ORIGIN || DEFAULT_RELEASE_FEED
-).replace(/\/+$/, '');
 
 /** Contagens de catálogo exibidas no site. */
 export const CATALOG = {

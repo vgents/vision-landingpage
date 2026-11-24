@@ -1,5 +1,5 @@
 import { OperatingSystem, PlatformProfile, RequirementItem, SupportedOS } from '../types';
-import { CATALOG, RELEASE_FEED, RELEASES } from './softwareData';
+import { CATALOG, RELEASES } from './softwareData';
 
 /**
  * Perfis de plataforma: o conteúdo do site que muda conforme o sistema do
@@ -11,20 +11,16 @@ import { CATALOG, RELEASE_FEED, RELEASES } from './softwareData';
  * ver `RELEASES`.
  */
 
-const artifactUrl = (version: string, file: string) =>
-  `${RELEASE_FEED}/stable/versions/${version}/vision-design-${version}-${file}`;
-
-const dmgUrl = (version: string) => artifactUrl(version, 'mac-arm64.dmg');
-const exeUrl = (version: string) => artifactUrl(version, 'win-x64.exe');
-
 /**
- * O feed publica dois artefatos de Linux — o `.AppImage` e um `.deb` — mas o
- * site oferece só o AppImage de propósito: a atualização automática do app
- * procura exclusivamente o artefato `appImage` do feed
- * (`apps/desktop/src/main/updater.ts`). Quem instalasse pelo `.deb` ficaria
- * preso na versão baixada, sem aviso.
+ * O site não monta mais endereço público de instalador: o download passa pela
+ * função `release-download`, que exige conta e devolve um link assinado e
+ * curto. Aqui cada plataforma só diz qual `platformKey`/`artifactType` pedir.
+ *
+ * O feed publica também um `.deb` de Linux, mas o site oferece só o AppImage de
+ * propósito: a atualização automática do app procura exclusivamente o artefato
+ * `appImage` (`apps/desktop/src/main/updater.ts`). Quem instalasse pelo `.deb`
+ * ficaria preso na versão baixada, sem aviso.
  */
-const appImageUrl = (version: string) => artifactUrl(version, 'linux-x64.AppImage');
 
 /**
  * Tamanhos conferidos no Content-Length de cada artefato publicado, em MiB
@@ -52,7 +48,8 @@ const MAC: PlatformProfile = {
   fileSize: SIZES.macAtual,
   fileFormat: 'Imagem .DMG',
   arch: 'Apple Silicon (M1–M4) e Intel',
-  url: dmgUrl(RELEASES.mac.current),
+  platformKey: 'mac',
+  artifactType: 'dmg',
   requirements: `macOS 12.0+ · ~1 GB livres em disco · um CLI de agente instalado ou chave própria de modelo`,
   ctaLabel: 'Baixar para macOS',
   ctaDetail: `Apple Silicon e Intel · ${SIZES.macAtual}`,
@@ -76,7 +73,7 @@ const MAC: PlatformProfile = {
       tagline: 'Alvo da atualização automática',
       description:
         'A versão mais recente, com as últimas correções e novidades. É para cá que o app se atualiza sozinho — instale esta se você não tem motivo para escolher a outra.',
-      url: dmgUrl(RELEASES.mac.current),
+      download: { platformKey: 'mac', artifactType: 'dmg' },
       autoUpdate: true
     },
     {
@@ -87,7 +84,7 @@ const MAC: PlatformProfile = {
       tagline: 'Recuo, se algo der errado',
       description:
         'A versão anterior, já rodada por mais tempo. Instale por cima da atual se encontrar um problema que impeça o seu trabalho, e nos conte o que aconteceu.',
-      url: dmgUrl(RELEASES.mac.previous),
+      download: { platformKey: 'mac', artifactType: 'dmg', version: RELEASES.mac.previous },
       autoUpdate: false
     }
   ]
@@ -103,7 +100,8 @@ const WINDOWS: PlatformProfile = {
   fileSize: SIZES.winAtual,
   fileFormat: 'Instalador .EXE (NSIS)',
   arch: 'x64',
-  url: exeUrl(RELEASES.windows.current),
+  platformKey: 'win',
+  artifactType: 'installer',
   requirements: `Windows 10 ou 11 em x64 · ~1 GB livres em disco · um CLI de agente instalado ou chave própria de modelo`,
   ctaLabel: 'Baixar para Windows',
   ctaDetail: `x64 · ${SIZES.winAtual}`,
@@ -127,7 +125,7 @@ const WINDOWS: PlatformProfile = {
       tagline: 'Alvo da atualização automática',
       description:
         'A versão de Windows mais recente publicada, com as últimas correções e novidades. É para cá que o app se atualiza sozinho — instale esta se você não tem motivo para escolher a outra.',
-      url: exeUrl(RELEASES.windows.current),
+      download: { platformKey: 'win', artifactType: 'installer' },
       autoUpdate: true
     },
     {
@@ -138,7 +136,7 @@ const WINDOWS: PlatformProfile = {
       tagline: 'Recuo, se algo der errado',
       description:
         'O instalador de Windows anterior, já rodado por mais tempo. Instale por cima da atual se encontrar um problema que impeça o seu trabalho, e nos conte o que aconteceu.',
-      url: exeUrl(RELEASES.windows.previous),
+      download: { platformKey: 'win', artifactType: 'installer', version: RELEASES.windows.previous },
       autoUpdate: false
     }
   ]
@@ -154,7 +152,8 @@ const LINUX: PlatformProfile = {
   fileSize: SIZES.linuxAtual,
   fileFormat: 'Executável .AppImage',
   arch: 'x86-64',
-  url: appImageUrl(RELEASES.linux.current),
+  platformKey: 'linux',
+  artifactType: 'appImage',
   requirements: `Linux x86-64 · FUSE 2 para montar o AppImage · ~1 GB livres em disco · um CLI de agente instalado ou chave própria de modelo`,
   ctaLabel: 'Baixar para Linux',
   ctaDetail: `x86-64 · ${SIZES.linuxAtual}`,
@@ -178,7 +177,7 @@ const LINUX: PlatformProfile = {
       tagline: 'Alvo da atualização automática',
       description:
         'A primeira versão de Linux publicada no feed. O app se atualiza sozinho para cá — no Linux ele baixa o AppImage novo e entrega para você abrir, em vez de trocar o arquivo por conta própria.',
-      url: appImageUrl(RELEASES.linux.current),
+      download: { platformKey: 'linux', artifactType: 'appImage' },
       autoUpdate: true
     }
   ]

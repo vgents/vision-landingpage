@@ -2,6 +2,8 @@ import React, { useEffect, useRef } from 'react';
 import { X, Download, Apple, Terminal, Monitor, ShieldAlert, Clock } from 'lucide-react';
 import { PLATFORM_BY_OS, PUBLISHED } from '../data/platforms';
 import { SupportedOS } from '../types';
+import { ACCOUNT_COPY } from '../data/account';
+import { useDownloadAction, useSignedIn } from '../lib/useAccount';
 
 interface DownloadModalProps {
   isOpen: boolean;
@@ -12,6 +14,8 @@ interface DownloadModalProps {
 const OS_ICON = { Apple, Monitor, Terminal };
 
 export const DownloadModal: React.FC<DownloadModalProps> = ({ isOpen, onClose, selectedOS }) => {
+  const { start, busy, message } = useDownloadAction();
+  const signedIn = useSignedIn();
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -133,14 +137,28 @@ export const DownloadModal: React.FC<DownloadModalProps> = ({ isOpen, onClose, s
               </div>
 
               <div className="space-y-2.5">
-                <a
-                  href={option.url}
-                  download
-                  className="w-full py-3.5 rounded-xl bg-accent hover:bg-accent-strong text-ink-deep font-semibold text-sm shadow-lg shadow-accent/20 transition-colors flex items-center justify-center gap-2"
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() =>
+                    option.platformKey &&
+                    option.artifactType &&
+                    start({ platformKey: option.platformKey, artifactType: option.artifactType })
+                  }
+                  className="w-full py-3.5 rounded-xl bg-accent hover:bg-accent-strong text-ink-deep font-semibold text-sm shadow-lg shadow-accent/20 transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
                 >
                   <Download className="w-4 h-4" />
-                  Baixar o instalador ({option.fileSize})
-                </a>
+                  {busy
+                    ? ACCOUNT_COPY.preparing
+                    : signedIn === false
+                      ? `${ACCOUNT_COPY.buttonSignedOut} (${option.fileSize})`
+                      : `Baixar o instalador (${option.fileSize})`}
+                </button>
+                {message && (
+                  <p role="alert" className="text-center text-xs text-warn">
+                    {message}
+                  </p>
+                )}
                 <p className="text-center text-xs text-soft pt-1 leading-relaxed">
                   {fallback ? (
                     <>

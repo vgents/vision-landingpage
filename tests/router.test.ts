@@ -1,6 +1,14 @@
 import { describe, expect, test } from 'vitest';
 import { isAuthFragment, parseRoute } from '../src/lib/router';
 
+describe('parseRoute /entrar', () => {
+  test('router parses /entrar with next and platform', () => {
+    expect(parseRoute('/entrar', '?next=download&platform=mac', '')).toEqual({ name: 'entrar', next: 'download', platform: 'mac', version: null });
+    expect(parseRoute('/entrar', '', '')).toEqual({ name: 'entrar', next: null, platform: null, version: null });
+    expect(parseRoute('/entrar', '?next=https://evil.com&platform=zzz', '')).toEqual({ name: 'entrar', next: null, platform: null, version: null });
+  });
+});
+
 describe('parseRoute', () => {
   test('known paths, trailing slash ignored', () => {
     expect(parseRoute('/planos/', '', '')).toEqual({ name: 'planos' });

@@ -5,6 +5,8 @@ import {
 } from 'lucide-react';
 import { PLATFORMS, referenceProfile } from '../data/platforms';
 import { OperatingSystem, SupportedOS } from '../types';
+import { ACCOUNT_COPY } from '../data/account';
+import { useDownloadAction, useSignedIn } from '../lib/useAccount';
 
 interface DownloadCenterProps {
   onOpenDownload: (os?: SupportedOS) => void;
@@ -19,6 +21,8 @@ export const DownloadCenter: React.FC<DownloadCenterProps> = ({ onOpenDownload, 
    * Quem está em sistema não identificado (celular, tablet, Chromebook) vê as do
    * macOS, sinalizadas como tal — melhor que esconder a seção.
    */
+  const { start, busy, message } = useDownloadAction();
+  const signedIn = useSignedIn();
   const profile = referenceProfile(detectedOS);
   const releases = profile.releases;
   const hasFallback = releases.length > 1;
@@ -184,21 +188,31 @@ export const DownloadCenter: React.FC<DownloadCenterProps> = ({ onOpenDownload, 
                   {release.description}
                 </p>
 
-                <a
-                  href={release.url}
-                  download
-                  className={`w-full py-3 rounded-xl font-semibold text-sm transition-colors flex items-center justify-center gap-2 ${
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => start(release.download)}
+                  className={`w-full py-3 rounded-xl font-semibold text-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-60 ${
                     release.autoUpdate
                       ? 'bg-accent hover:bg-accent-strong text-ink-deep shadow-lg shadow-accent/20'
                       : 'bg-cream/5 hover:bg-cream/10 border border-cream/15 text-cream'
                   }`}
                 >
                   <Download className="w-4 h-4" />
-                  Baixar {release.version} · {release.fileSize}
-                </a>
+                  {busy
+                    ? ACCOUNT_COPY.preparing
+                    : signedIn === false
+                      ? `${ACCOUNT_COPY.buttonSignedOut} · ${release.version}`
+                      : `Baixar ${release.version} · ${release.fileSize}`}
+                </button>
               </div>
             ))}
           </div>
+          {message && (
+            <p role="alert" className="text-center text-sm text-warn mt-4">
+              {message}
+            </p>
+          )}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-4xl mx-auto">

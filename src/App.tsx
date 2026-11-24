@@ -16,6 +16,7 @@ import { CheckoutPage } from './pages/CheckoutPage';
 import { PayLinkPage } from './pages/PayLinkPage';
 import { CheckoutResultPage } from './pages/CheckoutResultPage';
 import { CreatePasswordPage } from './pages/CreatePasswordPage';
+import { EntrarPage } from './pages/EntrarPage';
 import { useRoute, type Route } from './lib/router';
 import { applyRouteMeta } from './lib/pageMeta';
 import { detectOS } from './lib/detectOS';
@@ -126,5 +127,7 @@ function renderPage(route: Exclude<Route, { name: 'home' }>) {
       return <CheckoutResultPage variant="erro" />;
     case 'criar-senha':
       return <CreatePasswordPage />;
+    case 'entrar':
+      return <EntrarPage key={`${route.next}${route.platform}${route.version}`} next={route.next} platform={route.platform} version={route.version} />;
   }
 }

@@ -75,7 +75,6 @@ isso em vez de prometer o contrário.
 
 | Variável | Obrigatória | Para quê |
 | --- | --- | --- |
-| `VITE_DOWNLOAD_ORIGIN` | Não | Sobrescreve a origem de onde os instaladores são servidos, sem barra no fim |
 | `VITE_MP_PUBLIC_KEY` | Sim, para cartão | Chave **pública** do Mercado Pago (`TEST-…` no sandbox, `APP_USR-…` em produção), usada pelo Card Payment Brick em `/compra/pagar`. Sem ela a aba Cartão diz que o pagamento com cartão está indisponível e só o Pix funciona |
 
 `VITE_MP_PUBLIC_KEY` é a chave pública por desenho (vai para o bundle); o access token do Mercado
