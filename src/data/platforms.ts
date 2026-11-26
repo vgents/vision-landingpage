@@ -28,8 +28,8 @@ import { CATALOG, DOWNLOADS_PAUSED, RELEASES, SHOW_PREVIOUS_VERSIONS } from './s
  * `RELEASES`, meça o arquivo novo em vez de reaproveitar o número antigo.
  */
 const SIZES = {
-  /** 0.8.46 */ macAtual: '404 MB',
-  /** 0.8.45 */ macAnterior: '402 MB',
+  /** 0.8.47 */ macAtual: '402 MB',
+  /** 0.8.46 */ macAnterior: '404 MB',
   /** 0.8.43 */ winAtual: '344 MB',
   /** 0.8.37 */ winAnterior: '227 MB',
   /** 0.8.37 */ linuxAtual: '290 MB'
