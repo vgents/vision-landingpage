@@ -41,6 +41,11 @@ describe('signUp', () => {
     expect(await signUp('a@b.co', 'curta', c)).toEqual({ ok: false, code: 'weak_password' });
     expect(c.auth.signUp).not.toHaveBeenCalled();
   });
+  test('signUp envia signup_product vision', async () => {
+    const c = fakeAuth();
+    await signUp('a@b.co', 'senha-longa-1', c);
+    expect(c.auth.signUp).toHaveBeenCalledWith({ email: 'a@b.co', password: 'senha-longa-1', options: { data: { signup_product: 'vision' } } });
+  });
   test('calls auth.signUp and maps weak_password from the server', async () => {
     const c = fakeAuth();
     expect(await signUp('a@b.co', 'senha-longa-1', c)).toEqual({ ok: true });

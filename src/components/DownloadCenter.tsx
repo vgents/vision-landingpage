@@ -211,6 +211,14 @@ export const DownloadCenter: React.FC<DownloadCenterProps> = ({ onOpenDownload, 
           {message && (
             <p role="alert" className="text-center text-sm text-warn mt-4">
               {message}
+              {message === ACCOUNT_COPY.download['no-vision-access'] && (
+                <>
+                  {' '}
+                  <a href="/planos" className="underline font-semibold">
+                    {ACCOUNT_COPY.plansLink}
+                  </a>
+                </>
+              )}
             </p>
           )}
         </div>

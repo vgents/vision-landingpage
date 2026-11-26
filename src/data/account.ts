@@ -37,11 +37,13 @@ export const ACCOUNT_COPY = {
   download: {
     'session-expired': 'Sua sessão expirou. Entre de novo.',
     'account-blocked': 'Esta conta não pode baixar o Vision. Fale com o suporte.',
+    'no-vision-access': 'Esta conta não tem acesso ao Vision. Conheça os planos para começar.',
     'not-found': 'Este instalador não está disponível agora. Tente de novo mais tarde.',
     'server-error': 'Não foi possível gerar o link de download. Tente de novo.',
     network: 'Não foi possível conectar. Verifique a internet e tente de novo.',
     paused: 'Os downloads estão pausados enquanto preparamos a próxima versão. Volte em breve.',
   },
+  plansLink: 'Ver os planos',
   buttonSignedOut: 'Entrar para baixar',
   preparing: 'Preparando o download…',
 } as const;

@@ -22,7 +22,7 @@ interface AuthErrorLike {
 /** O pedaço do cliente Supabase que usamos (injetável nos testes). */
 export interface AuthLike {
   auth: {
-    signUp(args: { email: string; password: string }): Promise<{ data: unknown; error: AuthErrorLike | null }>;
+    signUp(args: { email: string; password: string; options?: { data?: Record<string, unknown> } }): Promise<{ data: unknown; error: AuthErrorLike | null }>;
     signInWithPassword(args: { email: string; password: string }): Promise<{ data: { session?: { access_token: string } | null } | unknown; error: AuthErrorLike | null }>;
     verifyOtp(args: { email: string; token: string; type: 'signup' }): Promise<{ data: { session?: { access_token: string } | null } | unknown; error: AuthErrorLike | null }>;
     resend(args: { type: 'signup'; email: string }): Promise<{ data: unknown; error: AuthErrorLike | null }>;
@@ -75,7 +75,7 @@ export async function signUp(email: string, password: string, client?: AuthLike)
   return guarded(
     async () => {
       const c = client ?? (await defaultClient());
-      const { error } = await c.auth.signUp({ email, password });
+      const { error } = await c.auth.signUp({ email, password, options: { data: { signup_product: 'vision' } } });
       return error ? { ok: false as const, code: mapAuthError(error) } : { ok: true as const };
     },
     (code) => ({ ok: false, code }),

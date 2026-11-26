@@ -157,6 +157,14 @@ export const DownloadModal: React.FC<DownloadModalProps> = ({ isOpen, onClose, s
                 {message && (
                   <p role="alert" className="text-center text-xs text-warn">
                     {message}
+                    {message === ACCOUNT_COPY.download['no-vision-access'] && (
+                      <>
+                        {' '}
+                        <a href="/planos" className="underline font-semibold">
+                          {ACCOUNT_COPY.plansLink}
+                        </a>
+                      </>
+                    )}
                   </p>
                 )}
                 <p className="text-center text-xs text-soft pt-1 leading-relaxed">

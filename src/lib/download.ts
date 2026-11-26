@@ -16,7 +16,7 @@ export const ARTIFACT_FOR_PLATFORM: Record<PlatformKey, ArtifactType> = {
 export const isPlatformKey = (v: string | null | undefined): v is PlatformKey =>
   !!v && (PLATFORM_KEYS as readonly string[]).includes(v);
 
-export type DownloadErrorCode = 'session-expired' | 'account-blocked' | 'not-found' | 'server-error' | 'network';
+export type DownloadErrorCode = 'session-expired' | 'account-blocked' | 'no-vision-access' | 'not-found' | 'server-error' | 'network';
 export type DownloadOutcome = { ok: true; url: string } | { ok: false; code: DownloadErrorCode };
 
 /** Pede à função `release-download` um link assinado (curto) do instalador. */
@@ -48,7 +48,10 @@ export async function requestDownload(
     return { ok: false, code: 'network' };
   }
   if (res.status === 401) return { ok: false, code: 'session-expired' };
-  if (res.status === 403) return { ok: false, code: 'account-blocked' };
+  if (res.status === 403) {
+    const body = (await res.json().catch(() => null)) as { code?: unknown } | null;
+    return { ok: false, code: body?.code === 'no-vision-access' ? 'no-vision-access' : 'account-blocked' };
+  }
   if (res.status === 404) return { ok: false, code: 'not-found' };
   const data = (await res.json().catch(() => null)) as { ok?: boolean; url?: unknown } | null;
   if (!res.ok || typeof data?.url !== 'string' || !data.url) return { ok: false, code: 'server-error' };

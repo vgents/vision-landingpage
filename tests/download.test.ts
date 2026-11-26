@@ -16,6 +16,12 @@ describe('requestDownload', () => {
   test('requestDownload maps 403 to account-blocked', async () => {
     expect(await requestDownload('mac', 'dmg', 't', undefined, fakeFetch(403, { ok: false, code: 'account-blocked' }))).toEqual({ ok: false, code: 'account-blocked' });
   });
+  test('requestDownload maps 403 no-vision-access', async () => {
+    expect(await requestDownload('mac', 'dmg', 't', undefined, fakeFetch(403, { ok: false, code: 'no-vision-access' }))).toEqual({ ok: false, code: 'no-vision-access' });
+  });
+  test('requestDownload 403 sem code continua account-blocked', async () => {
+    expect(await requestDownload('mac', 'dmg', 't', undefined, fakeFetch(403, {}))).toEqual({ ok: false, code: 'account-blocked' });
+  });
   test('requestDownload posts want artifact with bearer token', async () => {
     const seen: { url?: string; init?: RequestInit } = {};
     const out = await requestDownload('win', 'installer', 'tok', undefined, fakeFetch(200, { ok: true, url: 'https://x/y' }, seen));
